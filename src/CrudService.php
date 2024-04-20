@@ -7,7 +7,6 @@ namespace JPI\CRUD\API;
 use DateTime;
 use Exception;
 use JPI\CRUD\API\Entity\InvalidDataException;
-use JPI\CRUD\API\Utils\Str;
 use JPI\HTTP\Request;
 use JPI\ORM\Entity\Collection as EntityCollection;
 use JPI\ORM\Entity\PaginatedCollection as PaginatedEntityCollection;
@@ -74,6 +73,11 @@ class CrudService {
         return $entities;
     }
 
+    public static function machineToDisplay(string $value): string {
+        $value = str_replace("_", " ", $value);
+        return ucwords($value);
+    }
+
     /**
      * Checks the data in the request + sets entity values from valid data.
      */
@@ -91,7 +95,7 @@ class CrudService {
 
         // Make sure data submitted is all valid.
         foreach ($entity::getColumns() as $column) {
-            $label = Str::machineToDisplay($column);
+            $label = static::machineToDisplay($column);
 
             if (!isset($data[$column])) {
                 continue;
