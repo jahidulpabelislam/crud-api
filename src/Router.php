@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace JPI\CRUD;
+namespace JPI\CRUD\API;
 
 use JPI\HTTP\Router as BaseRouter;
 use JPI\HTTP\Request;

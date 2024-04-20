@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace JPI\CRUD\Entity;
+namespace JPI\CRUD\API\Entity;
 
 use Exception;
 use Throwable;

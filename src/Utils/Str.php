@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace JPI\CRUD\Utils;
+namespace JPI\CRUD\API\Utils;
 
 class Str {
 

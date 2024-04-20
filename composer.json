@@ -1,5 +1,5 @@
 {
-    "name": "jpi/crud",
+    "name": "jpi/crud-api",
     "description": "CRUD API Framework",
     "license": "GPL-3.0-only",
     "authors": [
@@ -26,7 +26,7 @@
     "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
-            "JPI\\CRUD\\": "src/"
+            "JPI\\CRUD\\API": "src/"
         }
     },
     "repositories": [

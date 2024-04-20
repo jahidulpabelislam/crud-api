@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace JPI\CRUD;
+namespace JPI\CRUD\API;
 
 use DateTime;
 use JPI\ORM\Entity as BaseEntity;
