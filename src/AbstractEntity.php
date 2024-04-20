@@ -71,4 +71,3 @@ abstract class AbstractEntity extends BaseEntity implements Arrayable {
         return $array;
     }
 }
-
