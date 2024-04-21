@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace JPI\CRUD\API\Entity;
 
 use JPI\CRUD\API\AbstractEntity;
-use JPI\CRUD\API\Core;
 use JPI\HTTP\Request;
 use JPI\HTTP\Response;
 use JPI\ORM\Entity\Collection as EntityCollection;
@@ -156,13 +155,10 @@ trait Responder {
         $id = $id ?? $request->getAttribute("route_params")["id"];
 
         if ($id && $entity && $entity->isLoaded() && $entity->getId() == $id) {
-            $response = $this->getItemFoundResponse($request, $entity);
-        }
-        else {
-            $response = $this->getItemNotFoundResponse($request, $id, $entityInstance);
+            return $this->getItemFoundResponse($request, $entity);
         }
 
-        return $response->withCacheHeaders(Core::getDefaultCacheHeaders());
+        return $this->getItemNotFoundResponse($request, $id, $entityInstance);
     }
 
     public function getInsertResponse(
