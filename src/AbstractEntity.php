@@ -7,11 +7,14 @@ namespace JPI\CRUD\API;
 use DateTime;
 use JPI\ORM\Entity as BaseEntity;
 use JPI\Utils\Arrayable;
+use JPI\Utils\URL;
 use ReflectionClass;
 
 abstract class AbstractEntity extends BaseEntity implements Arrayable {
 
     protected static string $crudService = CrudService::class;
+
+    abstract public function getAPIURL(): URL;
 
     public static function getDisplayName(): string {
         if (isset(static::$displayName)) {
@@ -55,7 +58,7 @@ abstract class AbstractEntity extends BaseEntity implements Arrayable {
 
     public function getAPILinks(): array {
         return [
-            "self" => (string)$this->getAPIURL(), // todo?
+            "self" => (string)$this->getAPIURL(),
         ];
     }
 
