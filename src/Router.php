@@ -13,7 +13,7 @@ use JPI\HTTP\Response;
  */
 class Router extends BaseRouter {
 
-    protected function __construct(protected Request $request) {
+    public function __construct(protected Request $request) {
         $this->notFoundHandler = function (Request $request) {
             return Response::json(404, [
                 "message" => "Unrecognised URI ({$request->getPath()}).",
