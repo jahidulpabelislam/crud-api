@@ -16,7 +16,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
     - name: Install PHP
-      uses: shivammathur/setup-php@v2
+      uses: shivammathur/setup-php@v4
       with:
         php-version: ${{ matrix.php-versions }}
         tools: composer:v2.2, phplint, phpcs
