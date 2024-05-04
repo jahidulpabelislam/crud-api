@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace JPI\CRUD\API;
 
-use JPI\CRUD\API\AbstractEntity as AbstractAPIEntity;
 use JPI\CRUD\API\Entity\InvalidDataException;
 use JPI\CRUD\API\Entity\Responder as EntityResponder;
 use JPI\HTTP\RequestAwareTrait;
@@ -24,7 +23,7 @@ abstract class AbstractController {
         return $this->publicActions;
     }
 
-    public function getEntityInstance(): AbstractAPIEntity {
+    public function getEntityInstance(): AbstractEntity {
         return new $this->entityClass();
     }
 
