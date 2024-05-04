@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace JPI\CRUD\API;
 
-use JPI\HTTP\Router as BaseRouter;
 use JPI\HTTP\Request;
 use JPI\HTTP\Response;
+use JPI\HTTP\Router as BaseRouter;
 
 /**
  * Extended router with default error handling for 404 & 405.

@@ -73,31 +73,24 @@ class CrudService {
         return $entities;
     }
 
-    public static function machineToDisplay(string $value): string {
-        $value = str_replace("_", " ", $value);
-        return ucwords($value);
-    }
-
     /**
      * Checks the data in the request + sets entity values from valid data.
      */
     protected function setValuesFromRequest(AbstractEntity $entity, Request $request): void {
         $errors = [];
 
-        $intColumns = $entity::getIntColumns();
-        $arrayColumns = $entity::getArrayColumns();
-        $dateTimeColumns = $entity::getDateTimeColumns();
-        $dateColumns = $entity::getDateColumns();
-
         $requiredColumns = static::$requiredColumns;
 
         $data = $request->getArrayFromBody()->toArray();
 
+        $mapping = $entity::getDataMapping();
+
         // Make sure data submitted is all valid.
         foreach ($entity::getColumns() as $column) {
-            $label = static::machineToDisplay($column);
-
             if (!isset($data[$column])) {
+                if (!$entity->isLoaded() && in_array($column, $requiredColumns)) {
+                    $errors[$column] = "`$column` is required.";
+                }
                 continue;
             }
 
@@ -105,7 +98,7 @@ class CrudService {
 
             if (empty($value)) {
                 if (in_array($column, $requiredColumns)) {
-                    $errors[$column] = "$label is required.";
+                    $errors[$column] = "`$column` cannot be empty.";
                 } else {
                     $entity->$column = $value;
                 }
@@ -113,24 +106,26 @@ class CrudService {
                 continue;
             }
 
-            if (in_array($column, $intColumns)) {
+            $type = $mapping[$column]["type"];
+
+            if ($type === "int") {
                 if (is_numeric($value) && $value == (int)$value) {
                     $value = (int)$value;
                 }
                 else {
-                    $errors[$column] = "$label must be a integer.";
+                    $errors[$column] = "`$column` must be a integer.";
                 }
             }
-            else if (in_array($column, $dateColumns) || in_array($column, $dateTimeColumns)) {
+            else if ($type === "date" || $type === "date_time") {
                 try {
                     $value = new DateTime($value);
                 }
                 catch (Exception $exception) {
-                    $errors[$column] = "$label is a invalid date" . (in_array($column, $dateTimeColumns) ? " time" : "") . " format.";
+                    $errors[$column] = "`$column` is a invalid date" . ($type === "date_time" ? " time" : "") . " format.";
                 }
             }
-            else if (in_array($column, $arrayColumns) && !is_array($value)) {
-                $errors[$column] = "$label must be an array.";
+            else if ($type === "array" && !is_array($value)) {
+                $errors[$column] = "`$column` must be an array.";
             }
 
             if (!array_key_exists($column, $errors)) {

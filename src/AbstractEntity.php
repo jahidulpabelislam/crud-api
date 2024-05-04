@@ -6,11 +6,11 @@ namespace JPI\CRUD\API;
 
 use DateTime;
 use JPI\ORM\Entity as BaseEntity;
-use JPI\Utils\Arrayable;
+use JPI\ORM\Entity\Collection as EntityCollection;
 use JPI\Utils\URL;
 use ReflectionClass;
 
-abstract class AbstractEntity extends BaseEntity implements Arrayable {
+abstract class AbstractEntity extends BaseEntity {
 
     protected static string $crudService = CrudService::class;
 
@@ -37,16 +37,33 @@ abstract class AbstractEntity extends BaseEntity implements Arrayable {
             "id" => $this->getId(),
         ];
 
-        $dateColumns = static::getDateColumns();
-        $dateTimeColumns = static::getDateTimeColumns();
+        $mapping = static::getDataMapping();
 
-        foreach ($this->columns as $column => $value) {
-            if ($value instanceof DateTime) {
-                if (in_array($column, $dateColumns)) {
-                    $value = $value->format("Y-m-d");
+        foreach ($this->data as $column => $value) {
+            if (!array_key_exists("value", $value)) {
+                continue;
+            }
+
+            $value = $value["value"];
+
+            if ($value instanceof self) {
+                $value = $value->getAPIResponse();
+            }
+            else if ($value instanceof EntityCollection) {
+                $items = $value;
+                $value = [];
+                foreach ($items as $item) {
+                    $itemResponse = $item->getAPIResponse();
+                    $itemResponse["_links"] = $item->getAPILinks();
+                    $value[] = $itemResponse;
                 }
-                else if (in_array($column, $dateTimeColumns)) {
+            }
+            else if ($value instanceof DateTime) {
+                if ($mapping[$column]["type"] === "date_time") {
                     $value = $value->format("Y-m-d H:i:s e");
+                }
+                else {
+                    $value = $value->format("Y-m-d");
                 }
             }
 
@@ -60,17 +77,5 @@ abstract class AbstractEntity extends BaseEntity implements Arrayable {
         return [
             "self" => (string)$this->getAPIURL(),
         ];
-    }
-
-    public function toArray(): array {
-        $array = [
-            "id" => $this->getId(),
-        ];
-
-        foreach ($this->columns as $column => $value) {
-            $array[$column] = $value;
-        }
-
-        return $array;
     }
 }
