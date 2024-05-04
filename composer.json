@@ -24,7 +24,7 @@
     "require-dev": {
         "jpi/codestyles": "^1.0.1"
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "beta",
     "autoload": {
         "psr-4": {
             "JPI\\CRUD\\API\\": "src/"
