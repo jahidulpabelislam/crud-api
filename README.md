@@ -4,7 +4,7 @@
 [![Latest Stable Version](https://poser.pugx.org/jpi/crud/v/stable)](https://packagist.org/packages/jpi/crud)
 [![Total Downloads](https://poser.pugx.org/jpi/crud/downloads)](https://packagist.org/packages/jpi/crud)
 [![Latest Unstable Version](https://poser.pugx.org/jpi/crud/v/unstable)](https://packagist.org/packages/jpi/crud)
-[![License](https://poser.pugx.org/jpi/crud/license)](https://packagist.org/packages/jpi/crud)
+[![Licence](https://poser.pugx.org/jpi/crud/license)](https://packagist.org/packages/jpi/crud)
 ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/jahidulpabelislam/crud-api/1.x.svg?label=last%20activity)
 
 TODO
@@ -33,6 +33,6 @@ If you find any issues or have any feature requests, you can open a [issue](http
 
 -   [Jahidul Pabel Islam](https://jahidulpabelislam.com/) [<me@jahidulpabelislam.com>](mailto:me@jahidulpabelislam.com)
 
-## License
+## Licence
 
-This module is licensed under the General Public License - see the [License](LICENSE.md) file for details
+This module is licenced under the General Public Licence - see the [Licence](LICENSE.md) file for details
