@@ -6,7 +6,9 @@ namespace JPI\CRUD\API;
 
 use DateTime;
 use Exception;
+use JPI\CRUD\API\Entity\FilterableInterface;
 use JPI\CRUD\API\Entity\InvalidDataException;
+use JPI\CRUD\API\Entity\SearchableInterface;
 use JPI\HTTP\Request;
 use JPI\ORM\Entity\Collection as EntityCollection;
 use JPI\ORM\Entity\PaginatedCollection as PaginatedEntityCollection;
@@ -40,6 +42,20 @@ class CrudService {
         $entity = $this->getEntityInstance();
 
         $query = $entity::newQuery();
+
+        if ($entity instanceof FilterableInterface) {
+            $filters = $request->getQueryParam("filters");
+            if ($filters) {
+                $entity::addFiltersToQuery($query, $filters->toArray());
+            }
+        }
+
+        if ($entity instanceof SearchableInterface) {
+            $search = $request->getQueryParam("search");
+            if ($search) {
+                $entity::addSearchToQuery($query, $search);
+            }
+        }
 
         if (!$this->paginated) {
             return $query->select();
