@@ -18,7 +18,7 @@
         "php": "^8.0",
         "ext-json": "*",
         "jpi/http": "^1.0",
-        "jpi/orm": "^2.0",
+        "jpi/orm": "^2.1",
         "jpi/utils": "^1.0"
     },
     "require-dev": {
