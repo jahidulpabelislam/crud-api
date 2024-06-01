@@ -27,7 +27,7 @@ class CrudService {
         return new $this->entityClass();
     }
 
-    protected function getEntityFromRequest(Request $request): ?AbstractEntity {
+    public function getEntityFromRequest(Request $request): ?AbstractEntity {
         $id = $request->getAttribute("route_params")["id"];
         if (!is_numeric($id)) {
             return null;
