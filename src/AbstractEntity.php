@@ -32,7 +32,7 @@ abstract class AbstractEntity extends BaseEntity {
         return new static::$crudService(static::class);
     }
 
-    public function getAPIResponse(): array {
+    public function getAPIResponse(int $depth = 1): array {
         $response = [
             "id" => $this->getId(),
         ];
@@ -47,13 +47,21 @@ abstract class AbstractEntity extends BaseEntity {
             $value = $value["value"];
 
             if ($value instanceof self) {
-                $value = $value->getAPIResponse();
+                if ($depth > 2) {
+                    continue;
+                }
+
+                $value = $value->getAPIResponse($depth + 1);
             }
             else if ($value instanceof EntityCollection) {
+                if ($depth > 2) {
+                    continue;
+                }
+
                 $items = $value;
                 $value = [];
                 foreach ($items as $item) {
-                    $itemResponse = $item->getAPIResponse();
+                    $itemResponse = $item->getAPIResponse($depth + 1);
                     $itemResponse["_links"] = $item->getAPILinks();
                     $value[] = $itemResponse;
                 }
