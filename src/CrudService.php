@@ -11,6 +11,7 @@ use JPI\CRUD\API\Entity\InvalidDataException;
 use JPI\CRUD\API\Entity\SearchableInterface;
 use JPI\HTTP\Request;
 use JPI\ORM\Entity\Collection as EntityCollection;
+use JPI\ORM\Entity\InvalidValueException;
 use JPI\ORM\Entity\PaginatedCollection as PaginatedEntityCollection;
 
 class CrudService {
@@ -112,44 +113,25 @@ class CrudService {
 
             $value = $data[$column];
 
-            if (empty($value)) {
-                if (in_array($column, $requiredColumns)) {
-                    $errors[$column] = "`$column` cannot be empty.";
-                } else {
-                    $entity->$column = $value;
-                }
-
+            if (empty($value) && in_array($column, $requiredColumns)) {
+                $errors[$column] = "`$column` cannot be empty.";
                 continue;
             }
 
-            $type = $mapping[$column]["type"];
-
-            if ($type === "int") {
-                if (is_numeric($value) && $value == (int)$value) {
-                    $value = (int)$value;
-                }
-                else {
-                    $errors[$column] = "`$column` must be a integer.";
-                }
-            }
-            else if ($type === "date" || $type === "date_time") {
-                try {
-                    $value = new DateTime($value);
-                }
-                catch (Exception $exception) {
-                    $errors[$column] = "`$column` is a invalid date" . ($type === "date_time" ? " time" : "") . " format.";
-                }
-            }
-            else if ($type === "array" && !is_array($value)) {
-                $errors[$column] = "`$column` must be an array.";
-            }
-
-            if (!array_key_exists($column, $errors)) {
+            try {
                 $entity->$column = $value;
+            }
+            catch (InvalidValueException $exception) {
+                $errorMessage = $exception->getMessage();
+                if (in_array($column, $requiredColumns)) {
+                    $errorMessage = str_replace(" or null", "", $errorMessage);
+                }
+
+                $errors[$column] = $errorMessage;
             }
         }
 
-        if ($errors) {
+        if (!empty($errors)) {
             throw new InvalidDataException($errors);
         }
     }
