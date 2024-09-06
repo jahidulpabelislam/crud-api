@@ -25,9 +25,9 @@ $ composer require jpi/crud
 
 ## Support
 
-If you found this library interesting or useful please do spread the word of this library: share on your social's, star on GitHub, etc.
+If you found this library interesting or useful please spread the word about this library: share on your socials, star on GitHub, etc.
 
-If you find any issues or have any feature requests, you can open a [issue](https://github.com/jahidulpabelislam/crud-api/issues) or can email [me @ jahidulpabelislam.com](mailto:me@jahidulpabelislam.com) :smirk:.
+If you find any issues or have any feature requests, you can open a [issue](https://github.com/jahidulpabelislam/crud-api/issues) or email [me @ jahidulpabelislam.com](mailto:me@jahidulpabelislam.com) :smirk:.
 
 ## Authors
 
