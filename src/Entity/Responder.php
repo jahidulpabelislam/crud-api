@@ -22,7 +22,7 @@ trait Responder {
     public function getItemsResponse(
         Request $request,
         EntityCollection $entities,
-        AbstractEntity $entityInstance = null
+        ?AbstractEntity $entityInstance = null
     ): Response {
         $entityInstance = $entityInstance ?? $this->getEntityInstance();
 
@@ -59,7 +59,7 @@ trait Responder {
     public function getPaginatedItemsResponse(
         Request $request,
         PaginatedEntityCollection $collection,
-        AbstractEntity $entityInstance = null
+        ?AbstractEntity $entityInstance = null
     ): Response {
         $params = $request->getQueryParams()->toArray();
 
@@ -127,8 +127,8 @@ trait Responder {
 
     public function getItemNotFoundResponse(
         Request $request,
-        string|int $id = null,
-        AbstractEntity $entityInstance = null
+        string|int|null $id = null,
+        ?AbstractEntity $entityInstance = null
     ): Response {
         $entityInstance = $entityInstance ?? $this->getEntityInstance();
 
@@ -147,8 +147,8 @@ trait Responder {
     public function getItemResponse(
         Request $request,
         ?AbstractEntity $entity,
-        string|int $id = null,
-        AbstractEntity $entityInstance = null
+        string|int|null $id = null,
+        ?AbstractEntity $entityInstance = null
     ): Response {
         $entityInstance = $entityInstance ?? $this->getEntityInstance();
 
@@ -164,7 +164,7 @@ trait Responder {
     public function getInsertResponse(
         Request $request,
         ?AbstractEntity $entity,
-        AbstractEntity $entityInstance = null
+        ?AbstractEntity $entityInstance = null
     ): Response {
         $entityInstance = $entityInstance ?? $this->getEntityInstance();
 
@@ -183,8 +183,8 @@ trait Responder {
     public function getUpdateResponse(
         Request $request,
         ?AbstractEntity $entity,
-        string|int $id = null,
-        AbstractEntity $entityInstance = null
+        string|int|null $id = null,
+        ?AbstractEntity $entityInstance = null
     ): Response {
         $entityInstance = $entityInstance ?? $this->getEntityInstance();
 
@@ -211,8 +211,8 @@ trait Responder {
     public function getItemDeletedResponse(
         Request $request,
         ?AbstractEntity $entity,
-        string|int $id = null,
-        AbstractEntity $entityInstance = null
+        string|int|null $id = null,
+        ?AbstractEntity $entityInstance = null
     ): Response {
         $entityInstance = $entityInstance ?? $this->getEntityInstance();
 
