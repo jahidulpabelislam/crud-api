@@ -10,25 +10,47 @@ use JPI\HTTP\RequestAwareTrait;
 use JPI\HTTP\Response;
 use JPI\ORM\Entity\PaginatedCollection;
 
+/**
+ * Base controller providing standard CRUD endpoints with authentication support.
+ *
+ * Child classes should set the $entityClass property and can define which actions
+ * are public (no authentication required) via the $publicActions property.
+ *
+ * Standard CRUD actions:
+ * - index(): List all entities with optional search, filtering, and pagination
+ * - create(): Create a new entity
+ * - read($id): Retrieve a specific entity
+ * - update($id): Update an existing entity
+ * - delete($id): Delete an entity
+ */
 abstract class AbstractController {
 
     use RequestAwareTrait;
     use EntityResponder;
 
+    /**
+     * Actions that don't require authentication.
+     */
     protected array $publicActions = [];
 
+    /**
+     * The entity class this controller manages.
+     */
     protected string $entityClass;
 
     public function getPublicActions(): array {
         return $this->publicActions;
     }
 
+    /**
+     * Returns a new instance of the entity managed by this controller.
+     */
     public function getEntityInstance(): AbstractEntity {
         return new $this->entityClass();
     }
 
     /**
-     * Response when user isn't logged in correctly
+     * Returns a 401 response for unauthenticated requests.
      */
     public static function getNotAuthorisedResponse(): Response {
         return Response::json(401, [
@@ -36,6 +58,9 @@ abstract class AbstractController {
         ]);
     }
 
+    /**
+     * Returns a 400 response with validation error details.
+     */
     public function getInvalidInputResponse(array $errors): Response {
         return Response::json(400, [
             "message" => "The necessary data was not provided and/or invalid.",
@@ -44,7 +69,13 @@ abstract class AbstractController {
     }
 
     /**
-     * Gets all entities but paginated (also might include search & filters)
+     * Retrieves all entities with optional pagination, search, and filters.
+     *
+     * Supports query parameters:
+     * - search: Text search across searchable columns
+     * - filters: Key-value pairs for filtering
+     * - page: Page number
+     * - limit: Results per page
      */
     public function index(): Response {
         $request = $this->getRequest();
@@ -65,6 +96,11 @@ abstract class AbstractController {
         return $this->getItemsResponse($request, $entities);
     }
 
+    /**
+     * Creates a new entity from request data.
+     *
+     * Returns 201 on success with Location header, or 400 on validation failure.
+     */
     public function create(): Response {
         $request = $this->getRequest();
 
@@ -84,6 +120,11 @@ abstract class AbstractController {
         return $this->getInsertResponse($request, $entity);
     }
 
+    /**
+     * Retrieves a specific entity by ID.
+     *
+     * Returns 404 if not found.
+     */
     public function read($id): Response {
         $request = $this->getRequest();
 
@@ -98,6 +139,11 @@ abstract class AbstractController {
         return $this->getItemResponse($request, $entity, $id);
     }
 
+    /**
+     * Updates an existing entity with request data.
+     *
+     * Returns 404 if not found, or 400 on validation failure.
+     */
     public function update($id): Response {
         $request = $this->getRequest();
 
@@ -117,6 +163,11 @@ abstract class AbstractController {
         return $this->getUpdateResponse($request, $entity, $id);
     }
 
+    /**
+     * Deletes an entity by ID.
+     *
+     * Returns 204 on success, or 404 if not found.
+     */
     public function delete($id): Response {
         $request = $this->getRequest();
 

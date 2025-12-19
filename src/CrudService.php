@@ -14,20 +14,37 @@ use JPI\ORM\Entity\Collection as EntityCollection;
 use JPI\ORM\Entity\InvalidValueException;
 use JPI\ORM\Entity\PaginatedCollection as PaginatedEntityCollection;
 
+/**
+ * Service layer for handling CRUD operations on entities.
+ *
+ * Provides standardised methods for creating, reading, updating, and deleting entities
+ * with built-in validation, pagination, search, and filtering support.
+ */
 class CrudService {
 
     protected bool $paginated = true;
     protected int $perPage = 10;
 
+    /**
+     * Columns that must be present and non-empty when creating entities.
+     */
     protected static array $requiredColumns = [];
 
     public function __construct(protected string $entityClass) {
     }
 
+    /**
+     * Returns a new instance of the entity managed by this service.
+     */
     public function getEntityInstance(): AbstractEntity {
         return new $this->entityClass();
     }
 
+    /**
+     * Retrieves an entity by ID from the request route parameters.
+     *
+     * Returns null if the ID is not numeric or the entity is not found.
+     */
     public function getEntityFromRequest(Request $request): ?AbstractEntity {
         $id = $request->getAttribute("route_params")["id"];
         if (!is_numeric($id)) {
@@ -39,6 +56,15 @@ class CrudService {
         ;
     }
 
+    /**
+     * Retrieves a collection of entities with optional search, filtering, and pagination.
+     *
+     * Supports query parameters:
+     * - search: Text search across searchable columns (if entity implements SearchableInterface)
+     * - filters: Key-value pairs for filtering (if entity implements FilterableInterface)
+     * - page: Page number for pagination (default: 1)
+     * - limit: Results per page (default: configured perPage value)
+     */
     public function index(Request $request): EntityCollection {
         $entity = $this->getEntityInstance();
 
@@ -91,7 +117,9 @@ class CrudService {
     }
 
     /**
-     * Checks the data in the request + sets entity values from valid data.
+     * Validates and sets entity values from request data.
+     *
+     * @throws InvalidDataException If validation fails, with detailed error messages
      */
     protected function setValuesFromRequest(AbstractEntity $entity, Request $request): void {
         $errors = [];
@@ -136,6 +164,11 @@ class CrudService {
         }
     }
 
+    /**
+     * Creates a new entity from request data.
+     *
+     * @throws InvalidDataException If validation fails
+     */
     public function create(Request $request): AbstractEntity {
         $entity = $this->getEntityInstance();
         $this->setValuesFromRequest($entity, $request);
@@ -145,10 +178,22 @@ class CrudService {
         return $entity;
     }
 
+    /**
+     * Retrieves an entity by ID from the request.
+     *
+     * Returns null if not found.
+     */
     public function read(Request $request): ?AbstractEntity {
         return $this->getEntityFromRequest($request);
     }
 
+    /**
+     * Updates an existing entity with request data.
+     *
+     * Returns null if the entity is not found.
+     *
+     * @throws InvalidDataException If validation fails
+     */
     public function update(Request $request): ?AbstractEntity {
         $entity = $this->getEntityFromRequest($request);
 
@@ -164,6 +209,11 @@ class CrudService {
         return $entity;
     }
 
+    /**
+     * Deletes an entity by ID from the request.
+     *
+     * Returns the deleted entity or null if not found.
+     */
     public function delete(Request $request): ?AbstractEntity {
         $entity = $this->getEntityFromRequest($request);
 

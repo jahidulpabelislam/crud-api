@@ -6,9 +6,20 @@ namespace JPI\CRUD\API\Entity;
 
 use JPI\ORM\Entity\QueryBuilder;
 
+/**
+ * Interface for entities that support search functionality.
+ *
+ * Implement this interface and use the Searchable trait to enable text search on your entities.
+ */
 interface SearchableInterface {
 
+    /**
+     * Returns the columns that can be searched.
+     */
     public static function getSearchableColumns(): array;
 
+    /**
+     * Adds search conditions to a query builder.
+     */
     public static function addSearchToQuery(QueryBuilder $query, string $value): void;
 }

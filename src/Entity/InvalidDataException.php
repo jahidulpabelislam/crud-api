@@ -7,6 +7,11 @@ namespace JPI\CRUD\API\Entity;
 use Exception;
 use Throwable;
 
+/**
+ * Exception thrown when entity data validation fails.
+ *
+ * Contains an array of validation errors keyed by field name.
+ */
 class InvalidDataException extends Exception {
 
     public function __construct(
@@ -18,6 +23,9 @@ class InvalidDataException extends Exception {
         parent::__construct($message, $code, $previous);
     }
 
+    /**
+     * Returns the validation errors.
+     */
     public function getErrors(): array {
         return $this->errors;
     }

@@ -10,12 +10,29 @@ use JPI\ORM\Entity\Collection as EntityCollection;
 use JPI\Utils\URL;
 use ReflectionClass;
 
+/**
+ * Base entity class for CRUD API with support for generating API responses and HATEOAS links.
+ *
+ * Child classes must implement getAPIURL() and can customise the CRUD service used
+ * by setting the $crudService property.
+ */
 abstract class AbstractEntity extends BaseEntity {
 
     protected static string $crudService = CrudService::class;
 
+    /**
+     * Returns the API URL for this entity instance.
+     *
+     * This must be implemented by child classes to provide the canonical URL.
+     */
     abstract public function getAPIURL(): URL;
 
+    /**
+     * Returns the singular display name for this entity type.
+     *
+     * Can be overridden by setting the $displayName property in child classes.
+     * Defaults to the short class name.
+     */
     public static function getDisplayName(): string {
         if (isset(static::$displayName)) {
             return static::$displayName;
@@ -24,14 +41,32 @@ abstract class AbstractEntity extends BaseEntity {
         return (new ReflectionClass(static::class))->getShortName();
     }
 
+    /**
+     * Returns the plural display name for this entity type.
+     *
+     * Defaults to singular name with an "s" appended.
+     * Override in child classes for irregular plurals.
+     */
     public static function getPluralDisplayName(): string {
         return static::getDisplayName() . "s";
     }
 
+    /**
+     * Returns a new instance of the CRUD service for this entity.
+     */
     public static function getCrudService(): CrudService {
         return new static::$crudService(static::class);
     }
 
+    /**
+     * Generates the API response representation of this entity.
+     *
+     * Handles nested entities up to a maximum depth of 3 to prevent circular references.
+     * DateTime objects are formatted according to their type (date or date_time).
+     *
+     * @param int $depth Current recursion depth
+     * @param AbstractEntity|null $parentEntity Parent entity to detect circular references
+     */
     public function getAPIResponse(int $depth = 1, ?AbstractEntity $parentEntity = null): array {
         $response = [
             "id" => $this->getId(),
@@ -81,6 +116,11 @@ abstract class AbstractEntity extends BaseEntity {
         return $response;
     }
 
+    /**
+     * Returns HATEOAS links for this entity.
+     *
+     * Includes a "self" link by default. Override to add additional links.
+     */
     public function getAPILinks(): array {
         return [
             "self" => (string)$this->getAPIURL(),

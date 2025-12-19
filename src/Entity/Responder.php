@@ -10,14 +10,20 @@ use JPI\HTTP\Response;
 use JPI\ORM\Entity\Collection as EntityCollection;
 use JPI\ORM\Entity\PaginatedCollection as PaginatedEntityCollection;
 
+/**
+ * Trait providing standardised response methods for controllers.
+ *
+ * Handles generation of consistent JSON responses for single items, collections,
+ * pagination metadata, and error scenarios.
+ */
 trait Responder {
 
     abstract public function getEntityInstance(): AbstractEntity;
 
     /**
-     * Return a response when items were requested,
-     * so check if some found return the items (with necessary meta)
-     * else if not found return necessary meta
+     * Returns a response for a collection of entities.
+     *
+     * Includes entity data, HATEOAS links, and a message if no items were found.
      */
     public function getItemsResponse(
         Request $request,
@@ -50,11 +56,12 @@ trait Responder {
     }
 
     /**
-     * Return a response when items request was a search request,
-     * so check if some found return the items (with necessary meta)
-     * else if not found return necessary meta
+     * Returns a paginated response for a collection of entities.
      *
-     * Use getItemsResponse function as the base response, then just adds additional meta data
+     * Extends getItemsResponse with pagination metadata including:
+     * - Total count and total pages
+     * - Previous/next page links
+     * - Current page and limit parameters
      */
     public function getPaginatedItemsResponse(
         Request $request,
@@ -125,6 +132,9 @@ trait Responder {
         ]);
     }
 
+    /**
+     * Returns a 404 response for an entity that was not found.
+     */
     public function getItemNotFoundResponse(
         Request $request,
         string|int|null $id = null,
@@ -140,9 +150,9 @@ trait Responder {
     }
 
     /**
-     * Return a response when an item was requested,
-     * so check if found return the item (with necessary meta)
-     * else if not found return necessary meta
+     * Returns a response for a single entity.
+     *
+     * Returns 200 with entity data if found, or 404 if not found.
      */
     public function getItemResponse(
         Request $request,
@@ -161,6 +171,11 @@ trait Responder {
         return $this->getItemNotFoundResponse($request, $id, $entityInstance);
     }
 
+    /**
+     * Returns a response for a newly created entity.
+     *
+     * Returns 201 with Location header on success, or 500 on failure.
+     */
     public function getInsertResponse(
         Request $request,
         ?AbstractEntity $entity,
@@ -180,6 +195,11 @@ trait Responder {
         ]);
     }
 
+    /**
+     * Returns a response for an updated entity.
+     *
+     * Returns 200 with updated data on success, 404 if not found, or 500 on failure.
+     */
     public function getUpdateResponse(
         Request $request,
         ?AbstractEntity $entity,
@@ -206,7 +226,9 @@ trait Responder {
     }
 
     /**
-     * Return the response when an item was attempted to be deleted
+     * Returns a response for a deleted entity.
+     *
+     * Returns 204 on successful deletion, 404 if not found, or 500 on failure.
      */
     public function getItemDeletedResponse(
         Request $request,
