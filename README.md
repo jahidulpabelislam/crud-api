@@ -33,7 +33,7 @@ A lightweight PHP framework for building RESTful CRUD APIs with built-in support
 Install via [Composer](https://getcomposer.org/):
 
 ```bash
-composer require jpi/crud-api
+composer require jpi/crud
 ```
 
 ## Core Components
@@ -321,4 +321,4 @@ For issues or feature requests, please [open an issue](https://github.com/jahidu
 
 ## Licence
 
-This project is licenced under the GNU General Public Licence v3.0 — see the [LICENCE](LICENSE.md) file for details.
+This project is licenced under the GNU General Public Licence v3.0 — see the [LICENSE](LICENSE.md) file for details.
