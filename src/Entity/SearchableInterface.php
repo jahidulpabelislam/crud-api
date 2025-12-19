@@ -13,13 +13,7 @@ use JPI\ORM\Entity\QueryBuilder;
  */
 interface SearchableInterface {
 
-    /**
-     * Returns the columns that can be searched.
-     */
     public static function getSearchableColumns(): array;
 
-    /**
-     * Adds search conditions to a query builder.
-     */
     public static function addSearchToQuery(QueryBuilder $query, string $value): void;
 }

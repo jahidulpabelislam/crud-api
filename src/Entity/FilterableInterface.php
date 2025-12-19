@@ -13,13 +13,7 @@ use JPI\ORM\Entity\QueryBuilder;
  */
 interface FilterableInterface {
 
-    /**
-     * Returns the columns that can be filtered.
-     */
     public static function getFilterableColumns(): array;
 
-    /**
-     * Adds filter conditions to a query builder.
-     */
     public static function addFiltersToQuery(QueryBuilder $query, array $filters): void;
 }

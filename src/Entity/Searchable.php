@@ -15,11 +15,6 @@ use JPI\ORM\Entity\QueryBuilder;
  */
 trait Searchable {
 
-    /**
-     * Returns the columns that can be searched.
-     *
-     * Defaults to all entity columns if $searchableColumns is not defined.
-     */
     public static function getSearchableColumns(): array {
         return static::$searchableColumns ?? static::getColumns();
     }
@@ -27,8 +22,8 @@ trait Searchable {
     /**
      * Adds search conditions to a query.
      *
-     * Splits the search value into words and searches for matches in both forward
-     * and reverse word order across all searchable columns.
+     * Splits the search value into words and searches for matches in both
+     * forward and reverse word order across all searchable columns.
      */
     public static function addSearchToQuery(QueryBuilder $query, string $value): void {
         $words = explode(" ", $value);

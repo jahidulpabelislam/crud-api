@@ -42,25 +42,16 @@ abstract class AbstractController {
         return $this->publicActions;
     }
 
-    /**
-     * Returns a new instance of the entity managed by this controller.
-     */
     public function getEntityInstance(): AbstractEntity {
         return new $this->entityClass();
     }
 
-    /**
-     * Returns a 401 response for unauthenticated requests.
-     */
     public static function getNotAuthorisedResponse(): Response {
         return Response::json(401, [
             "message" => "You need to be logged in!",
         ]);
     }
 
-    /**
-     * Returns a 400 response with validation error details.
-     */
     public function getInvalidInputResponse(array $errors): Response {
         return Response::json(400, [
             "message" => "The necessary data was not provided and/or invalid.",
@@ -98,8 +89,6 @@ abstract class AbstractController {
 
     /**
      * Creates a new entity from request data.
-     *
-     * Returns 201 on success with Location header, or 400 on validation failure.
      */
     public function create(): Response {
         $request = $this->getRequest();
@@ -122,8 +111,6 @@ abstract class AbstractController {
 
     /**
      * Retrieves a specific entity by ID.
-     *
-     * Returns 404 if not found.
      */
     public function read($id): Response {
         $request = $this->getRequest();
@@ -141,8 +128,6 @@ abstract class AbstractController {
 
     /**
      * Updates an existing entity with request data.
-     *
-     * Returns 404 if not found, or 400 on validation failure.
      */
     public function update($id): Response {
         $request = $this->getRequest();
@@ -165,8 +150,6 @@ abstract class AbstractController {
 
     /**
      * Deletes an entity by ID.
-     *
-     * Returns 204 on success, or 404 if not found.
      */
     public function delete($id): Response {
         $request = $this->getRequest();

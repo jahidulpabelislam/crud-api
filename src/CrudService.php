@@ -33,17 +33,12 @@ class CrudService {
     public function __construct(protected string $entityClass) {
     }
 
-    /**
-     * Returns a new instance of the entity managed by this service.
-     */
     public function getEntityInstance(): AbstractEntity {
         return new $this->entityClass();
     }
 
     /**
      * Retrieves an entity by ID from the request route parameters.
-     *
-     * Returns null if the ID is not numeric or the entity is not found.
      */
     public function getEntityFromRequest(Request $request): ?AbstractEntity {
         $id = $request->getAttribute("route_params")["id"];
@@ -167,7 +162,7 @@ class CrudService {
     /**
      * Creates a new entity from request data.
      *
-     * @throws InvalidDataException If validation fails
+     * @throws InvalidDataException
      */
     public function create(Request $request): AbstractEntity {
         $entity = $this->getEntityInstance();
@@ -178,11 +173,6 @@ class CrudService {
         return $entity;
     }
 
-    /**
-     * Retrieves an entity by ID from the request.
-     *
-     * Returns null if not found.
-     */
     public function read(Request $request): ?AbstractEntity {
         return $this->getEntityFromRequest($request);
     }
@@ -190,9 +180,7 @@ class CrudService {
     /**
      * Updates an existing entity with request data.
      *
-     * Returns null if the entity is not found.
-     *
-     * @throws InvalidDataException If validation fails
+     * @throws InvalidDataException
      */
     public function update(Request $request): ?AbstractEntity {
         $entity = $this->getEntityFromRequest($request);
@@ -209,11 +197,6 @@ class CrudService {
         return $entity;
     }
 
-    /**
-     * Deletes an entity by ID from the request.
-     *
-     * Returns the deleted entity or null if not found.
-     */
     public function delete(Request $request): ?AbstractEntity {
         $entity = $this->getEntityFromRequest($request);
 

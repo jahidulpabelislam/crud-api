@@ -132,9 +132,6 @@ trait Responder {
         ]);
     }
 
-    /**
-     * Returns a 404 response for an entity that was not found.
-     */
     public function getItemNotFoundResponse(
         Request $request,
         string|int|null $id = null,
@@ -151,8 +148,6 @@ trait Responder {
 
     /**
      * Returns a response for a single entity.
-     *
-     * Returns 200 with entity data if found, or 404 if not found.
      */
     public function getItemResponse(
         Request $request,
@@ -173,8 +168,6 @@ trait Responder {
 
     /**
      * Returns a response for a newly created entity.
-     *
-     * Returns 201 with Location header on success, or 500 on failure.
      */
     public function getInsertResponse(
         Request $request,
@@ -197,8 +190,6 @@ trait Responder {
 
     /**
      * Returns a response for an updated entity.
-     *
-     * Returns 200 with updated data on success, 404 if not found, or 500 on failure.
      */
     public function getUpdateResponse(
         Request $request,
@@ -227,8 +218,6 @@ trait Responder {
 
     /**
      * Returns a response for a deleted entity.
-     *
-     * Returns 204 on successful deletion, 404 if not found, or 500 on failure.
      */
     public function getItemDeletedResponse(
         Request $request,

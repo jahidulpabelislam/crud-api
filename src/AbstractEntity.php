@@ -27,12 +27,6 @@ abstract class AbstractEntity extends BaseEntity {
      */
     abstract public function getAPIURL(): URL;
 
-    /**
-     * Returns the singular display name for this entity type.
-     *
-     * Can be overridden by setting the $displayName property in child classes.
-     * Defaults to the short class name.
-     */
     public static function getDisplayName(): string {
         if (isset(static::$displayName)) {
             return static::$displayName;
@@ -41,19 +35,10 @@ abstract class AbstractEntity extends BaseEntity {
         return (new ReflectionClass(static::class))->getShortName();
     }
 
-    /**
-     * Returns the plural display name for this entity type.
-     *
-     * Defaults to singular name with an "s" appended.
-     * Override in child classes for irregular plurals.
-     */
     public static function getPluralDisplayName(): string {
         return static::getDisplayName() . "s";
     }
 
-    /**
-     * Returns a new instance of the CRUD service for this entity.
-     */
     public static function getCrudService(): CrudService {
         return new static::$crudService(static::class);
     }
@@ -116,11 +101,6 @@ abstract class AbstractEntity extends BaseEntity {
         return $response;
     }
 
-    /**
-     * Returns HATEOAS links for this entity.
-     *
-     * Includes a "self" link by default. Override to add additional links.
-     */
     public function getAPILinks(): array {
         return [
             "self" => (string)$this->getAPIURL(),

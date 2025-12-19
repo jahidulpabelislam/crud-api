@@ -23,9 +23,6 @@ class InvalidDataException extends Exception {
         parent::__construct($message, $code, $previous);
     }
 
-    /**
-     * Returns the validation errors.
-     */
     public function getErrors(): array {
         return $this->errors;
     }
