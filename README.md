@@ -164,7 +164,7 @@ class ProjectService extends \JPI\CRUD\API\CrudService {
 }
 ```
 
-Then reference it in your entity:
+Then reference it in your entity's `crudService` property:
 
 ```php
 class Project extends \JPI\CRUD\API\AbstractEntity {
@@ -236,15 +236,7 @@ class Project extends \JPI\CRUD\API\AbstractEntity {
 
 ### Search
 
-Enable search on your entities by implementing `SearchableInterface` and using the `Searchable` trait:
-
-```php
-class Project extends \JPI\CRUD\API\AbstractEntity implements \JPI\CRUD\API\Entity\SearchableInterface {
-    use \JPI\CRUD\API\Entity\Searchable;
-    
-    protected static array $searchableColumns = ["name", "description"];
-}
-```
+Enable search on your entities by implementing `SearchableInterface` and using the `Searchable` trait, then adding `searchableColumns` property to your Entity.
 
 Then use the search query parameter:
 ```
@@ -253,15 +245,7 @@ GET /projects?search=web+development
 
 ### Filtering
 
-Enable filtering by implementing `FilterableInterface` and using the `Filterable` trait:
-
-```php
-class Project extends \JPI\CRUD\API\AbstractEntity implements \JPI\CRUD\API\Entity\FilterableInterface {
-    use \JPI\CRUD\API\Entity\Filterable;
-    
-    protected static array $filterableColumns = ["status", "category"];
-}
-```
+Enable filtering by implementing `FilterableInterface` and using the `Filterable` trait, then adding `filterableColumns` property to your Entity.
 
 Then use the filters query parameter:
 ```
@@ -270,11 +254,7 @@ GET /projects?filters[status]=active&filters[category]=web
 
 ### Authentication
 
-The framework checks for an `is_authenticated` request attribute. Integrate with your authentication system by setting this attribute:
-
-```php
-$request = $request->withAttribute("is_authenticated", $isUserLoggedIn);
-```
+The framework checks for an `is_authenticated` request attribute. Integrate with your authentication system by setting this attribute.
 
 Endpoints not listed in `$publicActions` will return a 401 response if the user is not authenticated.
 
