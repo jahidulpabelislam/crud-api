@@ -176,8 +176,6 @@ class CrudService {
     }
 
     /**
-     * Updates an existing entity with request data.
-     *
      * @throws InvalidDataException
      */
     public function update(Request $request): ?AbstractEntity {
