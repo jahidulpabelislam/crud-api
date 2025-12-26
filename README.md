@@ -274,4 +274,4 @@ If you find any issues or have any feature requests, you can open a [issue](http
 
 ## Licence
 
-This module is licensed under the GNU General Public Licence v3.0 — see the [licence](LICENSE.md) file for details.
+This module is licensed under the GNU General Public Licence — see the [licence](LICENSE.md) file for details.
