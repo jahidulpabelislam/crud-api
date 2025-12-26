@@ -97,8 +97,6 @@ Extended HTTP router with built-in 404 and 405 error handlers.
 ```php
 <?php
 
-namespace App;
-
 class Project extends \JPI\CRUD\API\AbstractEntity implements \JPI\CRUD\API\Entity\SearchableInterface {
     use \JPI\CRUD\API\Entity\Searchable;
 
@@ -122,8 +120,6 @@ class Project extends \JPI\CRUD\API\AbstractEntity implements \JPI\CRUD\API\Enti
 
 ```php
 <?php
-
-namespace App;
 
 class ProjectController extends \JPI\CRUD\API\AbstractController {
     
@@ -158,8 +154,6 @@ $response->send();
 
 ```php
 <?php
-
-namespace App;
 
 class ProjectService extends \JPI\CRUD\API\CrudService {
     
