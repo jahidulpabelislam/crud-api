@@ -270,7 +270,7 @@ If you find any issues or have any feature requests, you can open a [issue](http
 
 ## Authors
 
-- [Jahidul Pabel Islam](https://jahidulpabelislam.com/) — [me@jahidulpabelislam.com](mailto:me@jahidulpabelislam.com)
+- [Jahidul Pabel Islam](https://jahidulpabelislam.com/) [<me@jahidulpabelislam.com>](mailto:me@jahidulpabelislam.com)
 
 ## Licence
 
