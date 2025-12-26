@@ -18,9 +18,6 @@ trait Filterable {
         return static::$filterableColumns ?? static::getColumns();
     }
 
-    /**
-     * Adds filter conditions to a query.
-     */
     public static function addFiltersToQuery(QueryBuilder $query, array $filters): void {
         foreach (static::getFilterableColumns() as $column) {
             if (array_key_exists($column, $filters)) {

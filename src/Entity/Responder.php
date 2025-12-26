@@ -146,9 +146,6 @@ trait Responder {
         ]);
     }
 
-    /**
-     * Returns a response for a single entity.
-     */
     public function getItemResponse(
         Request $request,
         ?AbstractEntity $entity,
@@ -166,9 +163,6 @@ trait Responder {
         return $this->getItemNotFoundResponse($request, $id, $entityInstance);
     }
 
-    /**
-     * Returns a response for a newly created entity.
-     */
     public function getInsertResponse(
         Request $request,
         ?AbstractEntity $entity,
@@ -188,9 +182,6 @@ trait Responder {
         ]);
     }
 
-    /**
-     * Returns a response for an updated entity.
-     */
     public function getUpdateResponse(
         Request $request,
         ?AbstractEntity $entity,
@@ -216,9 +207,6 @@ trait Responder {
         ]);
     }
 
-    /**
-     * Returns a response for a deleted entity.
-     */
     public function getItemDeletedResponse(
         Request $request,
         ?AbstractEntity $entity,

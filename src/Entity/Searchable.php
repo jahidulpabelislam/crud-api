@@ -19,12 +19,6 @@ trait Searchable {
         return static::$searchableColumns ?? static::getColumns();
     }
 
-    /**
-     * Adds search conditions to a query.
-     *
-     * Splits the search value into words and searches for matches in both
-     * forward and reverse word order across all searchable columns.
-     */
     public static function addSearchToQuery(QueryBuilder $query, string $value): void {
         $words = explode(" ", $value);
 

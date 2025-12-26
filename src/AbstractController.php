@@ -87,9 +87,6 @@ abstract class AbstractController {
         return $this->getItemsResponse($request, $entities);
     }
 
-    /**
-     * Creates a new entity from request data.
-     */
     public function create(): Response {
         $request = $this->getRequest();
 
@@ -109,9 +106,6 @@ abstract class AbstractController {
         return $this->getInsertResponse($request, $entity);
     }
 
-    /**
-     * Retrieves a specific entity by ID.
-     */
     public function read($id): Response {
         $request = $this->getRequest();
 
@@ -126,9 +120,6 @@ abstract class AbstractController {
         return $this->getItemResponse($request, $entity, $id);
     }
 
-    /**
-     * Updates an existing entity with request data.
-     */
     public function update($id): Response {
         $request = $this->getRequest();
 
@@ -148,9 +139,6 @@ abstract class AbstractController {
         return $this->getUpdateResponse($request, $entity, $id);
     }
 
-    /**
-     * Deletes an entity by ID.
-     */
     public function delete($id): Response {
         $request = $this->getRequest();
 

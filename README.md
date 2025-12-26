@@ -308,12 +308,9 @@ See a real-world implementation in the [Portfolio API](https://github.com/jahidu
 
 ## Support
 
-If you found this library useful, please consider:
-- ⭐ Starring the repository on GitHub
-- 📢 Sharing it on your social media
-- 🐛 Reporting issues or suggesting features
+If you found this library interesting or useful please spread the word about this library: share on your socials, star on GitHub, etc.
 
-For issues or feature requests, please [open an issue](https://github.com/jahidulpabelislam/crud-api/issues) or email [me@jahidulpabelislam.com](mailto:me@jahidulpabelislam.com).
+If you find any issues or have any feature requests, you can open a [issue](https://github.com/jahidulpabelislam/crud-api/issues) or email [me @ jahidulpabelislam.com](mailto:me@jahidulpabelislam.com) :smirk:.
 
 ## Authors
 
