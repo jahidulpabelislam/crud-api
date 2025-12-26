@@ -12,7 +12,7 @@ use JPI\ORM\Entity\QueryBuilder;
  * Entities using this trait can define filterable columns via the $filterableColumns property.
  * Filters are applied as equality conditions on the specified columns.
  *
- * @see FilterableInterface
+ * @see \JPI\CRUD\API\Entity\FilterableInterface
  */
 trait Filterable {
 

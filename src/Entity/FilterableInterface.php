@@ -11,7 +11,7 @@ use JPI\ORM\Entity\QueryBuilder;
  *
  * Implement this interface and use the Filterable trait to enable filtering on your entities.
  *
- * @see Filterable
+ * @see \JPI\CRUD\API\Entity\Filterable
  */
 interface FilterableInterface {
 

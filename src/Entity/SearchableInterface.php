@@ -11,7 +11,7 @@ use JPI\ORM\Entity\QueryBuilder;
  *
  * Implement this interface and use the Searchable trait to enable text search on your entities.
  *
- * @see Searchable
+ * @see \JPI\CRUD\API\Entity\Searchable
  */
 interface SearchableInterface {
 
