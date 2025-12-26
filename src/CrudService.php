@@ -109,8 +109,6 @@ class CrudService {
     }
 
     /**
-     * Validates and sets entity values from request data.
-     *
      * @throws InvalidDataException If validation fails, with detailed error messages
      */
     protected function setValuesFromRequest(AbstractEntity $entity, Request $request): void {
