@@ -24,9 +24,9 @@ A lightweight PHP framework for building RESTful CRUD APIs with built-in support
 
 - PHP 8.0+
 - Composer
-- [jpi/http](https://github.com/jahidulpabelislam/http) - HTTP request/response handling
-- [jpi/orm](https://github.com/jahidulpabelislam/orm) - Database ORM layer
-- [jpi/utils](https://github.com/jahidulpabelislam/utils) - Utility functions
+- [jpi/http](https://packagist.org/packages/jpi/http) ^1.0 - HTTP request/response handling
+- [jpi/orm](https://packagist.org/packages/jpi/orm) ^2.1 - Database ORM layer
+- [jpi/utils](https://packagist.org/packages/jpi/utils) ^1.0 - Utility functions
 
 ## Installation
 
@@ -99,13 +99,8 @@ Extended HTTP router with built-in 404 and 405 error handlers.
 
 namespace App;
 
-use JPI\CRUD\API\AbstractEntity;
-use JPI\CRUD\API\Entity\SearchableInterface;
-use JPI\CRUD\API\Entity\Searchable;
-use JPI\Utils\URL;
-
-class Project extends AbstractEntity implements SearchableInterface {
-    use Searchable;
+class Project extends \JPI\CRUD\API\AbstractEntity implements \JPI\CRUD\API\Entity\SearchableInterface {
+    use \JPI\CRUD\API\Entity\Searchable;
 
     protected static string $table = "projects";
     
@@ -117,8 +112,8 @@ class Project extends AbstractEntity implements SearchableInterface {
         "created_at" => ["type" => "date_time"],
     ];
 
-    public function getAPIURL(): URL {
-        return new URL("https://api.example.com/projects/{$this->getId()}");
+    public function getAPIURL(): \JPI\Utils\URL {
+        return new \JPI\Utils\URL("https://api.example.com/projects/{$this->getId()}");
     }
 }
 ```
@@ -130,9 +125,7 @@ class Project extends AbstractEntity implements SearchableInterface {
 
 namespace App;
 
-use JPI\CRUD\API\AbstractController;
-
-class ProjectController extends AbstractController {
+class ProjectController extends \JPI\CRUD\API\AbstractController {
     
     protected string $entityClass = Project::class;
     
@@ -146,11 +139,8 @@ class ProjectController extends AbstractController {
 ```php
 <?php
 
-use JPI\CRUD\API\Router;
-use JPI\HTTP\Request;
-
-$request = Request::createFromGlobals();
-$router = new Router($request);
+$request = \JPI\HTTP\Request::createFromGlobals();
+$router = new \JPI\CRUD\API\Router($request);
 
 $router->group("/projects", function($router) {
     $router->get("/", [ProjectController::class, "index"]);
@@ -171,9 +161,7 @@ $response->send();
 
 namespace App;
 
-use JPI\CRUD\API\CrudService;
-
-class ProjectService extends CrudService {
+class ProjectService extends \JPI\CRUD\API\CrudService {
     
     protected bool $paginated = true;
     protected int $perPage = 20;
@@ -185,7 +173,7 @@ class ProjectService extends CrudService {
 Then reference it in your entity:
 
 ```php
-class Project extends AbstractEntity {
+class Project extends \JPI\CRUD\API\AbstractEntity {
     protected static string $crudService = ProjectService::class;
     // ...
 }
@@ -257,11 +245,8 @@ class Project extends AbstractEntity {
 Enable search on your entities by implementing `SearchableInterface` and using the `Searchable` trait:
 
 ```php
-use JPI\CRUD\API\Entity\SearchableInterface;
-use JPI\CRUD\API\Entity\Searchable;
-
-class Project extends AbstractEntity implements SearchableInterface {
-    use Searchable;
+class Project extends \JPI\CRUD\API\AbstractEntity implements \JPI\CRUD\API\Entity\SearchableInterface {
+    use \JPI\CRUD\API\Entity\Searchable;
     
     protected static array $searchableColumns = ["name", "description"];
 }
@@ -277,11 +262,8 @@ GET /projects?search=web+development
 Enable filtering by implementing `FilterableInterface` and using the `Filterable` trait:
 
 ```php
-use JPI\CRUD\API\Entity\FilterableInterface;
-use JPI\CRUD\API\Entity\Filterable;
-
-class Project extends AbstractEntity implements FilterableInterface {
-    use Filterable;
+class Project extends \JPI\CRUD\API\AbstractEntity implements \JPI\CRUD\API\Entity\FilterableInterface {
+    use \JPI\CRUD\API\Entity\Filterable;
     
     protected static array $filterableColumns = ["status", "category"];
 }

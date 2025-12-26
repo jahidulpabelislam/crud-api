@@ -207,6 +207,11 @@ trait Responder {
         ]);
     }
 
+    /**
+     * Returns a response for a deleted entity.
+     *
+     * Returns 204 on successful deletion, 404 if not found, or 500 on failure.
+     */
     public function getItemDeletedResponse(
         Request $request,
         ?AbstractEntity $entity,

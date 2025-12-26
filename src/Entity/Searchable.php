@@ -12,6 +12,8 @@ use JPI\ORM\Entity\QueryBuilder;
  *
  * Entities using this trait can define searchable columns via the $searchableColumns property.
  * Searches use LIKE with wildcards and support multi-word queries in both forward and reverse order.
+ *
+ * @see SearchableInterface
  */
 trait Searchable {
 
