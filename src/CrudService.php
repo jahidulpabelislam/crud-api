@@ -160,8 +160,6 @@ class CrudService {
     }
 
     /**
-     * Creates a new entity from request data.
-     *
      * @throws InvalidDataException
      */
     public function create(Request $request): AbstractEntity {
