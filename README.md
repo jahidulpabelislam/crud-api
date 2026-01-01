@@ -258,7 +258,6 @@ The framework checks for an `is_authenticated` request attribute. Integrate with
 
 Endpoints not listed in `$publicActions` will return a 401 response if the user is not authenticated.
 
-
 ## Support
 
 If you found this library interesting or useful please spread the word about this library: share on your socials, star on GitHub, etc.
