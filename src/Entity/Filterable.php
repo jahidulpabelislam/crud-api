@@ -9,7 +9,7 @@ use JPI\ORM\Entity\QueryBuilder;
 /**
  * Standard implementation of `FilterableInterface`.
  *
- * Currently, supports only exact matches.
+ * Currently, only supports exact matches.
  */
 trait Filterable {
 
