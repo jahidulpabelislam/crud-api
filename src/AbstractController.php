@@ -35,6 +35,8 @@ abstract class AbstractController {
 
     /**
      * The entity class this controller manages.
+     *
+     * @var class-string<AbstractEntity>
      */
     protected string $entityClass;
 

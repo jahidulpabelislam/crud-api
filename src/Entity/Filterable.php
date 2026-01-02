@@ -7,12 +7,9 @@ namespace JPI\CRUD\API\Entity;
 use JPI\ORM\Entity\QueryBuilder;
 
 /**
- * Trait providing filtering functionality for entities.
+ * Standard implementation of `FilterableInterface`.
  *
- * Entities using this trait can define filterable columns via the $filterableColumns property.
- * Filters are applied as equality conditions on the specified columns.
- *
- * @see \JPI\CRUD\API\Entity\FilterableInterface
+ * Currently, supports only exact matches.
  */
 trait Filterable {
 

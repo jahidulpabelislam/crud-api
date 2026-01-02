@@ -18,6 +18,7 @@ use ReflectionClass;
  */
 abstract class AbstractEntity extends BaseEntity {
 
+    /** @var class-string<CrudService> */
     protected static string $crudService = CrudService::class;
 
     /**
