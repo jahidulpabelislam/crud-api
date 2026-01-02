@@ -164,14 +164,7 @@ class ProjectService extends \JPI\CRUD\API\CrudService {
 }
 ```
 
-Then reference it in your entity's `crudService` property:
-
-```php
-class Project extends \JPI\CRUD\API\AbstractEntity {
-    protected static string $crudService = ProjectService::class;
-    // ...
-}
-```
+Then reference it in your entity's `crudService` property.
 
 ## API Response Format
 
