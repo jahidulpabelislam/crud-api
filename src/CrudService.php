@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace JPI\CRUD\API;
 
-use DateTime;
-use Exception;
 use JPI\CRUD\API\Entity\FilterableInterface;
 use JPI\CRUD\API\Entity\InvalidDataException;
 use JPI\CRUD\API\Entity\SearchableInterface;
