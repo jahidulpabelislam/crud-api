@@ -1,10 +1,10 @@
 # CRUD API Framework
 
 [![CodeFactor](https://www.codefactor.io/repository/github/jahidulpabelislam/crud-api/badge)](https://www.codefactor.io/repository/github/jahidulpabelislam/crud-api)
-[![Latest Stable Version](https://poser.pugx.org/jpi/crud/v/stable)](https://packagist.org/packages/jpi/crud)
-[![Total Downloads](https://poser.pugx.org/jpi/crud/downloads)](https://packagist.org/packages/jpi/crud)
-[![Latest Unstable Version](https://poser.pugx.org/jpi/crud/v/unstable)](https://packagist.org/packages/jpi/crud)
-[![Licence](https://poser.pugx.org/jpi/crud/license)](https://packagist.org/packages/jpi/crud)
+[![Latest Stable Version](https://poser.pugx.org/jpi/crud-api/v/stable)](https://packagist.org/packages/jpi/crud-api)
+[![Total Downloads](https://poser.pugx.org/jpi/crud-api/downloads)](https://packagist.org/packages/jpi/crud-api)
+[![Latest Unstable Version](https://poser.pugx.org/jpi/crud-api/v/unstable)](https://packagist.org/packages/jpi/crud-api)
+[![Licence](https://poser.pugx.org/jpi/crud-api/license)](https://packagist.org/packages/jpi/crud-api)
 ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/jahidulpabelislam/crud-api/1.x.svg?label=last%20activity)
 
 A lightweight PHP framework for building RESTful CRUD APIs with built-in support for pagination, search, filtering, and authentication.
@@ -30,10 +30,10 @@ A lightweight PHP framework for building RESTful CRUD APIs with built-in support
 
 ## Installation
 
-Install via [Composer](https://getcomposer.org/):
+Use [Composer](https://getcomposer.org/)
 
 ```bash
-composer require jpi/crud
+$ composer require jpi/crud-api 
 ```
 
 ## Basic Usage
