@@ -171,7 +171,7 @@ trait Responder {
         if ($entity && $entity->isLoaded()) {
             return $this->getItemFoundResponse($request, $entity)
                 ->withStatus(201)
-                ->withHeader("Location", (string)$entity->getAPIURL())
+                ->withHeader("Location", $entity->getAPIURL())
             ;
         }
 
