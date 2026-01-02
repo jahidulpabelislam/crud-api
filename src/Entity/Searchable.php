@@ -29,6 +29,6 @@ trait Searchable {
             ;
         }
 
-        $query->where((string)$where);
+        $query->where($where);
     }
 }
