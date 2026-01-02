@@ -108,7 +108,7 @@ abstract class AbstractController {
         return $this->getInsertResponse($request, $entity);
     }
 
-    public function read($id): Response {
+    public function read(int|string|null $id): Response {
         $request = $this->getRequest();
 
         if (
@@ -122,7 +122,7 @@ abstract class AbstractController {
         return $this->getItemResponse($request, $entity, $id);
     }
 
-    public function update($id): Response {
+    public function update(int|string|null $id): Response {
         $request = $this->getRequest();
 
         if (
@@ -141,7 +141,7 @@ abstract class AbstractController {
         return $this->getUpdateResponse($request, $entity, $id);
     }
 
-    public function delete($id): Response {
+    public function delete(int|string|null $id): Response {
         $request = $this->getRequest();
 
         if (
