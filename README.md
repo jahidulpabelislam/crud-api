@@ -24,9 +24,9 @@ A lightweight PHP framework for building RESTful CRUD APIs with built-in support
 
 - PHP 8.0+
 - Composer
-- [jpi/http](https://packagist.org/packages/jpi/http) ^1.0 - HTTP request/response handling
-- [jpi/orm](https://packagist.org/packages/jpi/orm) ^2.1 - Database ORM layer
-- [jpi/utils](https://packagist.org/packages/jpi/utils) ^1.0 - Utility functions
+- [jpi/http](https://packagist.org/packages/jpi/http) v1
+- [jpi/orm](https://packagist.org/packages/jpi/orm) v2
+- [jpi/utils](https://packagist.org/packages/jpi/utils) v1
 
 ## Installation
 
@@ -43,6 +43,7 @@ composer require jpi/crud
 Base entity class that extends the ORM Entity and provides API-specific functionality.
 
 **Key Methods:**
+
 - `getAPIURL()`: Returns the API URL for the entity (must be implemented by child classes)
 - `getAPIResponse()`: Generates the JSON-serialisable response for the entity
 - `getAPILinks()`: Returns HATEOAS links for the entity
@@ -55,6 +56,7 @@ Base entity class that extends the ORM Entity and provides API-specific function
 Base controller class providing standard CRUD endpoints with authentication support.
 
 **Standard Actions:**
+
 - `index()`: GET - List all entities (with pagination, search, and filters)
 - `create()`: POST - Create a new entity
 - `read($id)`: GET - Retrieve a specific entity
@@ -66,6 +68,7 @@ Base controller class providing standard CRUD endpoints with authentication supp
 Service layer handling CRUD operations and data validation.
 
 **Key Features:**
+
 - Automatic request data validation
 - Support for required fields
 - Search and filter integration
@@ -78,14 +81,17 @@ Extended HTTP router with built-in 404 and 405 error handlers.
 ### Entity Traits
 
 **Searchable**: Adds search functionality to entities
+
 - Define searchable columns via `$searchableColumns` property
 - Multi-word search support
 
 **Filterable**: Adds filtering functionality to entities
+
 - Define filterable columns via `$filterableColumns` property
 - Equality-based filtering
 
 **Responder**: Provides standardised response methods for controllers
+
 - Item responses with proper status codes
 - Collection responses with pagination metadata
 - Error responses (not found, validation errors)
@@ -232,6 +238,7 @@ Then reference it in your entity's `crudService` property.
 Enable search on your entities by implementing `SearchableInterface` and using the `Searchable` trait, then adding `searchableColumns` property to your Entity.
 
 Then use the search query parameter:
+
 ```
 GET /projects?search=web+development
 ```
@@ -241,6 +248,7 @@ GET /projects?search=web+development
 Enable filtering by implementing `FilterableInterface` and using the `Filterable` trait, then adding `filterableColumns` property to your Entity.
 
 Then use the filters query parameter:
+
 ```
 GET /projects?filters[status]=active&filters[category]=web
 ```
