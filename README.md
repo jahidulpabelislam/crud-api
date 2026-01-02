@@ -36,14 +36,13 @@ Install via [Composer](https://getcomposer.org/):
 composer require jpi/crud
 ```
 
-## Core Components
+## Basic Usage
 
-### AbstractEntity
+### 1. Create an Entity
 
-Base entity class that extends the ORM Entity and provides API-specific functionality.
+**AbstractEntity** is the base entity class that extends the ORM Entity and provides API-specific functionality.
 
 **Key Methods:**
-
 - `getAPIURL()`: Returns the API URL for the entity (must be implemented by child classes)
 - `getAPIResponse()`: Generates the JSON-serialisable response for the entity
 - `getAPILinks()`: Returns HATEOAS links for the entity
@@ -51,54 +50,9 @@ Base entity class that extends the ORM Entity and provides API-specific function
 - `getDisplayName()`: Returns the human-readable display name (singular)
 - `getPluralDisplayName()`: Returns the human-readable display name (plural)
 
-### AbstractController
-
-Base controller class providing standard CRUD endpoints with authentication support.
-
-**Standard Actions:**
-
-- `index()`: GET - List all entities (with pagination, search, and filters)
-- `create()`: POST - Create a new entity
-- `read($id)`: GET - Retrieve a specific entity
-- `update($id)`: PUT - Update a specific entity
-- `delete($id)`: DELETE - Delete a specific entity
-
-### CrudService
-
-Service layer handling CRUD operations and data validation.
-
-**Key Features:**
-
-- Automatic request data validation
-- Support for required fields
-- Search and filter integration
-- Pagination support
-
-### Router
-
-Extended HTTP router with built-in 404 and 405 error handlers.
-
-### Entity Traits
-
-**Searchable**: Adds search functionality to entities
-
-- Define searchable columns via `$searchableColumns` property
-- Multi-word search support
-
-**Filterable**: Adds filtering functionality to entities
-
-- Define filterable columns via `$filterableColumns` property
-- Equality-based filtering
-
-**Responder**: Provides standardised response methods for controllers
-
-- Item responses with proper status codes
-- Collection responses with pagination metadata
-- Error responses (not found, validation errors)
-
-## Basic Usage
-
-### 1. Create an Entity
+**Entity Traits:**
+- **Searchable**: Adds search functionality - define searchable columns via `$searchableColumns` property with multi-word search support
+- **Filterable**: Adds filtering functionality - define filterable columns via `$filterableColumns` property with equality-based filtering
 
 ```php
 <?php
@@ -124,6 +78,17 @@ class Project extends \JPI\CRUD\API\AbstractEntity implements \JPI\CRUD\API\Enti
 
 ### 2. Create a Controller
 
+**AbstractController** is the base controller class providing standard CRUD endpoints with authentication support.
+
+**Standard Actions:**
+- `index()`: GET - List all entities (with pagination, search, and filters)
+- `create()`: POST - Create a new entity
+- `read($id)`: GET - Retrieve a specific entity
+- `update($id)`: PUT - Update a specific entity
+- `delete($id)`: DELETE - Delete a specific entity
+
+The **Responder** trait provides standardised response methods for controllers including item responses with proper status codes, collection responses with pagination metadata, and error responses.
+
 ```php
 <?php
 
@@ -137,6 +102,8 @@ class ProjectController extends \JPI\CRUD\API\AbstractController {
 ```
 
 ### 3. Set Up Routes
+
+**Router** is an extended HTTP router with built-in 404 and 405 error handlers.
 
 ```php
 <?php
@@ -157,6 +124,14 @@ $response->send();
 ```
 
 ### 4. Customise CRUD Service (Optional)
+
+**CrudService** is the service layer handling CRUD operations and data validation.
+
+**Key Features:**
+- Automatic request data validation
+- Support for required fields
+- Search and filter integration
+- Pagination support
 
 ```php
 <?php
