@@ -20,8 +20,6 @@ abstract class AbstractEntity extends BaseEntity {
 
     /**
      * Returns the API URL for this entity instance.
-     *
-     * This must be implemented by child classes to provide the canonical URL.
      */
     abstract public function getAPIURL(): URL;
 
