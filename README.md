@@ -155,7 +155,7 @@ See [jpi/http](https://github.com/jahidulpabelislam/http) for more details on ro
         "created_at": "2024-01-15 10:30:00 UTC"
     },
     "_links": {
-        "self": "https://api.example.com/projects/1"
+        "self": "https://api.example.com/projects/1/"
     }
 }
 ```
@@ -171,7 +171,7 @@ See [jpi/http](https://github.com/jahidulpabelislam/http) for more details on ro
             "description": "A sample project",
             "created_at": "2024-01-15 10:30:00 UTC",
             "_links": {
-                "self": "https://api.example.com/projects/1"
+                "self": "https://api.example.com/projects/1/"
             }
         },
         {
@@ -180,15 +180,15 @@ See [jpi/http](https://github.com/jahidulpabelislam/http) for more details on ro
             "description": "A sample project",
             "created_at": "2025-01-15 10:30:00 UTC",
             "_links": {
-                "self": "https://api.example.com/projects/2"
+                "self": "https://api.example.com/projects/2/"
             }
         }
     ],
     "_total_count": 25,
     "_total_pages": 3,
     "_links": {
-        "self": "https://api.example.com/projects",
-        "next_page": "https://api.example.com/projects?page=2"
+        "self": "https://api.example.com/projects/",
+        "next_page": "https://api.example.com/projects/?page=2"
     }
 }
 ```
