@@ -12,9 +12,6 @@ use ReflectionClass;
 
 /**
  * Base entity class for CRUD API with support for generating API responses and HATEOAS links.
- *
- * Child classes must implement getAPIURL() and can customise the CRUD service used
- * by setting the $crudService property.
  */
 abstract class AbstractEntity extends BaseEntity {
 
