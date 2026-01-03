@@ -19,7 +19,7 @@ A lightweight PHP framework for building RESTful CRUD APIs with built-in support
 - **Validation**: Comprehensive data validation with detailed error messages
 - **Extensible**: Easy to extend for custom business logic
 
-## Requirements
+## Dependencies
 
 - PHP 8.0+
 - Composer
