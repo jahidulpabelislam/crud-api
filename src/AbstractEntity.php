@@ -58,12 +58,12 @@ abstract class AbstractEntity extends BaseEntity {
                     continue;
                 }
 
-                $items = $value;
+                $entities = $value;
                 $value = [];
-                foreach ($items as $item) {
-                    $itemResponse = $item->getAPIResponse($depth + 1, $this);
-                    $itemResponse["_links"] = $item->getAPILinks();
-                    $value[] = $itemResponse;
+                foreach ($entities as $entity) {
+                    $entityResponse = $entity->getAPIResponse($depth + 1, $this);
+                    $entityResponse["_links"] = $entity->getAPILinks();
+                    $value[] = $entityResponse;
                 }
             }
             else if ($value instanceof DateTime) {
