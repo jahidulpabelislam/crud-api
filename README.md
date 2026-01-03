@@ -71,19 +71,49 @@ final class ProjectController extends \JPI\CRUD\API\AbstractController {
 }
 ```
 
-### 3. Set Up Routes
+### 3. Customise CRUD Service (Optional)
 
-**Router** is an extended HTTP router with built-in 404 and 405 error handlers.
+**CrudService** is the service layer handling CRUD operations and data validation.
+
+**Key Features:**
+
+- Automatic request data validation
+- Support for required fields
+- Search and filter integration
+- Pagination support
+
+By default:
+
+- paginated with 10 items per page - you can disable (`$paginated`) or change number of items per page (`$perPage`):
+- no columns are required - you can define using the static `$requiredColumns` property
+
+```php
+final class ProjectService extends \JPI\CRUD\API\CrudService {
+
+    protected bool $paginated = true;
+    protected int $perPage = 20;
+
+    protected static array $requiredColumns = ["name"];
+}
+```
+
+Then reference it in your entity's `crudService` property.
+
+### 4. Request Handling
+
+We use [jpi/http](https://github.com/jahidulpabelislam/http) for the request handling, though we extend **App** & **Router** to provide built-in 404 and 405 error handlers, and easy CRUD route setup.
+
+Set up the app as per `jpi/http`:
+
+```php
+$request = \JPI\HTTP\Request::createFromGlobals();
+$router = new \JPI\CRUD\API\Router($request);
+$app = new \JPI\CRUD\API\App($router);
+```
 
 You can set up CRUD routes manually or use the convenient `addCRUDRoutes()` method:
 
 ```php
-<?php
-
-$request = \JPI\HTTP\Request::createFromGlobals();
-$router = new \JPI\CRUD\API\Router($request);
-$app = new \JPI\CRUD\API\App($router);
-
 // Option 1: Use addCRUDRoutes() helper (recommended)
 // This creates 5 routes:
 //   GET    /projects/     -> ProjectController::index
@@ -101,34 +131,15 @@ $app->addRoute("/projects/", "POST", ProjectController::class . "::create");
 $app->addRoute("/projects/{id}/", "GET", ProjectController::class . "::read");
 $app->addRoute("/projects/{id}/", "PUT", ProjectController::class . "::update");
 $app->addRoute("/projects/{id}/", "DELETE", ProjectController::class . "::delete");
+```
 
+Handle the request and send the response:
+
+```php
 $response = $app->handle();
 $response->send();
 ```
 
-### 4. Customise CRUD Service (Optional)
-
-**CrudService** is the service layer handling CRUD operations and data validation.
-
-**Key Features:**
-- Automatic request data validation
-- Support for required fields
-- Search and filter integration
-- Pagination support
-
-```php
-<?php
-
-class ProjectService extends \JPI\CRUD\API\CrudService {
-    
-    protected bool $paginated = true;
-    protected int $perPage = 20;
-    
-    protected static array $requiredColumns = ["name"];
-}
-```
-
-Then reference it in your entity's `crudService` property.
 See [jpi/http](https://github.com/jahidulpabelislam/http) for more details on routing, request and response handling.
 
 ## API Response Format
