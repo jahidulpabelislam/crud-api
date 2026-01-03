@@ -123,15 +123,13 @@ $router = new \JPI\CRUD\API\Router($request);
 $router->addCRUDRoutes("/projects", ProjectController::class);
 
 // Option 2: Define routes manually
-$router->group("/projects", function($router) {
-    $router->get("/", [ProjectController::class, "index"]);
-    $router->post("/", [ProjectController::class, "create"]);
-    $router->get("/{id}/", [ProjectController::class, "read"]);
-    $router->put("/{id}/", [ProjectController::class, "update"]);
-    $router->delete("/{id}/", [ProjectController::class, "delete"]);
-});
+$router->addRoute("/projects/", "GET", ProjectController::class . "::index");
+$router->addRoute("/projects/", "POST", ProjectController::class . "::create");
+$router->addRoute("/projects/{id}/", "GET", ProjectController::class . "::read");
+$router->addRoute("/projects/{id}/", "PUT", ProjectController::class . "::update");
+$router->addRoute("/projects/{id}/", "DELETE", ProjectController::class . "::delete");
 
-$response = $router->dispatch($request);
+$response = $router->handle();
 $response->send();
 ```
 
