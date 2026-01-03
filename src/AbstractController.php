@@ -83,10 +83,10 @@ abstract class AbstractController {
         $entities = $this->getEntityInstance()::getCrudService()->index($request);
 
         if ($entities instanceof PaginatedCollection) {
-            return $this->getPaginatedItemsResponse($request, $entities);
+            return $this->getPaginatedEntitiesResponse($request, $entities);
         }
 
-        return $this->getItemsResponse($request, $entities);
+        return $this->getEntitiesResponse($request, $entities);
     }
 
     public function create(): Response {
@@ -105,7 +105,7 @@ abstract class AbstractController {
             return $this->getInvalidInputResponse($exception->getErrors());
         }
 
-        return $this->getInsertResponse($request, $entity);
+        return $this->getEntityCreateResponse($request, $entity);
     }
 
     public function read(int|string|null $id): Response {
@@ -119,7 +119,7 @@ abstract class AbstractController {
         }
 
         $entity = $this->getEntityInstance()::getCrudService()->read($request);
-        return $this->getItemResponse($request, $entity, $id);
+        return $this->getEntityResponse($request, $entity, $id);
     }
 
     public function update(int|string|null $id): Response {
@@ -138,7 +138,7 @@ abstract class AbstractController {
             return $this->getInvalidInputResponse($exception->getErrors());
         }
 
-        return $this->getUpdateResponse($request, $entity, $id);
+        return $this->getEntityUpdateResponse($request, $entity, $id);
     }
 
     public function delete(int|string|null $id): Response {
@@ -152,6 +152,6 @@ abstract class AbstractController {
         }
 
         $entity = $this->getEntityInstance()::getCrudService()->delete($request);
-        return $this->getItemDeletedResponse($request, $entity, $id);
+        return $this->getEntityDeleteResponse($request, $entity, $id);
     }
 }

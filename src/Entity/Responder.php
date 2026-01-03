@@ -13,7 +13,7 @@ use JPI\ORM\Entity\PaginatedCollection as PaginatedEntityCollection;
 /**
  * Trait providing standardised responses.
  *
- * Handles generation of consistent JSON responses for single items, collections,
+ * Handles generation of consistent JSON responses for single entity, collections,
  * pagination metadata, and error scenarios.
  */
 trait Responder {
@@ -25,7 +25,7 @@ trait Responder {
      *
      * Includes entity data, HATEOAS links, and a message if none were found.
      */
-    public function getItemsResponse(
+    public function getEntitiesResponse(
         Request $request,
         EntityCollection $entities,
         ?AbstractEntity $entityInstance = null
@@ -58,19 +58,19 @@ trait Responder {
     /**
      * Response when collection of paged entities was requested.
      *
-     * Extends getItemsResponse with pagination metadata including:
+     * Extends getEntitiesResponse with pagination metadata including:
      * - Total count and total pages
      * - Previous/next page links
      */
-    public function getPaginatedItemsResponse(
+    public function getPaginatedEntitiesResponse(
         Request $request,
         PaginatedEntityCollection $collection,
         ?AbstractEntity $entityInstance = null
     ): Response {
         $params = $request->getQueryParams();
 
-        // The items response is the base response, and the extra meta is added below
-        $response = $this->getItemsResponse($request, $collection, $entityInstance);
+        // The entities response is the base response, and the extra meta is added below
+        $response = $this->getEntitiesResponse($request, $collection, $entityInstance);
 
         $content = $response->getBody();
 
@@ -126,14 +126,14 @@ trait Responder {
         return $response->withJSON($content);
     }
 
-    private function getItemFoundResponse(Request $request, AbstractEntity $entity): Response {
+    private function getEntityFoundResponse(Request $request, AbstractEntity $entity): Response {
         return Response::json(200, [
             "data" => $entity->getAPIResponse(),
             "_links" => $entity->getAPILinks(),
         ]);
     }
 
-    public function getItemNotFoundResponse(
+    public function getEntityNotFoundResponse(
         Request $request,
         string|int|null $id = null,
         ?AbstractEntity $entityInstance = null
@@ -152,7 +152,7 @@ trait Responder {
      *
      * Includes entity data, HATEOAS links, and a message if not found.
      */
-    public function getItemResponse(
+    public function getEntityResponse(
         Request $request,
         ?AbstractEntity $entity,
         string|int|null $id = null,
@@ -163,10 +163,10 @@ trait Responder {
         $id = $id ?? $request->getAttribute("route_params")["id"];
 
         if ($id && $entity && $entity->isLoaded() && $entity->getId() == $id) {
-            return $this->getItemFoundResponse($request, $entity);
+            return $this->getEntityFoundResponse($request, $entity);
         }
 
-        return $this->getItemNotFoundResponse($request, $id, $entityInstance);
+        return $this->getEntityNotFoundResponse($request, $id, $entityInstance);
     }
 
     /**
@@ -174,7 +174,7 @@ trait Responder {
      *
      * Returns 201 on successful creation, or 500 on failure.
      */
-    public function getInsertResponse(
+    public function getEntityCreateResponse(
         Request $request,
         ?AbstractEntity $entity,
         ?AbstractEntity $entityInstance = null
@@ -182,14 +182,14 @@ trait Responder {
         $entityInstance = $entityInstance ?? $this->getEntityInstance();
 
         if ($entity && $entity->isLoaded()) {
-            return $this->getItemFoundResponse($request, $entity)
+            return $this->getEntityFoundResponse($request, $entity)
                 ->withStatus(201)
                 ->withHeader("Location", $entity->getAPIURL())
             ;
         }
 
         return Response::json(500, [
-            "message" => "Failed to insert the new {$entityInstance::getDisplayName()}.",
+            "message" => "Failed to create the new {$entityInstance::getDisplayName()}.",
         ]);
     }
 
@@ -198,7 +198,7 @@ trait Responder {
      *
      * Returns updated entity data, HATEOAS links on successful update, 404 if not found, or 500 on failure.
      */
-    public function getUpdateResponse(
+    public function getEntityUpdateResponse(
         Request $request,
         ?AbstractEntity $entity,
         string|int|null $id = null,
@@ -210,11 +210,11 @@ trait Responder {
 
         if ($id) {
             if (!$entity) {
-                return $this->getItemNotFoundResponse($request, $id, $entityInstance);
+                return $this->getEntityNotFoundResponse($request, $id, $entityInstance);
             }
 
             if ($entity->isLoaded() && $entity->getId() == $id) {
-                return $this->getItemFoundResponse($request, $entity);
+                return $this->getEntityFoundResponse($request, $entity);
             }
         }
 
@@ -228,7 +228,7 @@ trait Responder {
      *
      * Returns 204 on successful deletion, 404 if not found, or 500 on failure.
      */
-    public function getItemDeletedResponse(
+    public function getEntityDeleteResponse(
         Request $request,
         ?AbstractEntity $entity,
         string|int|null $id = null,
@@ -239,7 +239,7 @@ trait Responder {
         $id = $id ?? $request->getAttribute("route_params")["id"];
 
         if (!$id || !$entity || !$entity->isLoaded() || $entity->getId() != $id) {
-            return $this->getItemNotFoundResponse($request, $id, $entityInstance);
+            return $this->getEntityNotFoundResponse($request, $id, $entityInstance);
         }
 
         if ($entity->isDeleted()) {
