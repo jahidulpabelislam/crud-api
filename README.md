@@ -11,22 +11,21 @@ A lightweight PHP framework for building RESTful CRUD APIs with built-in support
 
 ## Features
 
-- **RESTful CRUD Operations**: Out-of-the-box support for Create, Read, Update, and Delete operations
+- **RESTful CRUD Operations**: Out-of-the-box support for List, Create, Read, Update and Delete operations
 - **Pagination**: Built-in pagination support with configurable page size
-- **Search & Filtering**: Flexible search and filter functionality using traits
+- **Search & Filtering**: Flexible search and filter functionality for listing endpoints
 - **Authentication**: Built-in authentication checks for protected endpoints
-- **Type Safety**: Full PHP 8+ type declarations for improved code quality
 - **JSON Responses**: Standardised JSON response format with HATEOAS links
 - **Validation**: Comprehensive data validation with detailed error messages
-- **Extensible**: Easy to extend with custom business logic
+- **Extensible**: Easy to extend for custom business logic
 
 ## Requirements
 
 - PHP 8.0+
 - Composer
-- [jpi/http](https://packagist.org/packages/jpi/http) v1
-- [jpi/orm](https://packagist.org/packages/jpi/orm) v2
 - [jpi/utils](https://packagist.org/packages/jpi/utils) v1
+- [jpi/orm](https://packagist.org/packages/jpi/orm) v2
+- [jpi/http](https://github.com/jahidulpabelislam/http) v1
 
 ## Installation
 
@@ -40,62 +39,33 @@ $ composer require jpi/crud-api
 
 ### 1. Create an Entity
 
-**AbstractEntity** is the base entity class that extends the ORM Entity and provides API-specific functionality.
+**AbstractEntity** is the base entity class that you'll need to extend, it builds on top of **jpi/orm**. See [jpi/orm](https://packagist.org/packages/jpi/orm) for more details on setting up entities.
 
-**Key Methods:**
+**Extra Set Up:**
+
 - `getAPIURL()`: Returns the API URL for the entity (must be implemented by child classes)
-- `getAPIResponse()`: Generates the JSON-serialisable response for the entity
-- `getAPILinks()`: Returns HATEOAS links for the entity
-- `getCrudService()`: Returns the associated CRUD service instance
-- `getDisplayName()`: Returns the human-readable display name (singular)
-- `getPluralDisplayName()`: Returns the human-readable display name (plural)
-
-**Entity Traits:**
-- **Searchable**: Adds search functionality - define searchable columns via `$searchableColumns` property with multi-word search support
-- **Filterable**: Adds filtering functionality - define filterable columns via `$filterableColumns` property with equality-based filtering
-
-```php
-<?php
-
-class Project extends \JPI\CRUD\API\AbstractEntity implements \JPI\CRUD\API\Entity\SearchableInterface {
-    use \JPI\CRUD\API\Entity\Searchable;
-
-    protected static string $table = "projects";
-    
-    protected static array $searchableColumns = ["name", "description"];
-    
-    protected static array $dataMapping = [
-        "name" => ["type" => "string"],
-        "description" => ["type" => "string"],
-        "created_at" => ["type" => "date_time"],
-    ];
-
-    public function getAPIURL(): \JPI\Utils\URL {
-        return new \JPI\Utils\URL("https://api.example.com/projects/{$this->getId()}");
-    }
-}
-```
+- `getDisplayName(): string`: Uses `$displayName` property if set otherwise returns the class name - used in error messages
+- `getPluralDisplayName(): string`: Simply appends an `s` to the display name (can be overridden for irregular plurals) - used in error messages
 
 ### 2. Create a Controller
 
-**AbstractController** is the base controller class providing standard CRUD endpoints with authentication support.
+**AbstractController** is the base controller class providing standard CRUD endpoints with authentication support. This handles the responses and delegates the business logic to the **CrudService** (see next), therefore should be rare to add much here.
 
 **Standard Actions:**
+
 - `index()`: GET - List all entities (with pagination, search, and filters)
 - `create()`: POST - Create a new entity
 - `read($id)`: GET - Retrieve a specific entity
 - `update($id)`: PUT - Update a specific entity
 - `delete($id)`: DELETE - Delete a specific entity
 
-The **Responder** trait provides standardised response methods for controllers including item responses with proper status codes, collection responses with pagination metadata, and error responses.
+All you need to do is extend the abstract controller, specify the entity class & define any public actions (if any):
 
 ```php
-<?php
+final class ProjectController extends \JPI\CRUD\API\AbstractController {
 
-class ProjectController extends \JPI\CRUD\API\AbstractController {
-    
     protected string $entityClass = Project::class;
-    
+
     // Define which actions are publicly accessible (no authentication required)
     protected array $publicActions = ["index", "read"];
 }
@@ -122,11 +92,11 @@ $app = new \JPI\CRUD\API\App($router);
 //   PUT    /projects/{id}/ -> ProjectController::update
 //   DELETE /projects/{id}/ -> ProjectController::delete
 // Optional third parameter: route name for the read action
-$app->addCRUDRoutes("/projects", ProjectController::class);
-// Or with a named route: $app->addCRUDRoutes("/projects", ProjectController::class, "project");
+$app->addCRUDRoutes("/projects/", ProjectController::class);
+// Or with a named route: $app->addCRUDRoutes("/projects/", ProjectController::class, "project");
 
 // Option 2: Define routes manually
-$app->addRoute("/projects/", "GET", ProjectController::class . "::index");
+$app->addRoute("/projects/", "GET", ProjectController::class . "::index", "project");
 $app->addRoute("/projects/", "POST", ProjectController::class . "::create");
 $app->addRoute("/projects/{id}/", "GET", ProjectController::class . "::read");
 $app->addRoute("/projects/{id}/", "PUT", ProjectController::class . "::update");
@@ -159,6 +129,7 @@ class ProjectService extends \JPI\CRUD\API\CrudService {
 ```
 
 Then reference it in your entity's `crudService` property.
+See [jpi/http](https://github.com/jahidulpabelislam/http) for more details on routing, request and response handling.
 
 ## API Response Format
 
@@ -223,7 +194,9 @@ Then reference it in your entity's `crudService` property.
 
 ### Search
 
-Enable search on your entities by implementing `SearchableInterface` and using the `Searchable` trait, then adding `searchableColumns` property to your Entity.
+Enable search on your entities by implementing `\JPI\CRUD\API\Entity\SearchableInterface` and using the `\JPI\CRUD\API\Entity\Searchable` trait, then adding `searchableColumns` property to your Entity.
+
+Adds search functionality - define searchable columns via `$searchableColumns` property with multi-word search support
 
 Then use the search query parameter:
 
@@ -233,7 +206,9 @@ GET /projects?search=web+development
 
 ### Filtering
 
-Enable filtering by implementing `FilterableInterface` and using the `Filterable` trait, then adding `filterableColumns` property to your Entity.
+Enable filtering by implementing `\JPI\CRUD\API\Entity\FilterableInterface` and using the `\JPI\CRUD\API\Entity\Filterable` trait, then adding `filterableColumns` property to your Entity.
+
+Adds filtering functionality - define filterable columns via `$filterableColumns` property with equality-based filtering
 
 Then use the filters query parameter:
 
