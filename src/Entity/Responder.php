@@ -61,7 +61,7 @@ trait Responder {
         PaginatedEntityCollection $collection,
         ?AbstractEntity $entityInstance = null
     ): Response {
-        $params = $request->getQueryParams()->toArray();
+        $params = $request->getQueryParams();
 
         // The items response is the base response, and the extra meta is added below
         $response = $this->getItemsResponse($request, $collection, $entityInstance);
@@ -91,7 +91,7 @@ trait Responder {
             $params["page"] = $page;
         }
 
-        $url->setQueryParams($params);
+        $url->setQueryParams($params->toArray());
 
         $content["_links"] = [
             "self" => $url,
