@@ -112,6 +112,7 @@ You can set up CRUD routes manually or use the convenient `addCRUDRoutes()` meth
 
 $request = \JPI\HTTP\Request::createFromGlobals();
 $router = new \JPI\CRUD\API\Router($request);
+$app = new \JPI\CRUD\API\App($router);
 
 // Option 1: Use addCRUDRoutes() helper (recommended)
 // This creates 5 routes:
@@ -121,8 +122,8 @@ $router = new \JPI\CRUD\API\Router($request);
 //   PUT    /projects/{id}/ -> ProjectController::update
 //   DELETE /projects/{id}/ -> ProjectController::delete
 // Optional third parameter: route name for the read action
-$router->addCRUDRoutes("/projects", ProjectController::class);
-// Or with a named route: $router->addCRUDRoutes("/projects", ProjectController::class, "project");
+$app->addCRUDRoutes("/projects", ProjectController::class);
+// Or with a named route: $app->addCRUDRoutes("/projects", ProjectController::class, "project");
 
 // Option 2: Define routes manually
 $router->addRoute("/projects/", "GET", ProjectController::class . "::index");
@@ -131,7 +132,7 @@ $router->addRoute("/projects/{id}/", "GET", ProjectController::class . "::read")
 $router->addRoute("/projects/{id}/", "PUT", ProjectController::class . "::update");
 $router->addRoute("/projects/{id}/", "DELETE", ProjectController::class . "::delete");
 
-$response = $router->handle();
+$response = $app->handle();
 $response->send();
 ```
 
