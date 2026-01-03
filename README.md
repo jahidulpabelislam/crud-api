@@ -126,11 +126,11 @@ $app->addCRUDRoutes("/projects", ProjectController::class);
 // Or with a named route: $app->addCRUDRoutes("/projects", ProjectController::class, "project");
 
 // Option 2: Define routes manually
-$router->addRoute("/projects/", "GET", ProjectController::class . "::index");
-$router->addRoute("/projects/", "POST", ProjectController::class . "::create");
-$router->addRoute("/projects/{id}/", "GET", ProjectController::class . "::read");
-$router->addRoute("/projects/{id}/", "PUT", ProjectController::class . "::update");
-$router->addRoute("/projects/{id}/", "DELETE", ProjectController::class . "::delete");
+$app->addRoute("/projects/", "GET", ProjectController::class . "::index");
+$app->addRoute("/projects/", "POST", ProjectController::class . "::create");
+$app->addRoute("/projects/{id}/", "GET", ProjectController::class . "::read");
+$app->addRoute("/projects/{id}/", "PUT", ProjectController::class . "::update");
+$app->addRoute("/projects/{id}/", "DELETE", ProjectController::class . "::delete");
 
 $response = $app->handle();
 $response->send();
