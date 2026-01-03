@@ -99,6 +99,7 @@ trait Responder {
 
         $hasPreviousPage = ($page > 1) && ($lastPage >= ($page - 1));
         if ($hasPreviousPage) {
+            $url = clone $url;
             if ($page > 2) {
                 $url->setQueryParam("page", $page - 1);
             }
@@ -111,6 +112,7 @@ trait Responder {
 
         $hasNextPage = $page < $lastPage;
         if ($hasNextPage) {
+            $url = clone $url;
             $url->setQueryParam("page", $page + 1);
             $content["_links"]["next_page"] = $url;
         }
