@@ -207,35 +207,35 @@ See [jpi/http](https://github.com/jahidulpabelislam/http) for more details on ro
 
 ## Advanced Features
 
+### Authentication
+
+The framework checks for an `is_authenticated` request attribute. Integrate with your authentication system by setting this attribute - would recommend a custom middleware.
+
+Endpoints not listed in `$publicActions` will return a 401 response if the attribute is not set.
+
 ### Search
 
-Enable search on your entities by implementing `\JPI\CRUD\API\Entity\SearchableInterface` and using the `\JPI\CRUD\API\Entity\Searchable` trait, then adding `searchableColumns` property to your Entity.
+Adds search functionality on the list/index endpoint.
 
-Adds search functionality - define searchable columns via `$searchableColumns` property with multi-word search support
+Enable search on your entities by implementing `\JPI\CRUD\API\Entity\SearchableInterface` and using the `\JPI\CRUD\API\Entity\Searchable` trait. Be default all columns are searchable but likely you'd want to define this using the `searchableColumns` property on your Entity.
 
-Then use the search query parameter:
+Then a search query parameter can be used:
 
 ```
-GET /projects?search=web+development
+GET /projects/?search=web+development
 ```
 
 ### Filtering
 
-Enable filtering by implementing `\JPI\CRUD\API\Entity\FilterableInterface` and using the `\JPI\CRUD\API\Entity\Filterable` trait, then adding `filterableColumns` property to your Entity.
+Adds equality-based filtering on the list/index endpoint.
 
-Adds filtering functionality - define filterable columns via `$filterableColumns` property with equality-based filtering
+Enable filtering by implementing `\JPI\CRUD\API\Entity\FilterableInterface` and using the `\JPI\CRUD\API\Entity\Filterable` trait. By default all columns are filterable but likely you'd want to define this using the `filterableColumns` property on your Entity.
 
-Then use the filters query parameter:
+Then filters can be added as query parameter(s):
 
 ```
-GET /projects?filters[status]=active&filters[category]=web
+GET /projects/?filters[status]=active&filters[category]=web
 ```
-
-### Authentication
-
-The framework checks for an `is_authenticated` request attribute. Integrate with your authentication system by setting this attribute.
-
-Endpoints not listed in `$publicActions` will return a 401 response if the user is not authenticated.
 
 ## Support
 
