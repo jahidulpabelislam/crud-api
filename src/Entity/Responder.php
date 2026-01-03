@@ -21,9 +21,9 @@ trait Responder {
     abstract public function getEntityInstance(): AbstractEntity;
 
     /**
-     * Return a response when items were requested,
-     * so check if some found return the items (with necessary meta)
-     * else if not found return necessary meta
+     * Response when collection of entities was requested.
+     *
+     * Includes entity data, HATEOAS links, and a message if none were found.
      */
     public function getItemsResponse(
         Request $request,
@@ -56,7 +56,7 @@ trait Responder {
     }
 
     /**
-     * Returns a paginated response for a collection of entities.
+     * Response when collection of paged entities was requested.
      *
      * Extends getItemsResponse with pagination metadata including:
      * - Total count and total pages
@@ -148,9 +148,9 @@ trait Responder {
     }
 
     /**
-     * Return a response when an item was requested,
-     * so check if found return the item (with necessary meta)
-     * else if not found return necessary meta
+     * Response when an entity was requested.
+     *
+     * Includes entity data, HATEOAS links, and a message if not found.
      */
     public function getItemResponse(
         Request $request,
@@ -169,6 +169,11 @@ trait Responder {
         return $this->getItemNotFoundResponse($request, $id, $entityInstance);
     }
 
+    /**
+     * Response for a request to create/insert entity.
+     *
+     * Returns 201 on successful creation, or 500 on failure.
+     */
     public function getInsertResponse(
         Request $request,
         ?AbstractEntity $entity,
@@ -188,6 +193,11 @@ trait Responder {
         ]);
     }
 
+    /**
+     * Response for a request to update entity.
+     *
+     * Returns updated entity data, HATEOAS links on successful update, 404 if not found, or 500 on failure.
+     */
     public function getUpdateResponse(
         Request $request,
         ?AbstractEntity $entity,
@@ -214,7 +224,7 @@ trait Responder {
     }
 
     /**
-     * Returns a response for a deleted entity.
+     * Response for a request to delete entity.
      *
      * Returns 204 on successful deletion, 404 if not found, or 500 on failure.
      */
