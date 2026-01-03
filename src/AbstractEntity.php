@@ -61,7 +61,7 @@ abstract class AbstractEntity extends BaseEntity {
                 $entities = $value;
                 $value = [];
                 foreach ($entities as $entity) {
-                    $entityResponse = $item->getAPIResponse($parentEntity ?: $this);
+                    $entityResponse = $entity->getAPIResponse($parentEntity ?: $this);
                     $entityResponse["_links"] = $entity->getAPILinks();
                     $value[] = $entityResponse;
                 }
