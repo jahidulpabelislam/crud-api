@@ -106,7 +106,7 @@ We use [jpi/http](https://github.com/jahidulpabelislam/http) for the request han
 Set up the app as per `jpi/http`:
 
 ```php
-$request = \JPI\HTTP\Request::createFromGlobals();
+$request = \JPI\HTTP\Request::fromGlobals();
 $router = new \JPI\CRUD\API\Router($request);
 $app = new \JPI\CRUD\API\App($router);
 ```
