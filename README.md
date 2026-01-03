@@ -105,12 +105,18 @@ class ProjectController extends \JPI\CRUD\API\AbstractController {
 
 **Router** is an extended HTTP router with built-in 404 and 405 error handlers.
 
+You can set up CRUD routes manually or use the convenient `addCRUDRoutes()` method:
+
 ```php
 <?php
 
 $request = \JPI\HTTP\Request::createFromGlobals();
 $router = new \JPI\CRUD\API\Router($request);
 
+// Option 1: Use addCRUDRoutes() helper (recommended)
+$router->addCRUDRoutes("/projects", ProjectController::class);
+
+// Option 2: Define routes manually
 $router->group("/projects", function($router) {
     $router->get("/", [ProjectController::class, "index"]);
     $router->post("/", [ProjectController::class, "create"]);
