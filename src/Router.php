@@ -25,4 +25,15 @@ class Router extends BaseRouter {
             ]);
         };
     }
+
+    public function addCRUDRoutes(string $basePath, string $controller, ?string $name = null): void {
+        $basePath = trim($basePath, "/");
+
+        $this->addRoute("/$basePath/{id}/", "GET", "$controller::read", $name);
+        $this->addRoute("/$basePath/{id}/", "PUT", "$controller::update");
+        $this->addRoute("/$basePath/{id}/", "DELETE", "$controller::delete");
+
+        $this->addRoute("/$basePath/", "GET", "$controller::index");
+        $this->addRoute("/$basePath/", "POST", "$controller::create");
+    }
 }
