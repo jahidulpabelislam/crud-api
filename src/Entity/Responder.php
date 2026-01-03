@@ -38,7 +38,7 @@ trait Responder {
         $content = [
             "data" => $data,
             "_links" => [
-                "self" => (string)$request->getURL(),
+                "self" => $request->getURL(),
             ],
         ];
 
@@ -94,7 +94,7 @@ trait Responder {
         $url->setQueryParams($params);
 
         $content["_links"] = [
-            "self" => (string)$url,
+            "self" => $url,
         ];
 
         $hasPreviousPage = ($page > 1) && ($lastPage >= ($page - 1));
@@ -106,13 +106,13 @@ trait Responder {
                 $url->removeQueryParam("page");
             }
 
-            $content["_links"]["previous_page"] = (string)$url;
+            $content["_links"]["previous_page"] = $url;
         }
 
         $hasNextPage = $page < $lastPage;
         if ($hasNextPage) {
             $url->setQueryParam("page", $page + 1);
-            $content["_links"]["next_page"] = (string)$url;
+            $content["_links"]["next_page"] = $url;
         }
 
         return $response->withJSON($content);
