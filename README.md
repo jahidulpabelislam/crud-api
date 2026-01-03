@@ -114,6 +114,12 @@ $request = \JPI\HTTP\Request::createFromGlobals();
 $router = new \JPI\CRUD\API\Router($request);
 
 // Option 1: Use addCRUDRoutes() helper (recommended)
+// This creates 5 routes:
+//   GET    /projects/     -> ProjectController::index
+//   POST   /projects/     -> ProjectController::create
+//   GET    /projects/{id}/ -> ProjectController::read
+//   PUT    /projects/{id}/ -> ProjectController::update
+//   DELETE /projects/{id}/ -> ProjectController::delete
 $router->addCRUDRoutes("/projects", ProjectController::class);
 
 // Option 2: Define routes manually
