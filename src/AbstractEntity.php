@@ -42,7 +42,6 @@ abstract class AbstractEntity extends BaseEntity {
     /**
      * Generates the API response representation of this entity.
      *
-     * Handles nested entities up to a maximum depth of 3 to prevent circular references.
      * DateTime objects are formatted according to their type (date or date_time).
      *
      * @param AbstractEntity|null $parentEntity Parent entity to detect circular references
