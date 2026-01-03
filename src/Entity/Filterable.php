@@ -6,6 +6,11 @@ namespace JPI\CRUD\API\Entity;
 
 use JPI\ORM\Entity\QueryBuilder;
 
+/**
+ * Standard implementation of `FilterableInterface`.
+ *
+ * Currently, only supports exact matches.
+ */
 trait Filterable {
 
     public static function getFilterableColumns(): array {

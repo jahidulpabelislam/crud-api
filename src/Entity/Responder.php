@@ -10,14 +10,20 @@ use JPI\HTTP\Response;
 use JPI\ORM\Entity\Collection as EntityCollection;
 use JPI\ORM\Entity\PaginatedCollection as PaginatedEntityCollection;
 
+/**
+ * Trait providing standardised responses.
+ *
+ * Handles generation of consistent JSON responses for single entity, collections,
+ * pagination metadata, and error scenarios.
+ */
 trait Responder {
 
     abstract public function getEntityInstance(): AbstractEntity;
 
     /**
-     * Return a response when items were requested,
-     * so check if some found return the items (with necessary meta)
-     * else if not found return necessary meta
+     * Response when collection of entities was requested.
+     *
+     * Includes entity data, HATEOAS links, and a message if none were found.
      */
     public function getEntitiesResponse(
         Request $request,
@@ -50,11 +56,11 @@ trait Responder {
     }
 
     /**
-     * Return a response when items request was a search request,
-     * so check if some found return the items (with necessary meta)
-     * else if not found return necessary meta
+     * Response when collection of paged entities was requested.
      *
-     * Use getItemsResponse function as the base response, then just adds additional meta data
+     * Extends getEntitiesResponse with pagination metadata including:
+     * - Total count and total pages
+     * - Previous/next page links
      */
     public function getPaginatedEntitiesResponse(
         Request $request,
@@ -142,9 +148,9 @@ trait Responder {
     }
 
     /**
-     * Return a response when an item was requested,
-     * so check if found return the item (with necessary meta)
-     * else if not found return necessary meta
+     * Response when an entity was requested.
+     *
+     * Includes entity data, HATEOAS links, and a message if not found.
      */
     public function getEntityResponse(
         Request $request,
@@ -163,6 +169,11 @@ trait Responder {
         return $this->getEntityNotFoundResponse($request, $id, $entityInstance);
     }
 
+    /**
+     * Response for a request to create/insert entity.
+     *
+     * Returns 201 on successful creation, or 500 on failure.
+     */
     public function getEntityCreateResponse(
         Request $request,
         ?AbstractEntity $entity,
@@ -182,6 +193,11 @@ trait Responder {
         ]);
     }
 
+    /**
+     * Response for a request to update entity.
+     *
+     * Returns updated entity data, HATEOAS links on successful update, 404 if not found, or 500 on failure.
+     */
     public function getEntityUpdateResponse(
         Request $request,
         ?AbstractEntity $entity,
@@ -208,7 +224,9 @@ trait Responder {
     }
 
     /**
-     * Return the response when an item was attempted to be deleted
+     * Response for a request to delete entity.
+     *
+     * Returns 204 on successful deletion, 404 if not found, or 500 on failure.
      */
     public function getEntityDeleteResponse(
         Request $request,
