@@ -43,7 +43,7 @@ $ composer require jpi/crud-api
 
 **Extra Set Up:**
 
-- `getAPIURL()`: Returns the API URL for the entity (must be implemented by child classes)
+- `getAPIURL()`: Returns the API URL for the entity - MUST be implemented
 - `getDisplayName(): string`: Used in error messages - uses `$displayName` property if set otherwise returns the class name
 - `getPluralDisplayName(): string`: Used in error messages - simply appends an `s` to the display name (can be overridden for irregular plurals)
 
