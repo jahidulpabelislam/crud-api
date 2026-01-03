@@ -163,7 +163,7 @@ trait Responder {
         return $this->getEntityNotFoundResponse($request, $id, $entityInstance);
     }
 
-    public function getEntityInsertResponse(
+    public function getEntityCreateResponse(
         Request $request,
         ?AbstractEntity $entity,
         ?AbstractEntity $entityInstance = null
@@ -178,7 +178,7 @@ trait Responder {
         }
 
         return Response::json(500, [
-            "message" => "Failed to insert the new {$entityInstance::getDisplayName()}.",
+            "message" => "Failed to create the new {$entityInstance::getDisplayName()}.",
         ]);
     }
 

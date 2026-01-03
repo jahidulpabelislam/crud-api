@@ -81,7 +81,7 @@ abstract class AbstractController {
             return $this->getInvalidInputResponse($exception->getErrors());
         }
 
-        return $this->getEntityInsertResponse($request, $entity);
+        return $this->getEntityCreateResponse($request, $entity);
     }
 
     public function read(int|string|null $id): Response {
