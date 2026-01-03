@@ -45,7 +45,7 @@ class CrudService {
         if ($entity instanceof FilterableInterface) {
             $filters = $request->getQueryParam("filters");
             if ($filters) {
-                $entity::addFiltersToQuery($query, $filters->toArray());
+                $entity::addFiltersToQuery($query, $filters);
             }
         }
 
