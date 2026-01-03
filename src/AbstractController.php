@@ -128,6 +128,6 @@ abstract class AbstractController {
         }
 
         $entity = $this->getEntityInstance()::getCrudService()->delete($request);
-        return $this->getEntityDeletedResponse($request, $entity, $id);
+        return $this->getEntityDeleteResponse($request, $entity, $id);
     }
 }

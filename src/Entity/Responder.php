@@ -210,7 +210,7 @@ trait Responder {
     /**
      * Return the response when an item was attempted to be deleted
      */
-    public function getEntityDeletedResponse(
+    public function getEntityDeleteResponse(
         Request $request,
         ?AbstractEntity $entity,
         string|int|null $id = null,
