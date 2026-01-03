@@ -61,7 +61,6 @@ trait Responder {
      * Extends getItemsResponse with pagination metadata including:
      * - Total count and total pages
      * - Previous/next page links
-     * - Current page and limit parameters
      */
     public function getPaginatedItemsResponse(
         Request $request,
