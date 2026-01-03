@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace JPI\CRUD\API\Entity;
 
-use JPI\Database\Query\Clause\Where\OrCondition as WhereOrCondition;
 use JPI\ORM\Entity\QueryBuilder;
 
 /**
@@ -26,7 +25,7 @@ trait Searchable {
             "searchReversed" => "%" . implode("%", array_reverse($words)) . "%",
         ]);
 
-        $where = new WhereOrCondition($query);
+        $where = $query->newOrCondition();
         foreach (static::getSearchableColumns() as $column) {
             $where
                 ->where($column, "LIKE", ":search")
