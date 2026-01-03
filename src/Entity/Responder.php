@@ -11,7 +11,7 @@ use JPI\ORM\Entity\Collection as EntityCollection;
 use JPI\ORM\Entity\PaginatedCollection as PaginatedEntityCollection;
 
 /**
- * Trait providing standardised response methods for controllers.
+ * Trait providing standardised responses.
  *
  * Handles generation of consistent JSON responses for single items, collections,
  * pagination metadata, and error scenarios.
