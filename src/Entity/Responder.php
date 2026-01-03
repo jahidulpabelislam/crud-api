@@ -21,9 +21,9 @@ trait Responder {
     abstract public function getEntityInstance(): AbstractEntity;
 
     /**
-     * Returns a response for a collection of entities.
-     *
-     * Includes entity data, HATEOAS links, and a message if no items were found.
+     * Return a response when items were requested,
+     * so check if some found return the items (with necessary meta)
+     * else if not found return necessary meta
      */
     public function getItemsResponse(
         Request $request,
@@ -147,6 +147,11 @@ trait Responder {
         ]);
     }
 
+    /**
+     * Return a response when an item was requested,
+     * so check if found return the item (with necessary meta)
+     * else if not found return necessary meta
+     */
     public function getItemResponse(
         Request $request,
         ?AbstractEntity $entity,
