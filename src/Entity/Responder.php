@@ -19,7 +19,7 @@ trait Responder {
      * so check if some found return the items (with necessary meta)
      * else if not found return necessary meta
      */
-    public function getItemsResponse(
+    public function getEntitiesResponse(
         Request $request,
         EntityCollection $entities,
         ?AbstractEntity $entityInstance = null
@@ -56,15 +56,15 @@ trait Responder {
      *
      * Use getItemsResponse function as the base response, then just adds additional meta data
      */
-    public function getPaginatedItemsResponse(
+    public function getPaginatedEntitiesResponse(
         Request $request,
         PaginatedEntityCollection $collection,
         ?AbstractEntity $entityInstance = null
     ): Response {
         $params = $request->getQueryParams();
 
-        // The items response is the base response, and the extra meta is added below
-        $response = $this->getItemsResponse($request, $collection, $entityInstance);
+        // The entities response is the base response, and the extra meta is added below
+        $response = $this->getEntitiesResponse($request, $collection, $entityInstance);
 
         $content = $response->getBody();
 
@@ -120,14 +120,14 @@ trait Responder {
         return $response->withJSON($content);
     }
 
-    private function getItemFoundResponse(Request $request, AbstractEntity $entity): Response {
+    private function getEntityFoundResponse(Request $request, AbstractEntity $entity): Response {
         return Response::json(200, [
             "data" => $entity->getAPIResponse(),
             "_links" => $entity->getAPILinks(),
         ]);
     }
 
-    public function getItemNotFoundResponse(
+    public function getEntityNotFoundResponse(
         Request $request,
         string|int|null $id = null,
         ?AbstractEntity $entityInstance = null
@@ -146,7 +146,7 @@ trait Responder {
      * so check if found return the item (with necessary meta)
      * else if not found return necessary meta
      */
-    public function getItemResponse(
+    public function getEntityResponse(
         Request $request,
         ?AbstractEntity $entity,
         string|int|null $id = null,
@@ -157,13 +157,13 @@ trait Responder {
         $id = $id ?? $request->getAttribute("route_params")["id"];
 
         if ($id && $entity && $entity->isLoaded() && $entity->getId() == $id) {
-            return $this->getItemFoundResponse($request, $entity);
+            return $this->getEntityFoundResponse($request, $entity);
         }
 
-        return $this->getItemNotFoundResponse($request, $id, $entityInstance);
+        return $this->getEntityNotFoundResponse($request, $id, $entityInstance);
     }
 
-    public function getInsertResponse(
+    public function getEntityCreateResponse(
         Request $request,
         ?AbstractEntity $entity,
         ?AbstractEntity $entityInstance = null
@@ -171,18 +171,18 @@ trait Responder {
         $entityInstance = $entityInstance ?? $this->getEntityInstance();
 
         if ($entity && $entity->isLoaded()) {
-            return $this->getItemFoundResponse($request, $entity)
+            return $this->getEntityFoundResponse($request, $entity)
                 ->withStatus(201)
                 ->withHeader("Location", $entity->getAPIURL())
             ;
         }
 
         return Response::json(500, [
-            "message" => "Failed to insert the new {$entityInstance::getDisplayName()}.",
+            "message" => "Failed to create the new {$entityInstance::getDisplayName()}.",
         ]);
     }
 
-    public function getUpdateResponse(
+    public function getEntityUpdateResponse(
         Request $request,
         ?AbstractEntity $entity,
         string|int|null $id = null,
@@ -194,11 +194,11 @@ trait Responder {
 
         if ($id) {
             if (!$entity) {
-                return $this->getItemNotFoundResponse($request, $id, $entityInstance);
+                return $this->getEntityNotFoundResponse($request, $id, $entityInstance);
             }
 
             if ($entity->isLoaded() && $entity->getId() == $id) {
-                return $this->getItemFoundResponse($request, $entity);
+                return $this->getEntityFoundResponse($request, $entity);
             }
         }
 
@@ -210,7 +210,7 @@ trait Responder {
     /**
      * Return the response when an item was attempted to be deleted
      */
-    public function getItemDeletedResponse(
+    public function getEntityDeleteResponse(
         Request $request,
         ?AbstractEntity $entity,
         string|int|null $id = null,
@@ -221,7 +221,7 @@ trait Responder {
         $id = $id ?? $request->getAttribute("route_params")["id"];
 
         if (!$id || !$entity || !$entity->isLoaded() || $entity->getId() != $id) {
-            return $this->getItemNotFoundResponse($request, $id, $entityInstance);
+            return $this->getEntityNotFoundResponse($request, $id, $entityInstance);
         }
 
         if ($entity->isDeleted()) {
