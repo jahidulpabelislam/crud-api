@@ -193,6 +193,10 @@ See [jpi/http](https://github.com/jahidulpabelislam/http) for more details on ro
 }
 ```
 
+**getAPIResponse** on the Entity generates the API response for the entity.
+**getAPILinks()** on the Entity returns HATEOAS links for the entity for the API response. Returns a `self` link out the box.
+
+
 ### Error Response
 
 ```json
