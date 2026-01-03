@@ -10,13 +10,34 @@ use JPI\HTTP\RequestAwareTrait;
 use JPI\HTTP\Response;
 use JPI\ORM\Entity\PaginatedCollection;
 
+/**
+ * Base controller providing standard CRUD endpoints with authentication support.
+ *
+ * Child classes should set the $entityClass property and can define which actions
+ * are public (no authentication required) via the $publicActions property.
+ *
+ * Standard CRUD actions:
+ * - index(): List all entities with optional search, filtering, and pagination
+ * - create(): Create a new entity
+ * - read($id): Retrieve a specific entity
+ * - update($id): Update an existing entity
+ * - delete($id): Delete an entity
+ */
 abstract class AbstractController {
 
     use RequestAwareTrait;
     use EntityResponder;
 
+    /**
+     * Actions that don't require authentication.
+     */
     protected array $publicActions = [];
 
+    /**
+     * The entity class this controller manages.
+     *
+     * @var class-string<AbstractEntity>
+     */
     protected string $entityClass;
 
     public function getPublicActions(): array {
@@ -27,9 +48,6 @@ abstract class AbstractController {
         return new $this->entityClass();
     }
 
-    /**
-     * Response when user isn't logged in correctly
-     */
     public static function getNotAuthorisedResponse(): Response {
         return Response::json(401, [
             "message" => "You need to be logged in!",
@@ -44,7 +62,13 @@ abstract class AbstractController {
     }
 
     /**
-     * Gets all entities but paginated (also might include search & filters)
+     * Retrieves all entities with optional pagination, search, and filters.
+     *
+     * Supports query parameters:
+     * - search: Text search across searchable columns
+     * - filters: Key-value pairs for filtering
+     * - page: Page number
+     * - limit: Results per page
      */
     public function index(): Response {
         $request = $this->getRequest();

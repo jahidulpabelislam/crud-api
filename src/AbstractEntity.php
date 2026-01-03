@@ -10,10 +10,17 @@ use JPI\ORM\Entity\Collection as EntityCollection;
 use JPI\Utils\URL;
 use ReflectionClass;
 
+/**
+ * Base entity class for CRUD API with support for generating API responses and HATEOAS links.
+ */
 abstract class AbstractEntity extends BaseEntity {
 
+    /** @var class-string<CrudService> */
     protected static string $crudService = CrudService::class;
 
+    /**
+     * Returns the API URL for this entity instance.
+     */
     abstract public function getAPIURL(): URL;
 
     public static function getDisplayName(): string {
@@ -32,6 +39,15 @@ abstract class AbstractEntity extends BaseEntity {
         return new static::$crudService(static::class);
     }
 
+    /**
+     * Generates the API response representation of this entity.
+     *
+     * Handles nested entities up to a maximum depth of 3 to prevent circular references.
+     * DateTime objects are formatted according to their type (date or date_time).
+     *
+     * @param int $depth Current recursion depth
+     * @param AbstractEntity|null $parentEntity Parent entity to detect circular references
+     */
     public function getAPIResponse(int $depth = 1, ?AbstractEntity $parentEntity = null): array {
         $response = [
             "id" => $this->getId(),

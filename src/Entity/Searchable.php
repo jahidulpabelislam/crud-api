@@ -7,6 +7,11 @@ namespace JPI\CRUD\API\Entity;
 use JPI\Database\Query\Clause\Where\OrCondition as WhereOrCondition;
 use JPI\ORM\Entity\QueryBuilder;
 
+/**
+ * Standard implementation of `SearchableInterface`.
+ *
+ * Searches use LIKE with wildcards and support multi-word queries in both forward and reverse order.
+ */
 trait Searchable {
 
     public static function getSearchableColumns(): array {
