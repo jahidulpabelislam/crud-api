@@ -44,7 +44,7 @@ trait Responder {
         $content = [
             "data" => $data,
             "_links" => [
-                "self" => (string)$request->getURL(),
+                "self" => $request->getURL(),
             ],
         ];
 
@@ -68,7 +68,7 @@ trait Responder {
         PaginatedEntityCollection $collection,
         ?AbstractEntity $entityInstance = null
     ): Response {
-        $params = $request->getQueryParams()->toArray();
+        $params = $request->getQueryParams();
 
         // The items response is the base response, and the extra meta is added below
         $response = $this->getItemsResponse($request, $collection, $entityInstance);
@@ -98,14 +98,15 @@ trait Responder {
             $params["page"] = $page;
         }
 
-        $url->setQueryParams($params);
+        $url->setQueryParams($params->toArray());
 
         $content["_links"] = [
-            "self" => (string)$url,
+            "self" => $url,
         ];
 
         $hasPreviousPage = ($page > 1) && ($lastPage >= ($page - 1));
         if ($hasPreviousPage) {
+            $url = clone $url;
             if ($page > 2) {
                 $url->setQueryParam("page", $page - 1);
             }
@@ -113,13 +114,14 @@ trait Responder {
                 $url->removeQueryParam("page");
             }
 
-            $content["_links"]["previous_page"] = (string)$url;
+            $content["_links"]["previous_page"] = $url;
         }
 
         $hasNextPage = $page < $lastPage;
         if ($hasNextPage) {
+            $url = clone $url;
             $url->setQueryParam("page", $page + 1);
-            $content["_links"]["next_page"] = (string)$url;
+            $content["_links"]["next_page"] = $url;
         }
 
         return $response->withJSON($content);

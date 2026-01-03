@@ -104,7 +104,7 @@ abstract class AbstractEntity extends BaseEntity {
 
     public function getAPILinks(): array {
         return [
-            "self" => (string)$this->getAPIURL(),
+            "self" => $this->getAPIURL(),
         ];
     }
 }

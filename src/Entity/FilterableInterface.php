@@ -15,5 +15,5 @@ interface FilterableInterface {
 
     public static function getFilterableColumns(): array;
 
-    public static function addFiltersToQuery(QueryBuilder $query, array $filters): void;
+    public static function addFiltersToQuery(QueryBuilder $query, \ArrayAccess|array $filters): void;
 }

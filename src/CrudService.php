@@ -64,7 +64,7 @@ class CrudService {
         if ($entity instanceof FilterableInterface) {
             $filters = $request->getQueryParam("filters");
             if ($filters) {
-                $entity::addFiltersToQuery($query, $filters->toArray());
+                $entity::addFiltersToQuery($query, $filters);
             }
         }
 
@@ -115,7 +115,7 @@ class CrudService {
 
         $requiredColumns = static::$requiredColumns;
 
-        $data = $request->getArrayFromBody()->toArray();
+        $data = $request->getArrayFromBody();
 
         $mapping = $entity::getDataMapping();
 
