@@ -96,7 +96,7 @@ class CrudService {
 
         $requiredColumns = static::$requiredColumns;
 
-        $data = $request->getArrayFromBody()->toArray();
+        $data = $request->getArrayFromBody();
 
         $mapping = $entity::getDataMapping();
 
