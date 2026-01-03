@@ -203,7 +203,7 @@ See [jpi/http](https://github.com/jahidulpabelislam/http) for more details on ro
     "message": "The necessary data was not provided and/or invalid.",
     "errors": {
         "name": "`name` is required.",
-        "created_at": "`created_at` must be instance of \DateTime or valid format for creation or null."
+        "created_at": "`created_at` must be instance of \\DateTime or valid format for creation or null."
     }
 }
 ```
