@@ -12,9 +12,9 @@ trait Filterable {
         return static::$filterableColumns ?? static::getColumns();
     }
 
-    public static function addFiltersToQuery(QueryBuilder $query, array $filters): void {
+    public static function addFiltersToQuery(QueryBuilder $query, \ArrayAccess|array $filters): void {
         foreach (static::getFilterableColumns() as $column) {
-            if (array_key_exists($column, $filters)) {
+            if (isset($filters[$column])) {
                 $query->where($column, "=", $filters[$column]);
             }
         }
