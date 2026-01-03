@@ -120,7 +120,9 @@ $router = new \JPI\CRUD\API\Router($request);
 //   GET    /projects/{id}/ -> ProjectController::read
 //   PUT    /projects/{id}/ -> ProjectController::update
 //   DELETE /projects/{id}/ -> ProjectController::delete
+// Optional third parameter: route name for the read action
 $router->addCRUDRoutes("/projects", ProjectController::class);
+// Or with a named route: $router->addCRUDRoutes("/projects", ProjectController::class, "project");
 
 // Option 2: Define routes manually
 $router->addRoute("/projects/", "GET", ProjectController::class . "::index");
