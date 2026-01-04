@@ -15,5 +15,5 @@ interface SortableInterface {
 
     public static function getSortableColumns(): array;
 
-    public static function addSortToQuery(QueryBuilder $query, \ArrayAccess|array $sort): void;
+    public static function addSortToQuery(QueryBuilder $query, array $sort): void;
 }
