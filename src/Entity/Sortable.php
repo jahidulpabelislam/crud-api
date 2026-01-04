@@ -26,8 +26,8 @@ trait Sortable {
             // Parse column:direction syntax (e.g., "created_at:desc")
             if (is_string($sortColumn) && str_contains($sortColumn, ":")) {
                 $parts = explode(":", $sortColumn, 2);
-                $column = $parts[0];
-                $specifiedDirection = strtoupper($parts[1] ?? "");
+                $column = trim($parts[0]);
+                $specifiedDirection = strtoupper(trim($parts[1]));
                 
                 // Only accept valid directions
                 if (in_array($specifiedDirection, ["ASC", "DESC"])) {
