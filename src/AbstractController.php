@@ -63,8 +63,6 @@ abstract class AbstractController {
 
     /**
      * Retrieves all entities with optional pagination, search, filters, and sorting.
-     *
-     * Query parameters: search, filters, sort, page, limit. See README for details.
      */
     public function index(): Response {
         $request = $this->getRequest();
