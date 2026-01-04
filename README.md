@@ -62,7 +62,7 @@ $ composer require jpi/crud-api
 All you need to do is extend the abstract controller, specify the entity class & define any public actions (if any):
 
 ```php
-final class ProjectController extends \JPI\CRUD\API\AbstractController {
+final class ProjectsController extends \JPI\CRUD\API\AbstractController {
 
     protected string $entityClass = Project::class;
 
@@ -116,21 +116,21 @@ You can set up CRUD routes manually or use the convenient `addCRUDRoutes()` meth
 ```php
 // Option 1: Use addCRUDRoutes() helper (recommended)
 // This creates 5 routes:
-//   GET    /projects/     -> ProjectController::index
-//   POST   /projects/     -> ProjectController::create
-//   GET    /projects/{id}/ -> ProjectController::read
-//   PUT    /projects/{id}/ -> ProjectController::update
-//   DELETE /projects/{id}/ -> ProjectController::delete
+//   GET    /projects/      -> ProjectsController::index
+//   POST   /projects/      -> ProjectsController::create
+//   GET    /projects/{id}/ -> ProjectsController::read
+//   PUT    /projects/{id}/ -> ProjectsController::update
+//   DELETE /projects/{id}/ -> ProjectsController::delete
 // Optional third parameter: route name for the read action
-$app->addCRUDRoutes("/projects/", ProjectController::class);
-// Or with a named route: $app->addCRUDRoutes("/projects/", ProjectController::class, "project");
+$app->addCRUDRoutes("/projects/", ProjectsController::class);
+// Or with a named route: $app->addCRUDRoutes("/projects/", ProjectsController::class, "project");
 
 // Option 2: Define routes manually
-$app->addRoute("/projects/", "GET", ProjectController::class . "::index", "project");
-$app->addRoute("/projects/", "POST", ProjectController::class . "::create");
-$app->addRoute("/projects/{id}/", "GET", ProjectController::class . "::read");
-$app->addRoute("/projects/{id}/", "PUT", ProjectController::class . "::update");
-$app->addRoute("/projects/{id}/", "DELETE", ProjectController::class . "::delete");
+$app->addRoute("/projects/", "GET", ProjectsController::class . "::index", "project");
+$app->addRoute("/projects/", "POST", ProjectsController::class . "::create");
+$app->addRoute("/projects/{id}/", "GET", ProjectsController::class . "::read");
+$app->addRoute("/projects/{id}/", "PUT", ProjectsController::class . "::update");
+$app->addRoute("/projects/{id}/", "DELETE", ProjectsController::class . "::delete");
 ```
 
 Handle the request and send the response:
