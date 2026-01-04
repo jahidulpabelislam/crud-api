@@ -247,7 +247,7 @@ Adds sorting functionality on the list/index endpoint.
 
 Enable sorting by implementing `\JPI\CRUD\API\Entity\SortableInterface` and using the `\JPI\CRUD\API\Entity\Sortable` trait. By default all columns are sortable but likely you'd want to define this using the `sortableColumns` property on your Entity.
 
-Then sorting can be applied using the `sort` query parameter as an array. Use column:direction syntax where direction can be `asc` or `desc`. If no direction is specified, it defaults to ascending order:
+Then sorting can be applied using the `sort` query parameter as an array. Use `{column}:{direction}` syntax where direction can be `asc` or `desc`. If no direction is specified, it defaults to ascending order:
 
 ```
 GET /projects/?sort[]=created_at                    # Sort by created_at ascending (default)
