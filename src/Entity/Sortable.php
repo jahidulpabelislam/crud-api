@@ -15,7 +15,12 @@ use JPI\ORM\Entity\QueryBuilder;
 trait Sortable {
 
     public static function getSortableColumns(): array {
-        return static::$sortableColumns ?? static::getColumns();
+        if (property_exists(static::class, 'sortableColumns')) {
+            return static::$sortableColumns;
+        }
+        $columns = static::getColumns();
+        $columns[] = "id"; // Always allow sorting by ID
+        return $columns;
     }
 
     public static function addSortToQuery(QueryBuilder $query, iterable $sort): void {
