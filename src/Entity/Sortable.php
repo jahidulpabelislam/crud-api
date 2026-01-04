@@ -27,11 +27,15 @@ trait Sortable {
             if (is_string($sortColumn) && str_contains($sortColumn, ":")) {
                 $parts = explode(":", $sortColumn, 2);
                 $column = trim($parts[0]);
-                $specifiedDirection = strtoupper(trim($parts[1]));
                 
-                // Only accept valid directions
-                if (in_array($specifiedDirection, ["ASC", "DESC"])) {
-                    $direction = $specifiedDirection;
+                // Check if direction part exists and is valid
+                if (isset($parts[1])) {
+                    $specifiedDirection = strtoupper(trim($parts[1]));
+                    
+                    // Only accept valid directions
+                    if (in_array($specifiedDirection, ["ASC", "DESC"])) {
+                        $direction = $specifiedDirection;
+                    }
                 }
             }
 
