@@ -17,7 +17,7 @@ use JPI\ORM\Entity\PaginatedCollection;
  * are public (no authentication required) via the $publicActions property.
  *
  * Standard CRUD actions:
- * - index(): List all entities with optional search, filtering, sorting, and pagination
+ * - index(): List all entities with optional search, filtering, and pagination
  * - create(): Create a new entity
  * - read($id): Retrieve a specific entity
  * - update($id): Update an existing entity
@@ -62,12 +62,11 @@ abstract class AbstractController {
     }
 
     /**
-     * Retrieves all entities with optional pagination, search, filters, and sorting.
+     * Retrieves all entities with optional pagination, search, and filters.
      *
      * Supports query parameters:
      * - search: Text search across searchable columns
      * - filters: Key-value pairs for filtering
-     * - sort: Array of columns to sort by. Prefix with '-' for DESC order
      * - page: Page number
      * - limit: Results per page
      */

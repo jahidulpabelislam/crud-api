@@ -7,7 +7,6 @@ namespace JPI\CRUD\API;
 use JPI\CRUD\API\Entity\FilterableInterface;
 use JPI\CRUD\API\Entity\InvalidDataException;
 use JPI\CRUD\API\Entity\SearchableInterface;
-use JPI\CRUD\API\Entity\SortableInterface;
 use JPI\HTTP\Request;
 use JPI\ORM\Entity\Collection as EntityCollection;
 use JPI\ORM\Entity\InvalidValueException;
@@ -17,7 +16,7 @@ use JPI\ORM\Entity\PaginatedCollection as PaginatedEntityCollection;
  * Service layer for handling CRUD operations on entities.
  *
  * Provides standardised methods for creating, reading, updating, and deleting entities
- * with built-in validation, pagination, search, filtering, and sorting support.
+ * with built-in validation, pagination, search, and filtering support.
  */
 class CrudService {
 
@@ -49,12 +48,11 @@ class CrudService {
     }
 
     /**
-     * Retrieves a collection of entities with optional search, filtering, sorting, and pagination.
+     * Retrieves a collection of entities with optional search, filtering, and pagination.
      *
      * Supports query parameters:
      * - search: Text search across searchable columns (if entity implements SearchableInterface)
      * - filters: Key-value pairs for filtering (if entity implements FilterableInterface)
-     * - sort: Array of columns to sort by (if entity implements SortableInterface). Prefix with '-' for DESC
      * - page: Page number for pagination (default: 1)
      * - limit: Results per page (default: configured perPage value)
      */
@@ -74,13 +72,6 @@ class CrudService {
             $search = $request->getQueryParam("search");
             if ($search) {
                 $entity::addSearchToQuery($query, $search);
-            }
-        }
-
-        if ($entity instanceof SortableInterface) {
-            $sort = $request->getQueryParam("sort");
-            if ($sort) {
-                $entity::addSortToQuery($query, $sort);
             }
         }
 
