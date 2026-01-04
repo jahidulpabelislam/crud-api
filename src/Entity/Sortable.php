@@ -18,7 +18,7 @@ trait Sortable {
         return static::$sortableColumns ?? static::getColumns();
     }
 
-    public static function addSortToQuery(QueryBuilder $query, array $sort): void {
+    public static function addSortToQuery(QueryBuilder $query, iterable $sort): void {
         foreach ($sort as $sortColumn) {
             $direction = "ASC";
             $column = $sortColumn;
