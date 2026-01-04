@@ -10,7 +10,7 @@ use JPI\ORM\Entity\QueryBuilder;
  * Standard implementation of `SortableInterface`.
  *
  * Supports sorting by multiple columns with ascending or descending order.
- * Prefix column name with '-' for DESC order, no prefix for ASC order.
+ * Use column:direction syntax (e.g., 'created_at:desc'). Direction defaults to ASC if not specified.
  */
 trait Sortable {
 
@@ -23,10 +23,16 @@ trait Sortable {
             $direction = "ASC";
             $column = $sortColumn;
 
-            // Check if column starts with '-' for DESC order
-            if (is_string($sortColumn) && str_starts_with($sortColumn, "-")) {
-                $direction = "DESC";
-                $column = substr($sortColumn, 1);
+            // Parse column:direction syntax (e.g., "created_at:desc")
+            if (is_string($sortColumn) && str_contains($sortColumn, ":")) {
+                $parts = explode(":", $sortColumn, 2);
+                $column = $parts[0];
+                $specifiedDirection = strtoupper($parts[1] ?? "");
+                
+                // Only accept valid directions
+                if (in_array($specifiedDirection, ["ASC", "DESC"])) {
+                    $direction = $specifiedDirection;
+                }
             }
 
             // Only add sort if column is in sortable columns list
