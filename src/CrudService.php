@@ -51,12 +51,8 @@ class CrudService {
     /**
      * Retrieves a collection of entities with optional search, filtering, sorting, and pagination.
      *
-     * Supports query parameters:
-     * - search: Text search across searchable columns (if entity implements SearchableInterface)
-     * - filters: Key-value pairs for filtering (if entity implements FilterableInterface)
-     * - sort: Array of columns to sort by (if entity implements SortableInterface). Prefix with '-' for DESC
-     * - page: Page number for pagination (default: 1)
-     * - limit: Results per page (default: configured perPage value)
+     * Processes search, filters, and sort query parameters based on entity interfaces implemented,
+     * then applies pagination if enabled. See README for query parameter details.
      */
     public function index(Request $request): EntityCollection {
         $entity = $this->getEntityInstance();

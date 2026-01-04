@@ -64,12 +64,7 @@ abstract class AbstractController {
     /**
      * Retrieves all entities with optional pagination, search, filters, and sorting.
      *
-     * Supports query parameters:
-     * - search: Text search across searchable columns
-     * - filters: Key-value pairs for filtering
-     * - sort: Array of columns to sort by. Prefix with '-' for DESC order
-     * - page: Page number
-     * - limit: Results per page
+     * Query parameters: search, filters, sort, page, limit. See README for details.
      */
     public function index(): Response {
         $request = $this->getRequest();
