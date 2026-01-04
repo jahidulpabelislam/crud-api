@@ -20,8 +20,8 @@ trait Sortable {
 
     public static function addSortToQuery(QueryBuilder $query, iterable $sort): void {
         foreach ($sort as $sortColumn) {
-            $direction = "ASC";
             $column = $sortColumn;
+            $direction = "ASC";
 
             // Parse column:direction syntax (e.g., "created_at:desc")
             if (is_string($sortColumn) && str_contains($sortColumn, ":")) {
