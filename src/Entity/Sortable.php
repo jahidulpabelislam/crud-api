@@ -19,29 +19,24 @@ trait Sortable {
     }
 
     public static function addSortToQuery(QueryBuilder $query, iterable $sort): void {
-        foreach ($sort as $sortColumn) {
-            $column = $sortColumn;
-            $direction = "ASC";
+        foreach ($sort as $entry) {
+            $column = $entry;
+            $ascDirection = true;
 
             // Parse column:direction syntax (e.g., "created_at:desc")
-            if (is_string($sortColumn) && str_contains($sortColumn, ":")) {
-                $parts = explode(":", $sortColumn, 2);
+            if (is_string($column) && str_contains($column, ":")) {
+                $parts = explode(":", $column, 2);
                 $column = trim($parts[0]);
-                
+
                 // Check if direction part exists and is valid
-                if (isset($parts[1])) {
-                    $specifiedDirection = strtoupper(trim($parts[1]));
-                    
-                    // Only accept valid directions
-                    if (in_array($specifiedDirection, ["ASC", "DESC"])) {
-                        $direction = $specifiedDirection;
-                    }
+                if (isset($parts[1]) && strtoupper(trim($parts[1])) === "DESC") {
+                    $ascDirection = false;
                 }
             }
 
             // Only add sort if column is in sortable columns list
             if (in_array($column, static::getSortableColumns())) {
-                $query->orderBy($column, $direction);
+                $query->orderBy($column, $ascDirection);
             }
         }
     }
