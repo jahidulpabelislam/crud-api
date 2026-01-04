@@ -20,8 +20,7 @@ use JPI\ORM\Entity\PaginatedCollection as PaginatedEntityCollection;
  */
 class CrudService {
 
-    protected bool $paginated = true;
-    protected int $perPage = 10;
+    protected ?int $perPage = 10;
 
     /**
      * Columns that must be present and non-empty when creating entities.
@@ -75,7 +74,7 @@ class CrudService {
             }
         }
 
-        if (!$this->paginated) {
+        if ($this->perPage === null) {
             return $query->select();
         }
 

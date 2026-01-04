@@ -84,7 +84,7 @@ final class ProjectController extends \JPI\CRUD\API\AbstractController {
 
 By default:
 
-- paginated with 10 items per page - you can disable (`$paginated`) or change number of items per page (`$perPage`):
+- paginated with 10 items per page - you can change using `$perPage` property or disable pagination setting to null
 - no columns are required - you can define using the static `$requiredColumns` property
 
 ```php
