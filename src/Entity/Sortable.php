@@ -33,7 +33,7 @@ trait Sortable {
                 $parts = explode(":", $column, 2);
                 $column = trim($parts[0]);
 
-                // Check if direction part exists and is valid
+                // Check if direction is DESC, otherwise defaults to ASC
                 if (isset($parts[1]) && strtoupper(trim($parts[1])) === "DESC") {
                     $ascDirection = false;
                 }
