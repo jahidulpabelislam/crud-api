@@ -19,7 +19,7 @@ trait Sortable {
             return static::$sortableColumns;
         }
         $columns = static::getColumns();
-        $columns[] = "id"; // Always allow sorting by ID
+        $columns[] = "id"; // Allow sorting by ID too
         return $columns;
     }
 
