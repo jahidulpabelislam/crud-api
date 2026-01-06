@@ -14,6 +14,7 @@ A lightweight PHP framework for building RESTful CRUD APIs with built-in support
 - **RESTful CRUD Operations**: Out-of-the-box support for List, Create, Read, Update and Delete operations
 - **Pagination**: Built-in pagination support with configurable page size
 - **Search & Filtering**: Flexible search and filter functionality for listing endpoints
+- **Sorting**: Sort results by multiple columns in ascending or descending order
 - **Authentication**: Built-in authentication checks for protected endpoints
 - **JSON Responses**: Standardised JSON response format with HATEOAS links
 - **Validation**: Comprehensive data validation with detailed error messages
@@ -62,7 +63,7 @@ $ composer require jpi/crud-api
 All you need to do is extend the abstract controller, specify the entity class & define any public actions (if any):
 
 ```php
-final class ProjectController extends \JPI\CRUD\API\AbstractController {
+final class ProjectsController extends \JPI\CRUD\API\AbstractController {
 
     protected string $entityClass = Project::class;
 
@@ -84,7 +85,7 @@ final class ProjectController extends \JPI\CRUD\API\AbstractController {
 
 By default:
 
-- paginated with 10 items per page - you can disable (`$paginated`) or change number of items per page (`$perPage`):
+- paginated with 10 items per page - you can change using `$perPage` property or disable pagination setting to null
 - no columns are required - you can define using the static `$requiredColumns` property
 
 ```php
@@ -116,21 +117,21 @@ You can set up CRUD routes manually or use the convenient `addCRUDRoutes()` meth
 ```php
 // Option 1: Use addCRUDRoutes() helper (recommended)
 // This creates 5 routes:
-//   GET    /projects/     -> ProjectController::index
-//   POST   /projects/     -> ProjectController::create
-//   GET    /projects/{id}/ -> ProjectController::read
-//   PUT    /projects/{id}/ -> ProjectController::update
-//   DELETE /projects/{id}/ -> ProjectController::delete
+//   GET    /projects/      -> ProjectsController::index
+//   POST   /projects/      -> ProjectsController::create
+//   GET    /projects/{id}/ -> ProjectsController::read
+//   PUT    /projects/{id}/ -> ProjectsController::update
+//   DELETE /projects/{id}/ -> ProjectsController::delete
 // Optional third parameter: route name for the read action
-$app->addCRUDRoutes("/projects/", ProjectController::class);
-// Or with a named route: $app->addCRUDRoutes("/projects/", ProjectController::class, "project");
+$app->addCRUDRoutes("/projects/", ProjectsController::class);
+// Or with a named route: $app->addCRUDRoutes("/projects/", ProjectsController::class, "project");
 
 // Option 2: Define routes manually
-$app->addRoute("/projects/", "GET", ProjectController::class . "::index", "project");
-$app->addRoute("/projects/", "POST", ProjectController::class . "::create");
-$app->addRoute("/projects/{id}/", "GET", ProjectController::class . "::read");
-$app->addRoute("/projects/{id}/", "PUT", ProjectController::class . "::update");
-$app->addRoute("/projects/{id}/", "DELETE", ProjectController::class . "::delete");
+$app->addRoute("/projects/", "GET", ProjectsController::class . "::index", "project");
+$app->addRoute("/projects/", "POST", ProjectsController::class . "::create");
+$app->addRoute("/projects/{id}/", "GET", ProjectsController::class . "::read");
+$app->addRoute("/projects/{id}/", "PUT", ProjectsController::class . "::update");
+$app->addRoute("/projects/{id}/", "DELETE", ProjectsController::class . "::delete");
 ```
 
 Handle the request and send the response:
@@ -238,6 +239,21 @@ Then filters can be added as query parameter(s):
 
 ```
 GET /projects/?filters[status]=active&filters[category]=web
+```
+
+### Sorting
+
+Adds sorting functionality on the list/index endpoint.
+
+Enable sorting by implementing `\JPI\CRUD\API\Entity\SortableInterface` and using the `\JPI\CRUD\API\Entity\Sortable` trait. By default all columns are sortable but likely you'd want to define this using the `sortableColumns` property on your Entity.
+
+Then sorting can be applied using the `sort` query parameter as an array. Use `{column}:{direction}` syntax where direction can be `asc` or `desc`. If no direction is specified, it defaults to ascending order:
+
+```
+GET /projects/?sort[]=created_at                            # Sort by created_at ascending (default)
+GET /projects/?sort[]=created_at:asc                        # Sort by created_at ascending (explicit)
+GET /projects/?sort[]=created_at:desc                       # Sort by created_at descending
+GET /projects/?sort[]=status:asc&sort[]=created_at:desc     # Sort by status ASC, then created_at DESC
 ```
 
 ## Support
