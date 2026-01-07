@@ -21,17 +21,12 @@ trait Responder {
     abstract public function getEntityInstance(): AbstractEntity;
 
     /**
-     * Parse fields parameter from request.
+     * Get fields parameter from request attribute.
      *
-     * Returns array of field names or null if no fields parameter was provided.
+     * Returns array of field names or null if no fields attribute was set.
      */
     protected function getFieldsFromRequest(Request $request): ?array {
-        $fields = $request->getQueryParam("fields");
-        if (empty($fields) || !is_string($fields)) {
-            return null;
-        }
-
-        return array_map('trim', explode(',', $fields));
+        return $request->getAttribute("fields");
     }
 
     /**
