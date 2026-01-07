@@ -51,6 +51,7 @@ abstract class AbstractEntity extends BaseEntity {
         $mapping = static::getDataMapping();
 
         $fields = $request->getAttribute("fields");
+        $fields = $fields ? array_intersect(array_keys($mapping), $fields) : null;
 
         foreach ($this->data as $key => $value) {
             if (!array_key_exists("value", $value) || ($fields && !in_array($key, $fields))) {
