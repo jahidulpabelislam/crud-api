@@ -75,6 +75,10 @@ class CrudService {
         if ($entity instanceof SortableInterface) {
             $sort = $request->getQueryParam("sort");
             if ($sort) {
+                // If sort is a string, split by comma to support comma-separated values
+                if (is_string($sort)) {
+                    $sort = array_map('trim', explode(',', $sort));
+                }
                 $entity::addSortToQuery($query, $sort);
             }
         }
