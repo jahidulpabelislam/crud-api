@@ -7,6 +7,7 @@ namespace JPI\CRUD\API\Entity;
 use JPI\CRUD\API\AbstractEntity;
 use JPI\HTTP\Request;
 use JPI\HTTP\Response;
+use JPI\ORM\Entity;
 use JPI\ORM\Entity\Collection as EntityCollection;
 use JPI\ORM\Entity\PaginatedCollection as PaginatedEntityCollection;
 
@@ -31,13 +32,13 @@ trait Responder {
         ?AbstractEntity $entityInstance = null
     ): Response {
         $entityInstance = $entityInstance ?? $this->getEntityInstance();
-        $fields = $request->getAttribute("fields");
 
         $count = count($entities);
         $data = [];
 
+        /** @var Entity $entity */
         foreach ($entities as $entity) {
-            $response = $entity->getAPIResponse(null, $fields);
+            $response = $entity->getAPIResponse($request);
             $response["_links"] = $entity->getAPILinks();
             $data[] = $response;
         }
@@ -130,7 +131,7 @@ trait Responder {
     private function getEntityFoundResponse(Request $request, AbstractEntity $entity): Response {
         $fields = $request->getAttribute("fields");
         return Response::json(200, [
-            "data" => $entity->getAPIResponse(null, $fields),
+            "data" => $entity->getAPIResponse($request),
             "_links" => $entity->getAPILinks(),
         ]);
     }

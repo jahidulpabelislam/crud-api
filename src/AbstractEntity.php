@@ -45,14 +45,15 @@ abstract class AbstractEntity extends BaseEntity {
      * DateTime objects are formatted according to their type (date or date_time).
      *
      * @param AbstractEntity|null $parentEntity Parent entity to detect circular references
-     * @param array|null $fields List of fields to include in response. If null, all fields are included.
      */
-    public function getAPIResponse(?AbstractEntity $parentEntity = null, ?array $fields = null): array {
+    public function getAPIResponse($request, ?AbstractEntity $parentEntity = null): array {
         $response = [
             "id" => $this->getId(),
         ];
 
         $mapping = static::getDataMapping();
+
+        $fields = $request->getAttribute("fields");
 
         foreach ($this->data as $key => $value) {
             if (!array_key_exists("value", $value) || ($fields && !in_array($key, $fields))) {
