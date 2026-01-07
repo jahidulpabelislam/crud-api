@@ -21,15 +21,6 @@ trait Responder {
     abstract public function getEntityInstance(): AbstractEntity;
 
     /**
-     * Get fields parameter from request attribute.
-     *
-     * Returns array of field names or null if no fields attribute was set.
-     */
-    protected function getFieldsFromRequest(Request $request): ?array {
-        return $request->getAttribute("fields");
-    }
-
-    /**
      * Response when collection of entities was requested.
      *
      * Includes entity data, HATEOAS links, and a message if none were found.
@@ -40,7 +31,7 @@ trait Responder {
         ?AbstractEntity $entityInstance = null
     ): Response {
         $entityInstance = $entityInstance ?? $this->getEntityInstance();
-        $fields = $this->getFieldsFromRequest($request);
+        $fields = $request->getAttribute("fields");
 
         $count = count($entities);
         $data = [];
@@ -137,7 +128,7 @@ trait Responder {
     }
 
     private function getEntityFoundResponse(Request $request, AbstractEntity $entity): Response {
-        $fields = $this->getFieldsFromRequest($request);
+        $fields = $request->getAttribute("fields");
         return Response::json(200, [
             "data" => $entity->getAPIResponse(null, $fields),
             "_links" => $entity->getAPILinks(),
