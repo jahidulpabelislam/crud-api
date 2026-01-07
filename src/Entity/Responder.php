@@ -27,7 +27,7 @@ trait Responder {
      */
     protected function getFieldsFromRequest(Request $request): ?array {
         $fields = $request->getQueryParam("fields");
-        if (!$fields || !is_string($fields)) {
+        if (empty($fields) || !is_string($fields)) {
             return null;
         }
 
