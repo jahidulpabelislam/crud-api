@@ -35,8 +35,9 @@ trait Responder {
         $count = count($entities);
         $data = [];
 
+        /** @var AbstractEntity $entity */
         foreach ($entities as $entity) {
-            $response = $entity->getAPIResponse();
+            $response = $entity->getAPIResponse($request);
             $response["_links"] = $entity->getAPILinks();
             $data[] = $response;
         }
@@ -128,7 +129,7 @@ trait Responder {
 
     private function getEntityFoundResponse(Request $request, AbstractEntity $entity): Response {
         return Response::json(200, [
-            "data" => $entity->getAPIResponse(),
+            "data" => $entity->getAPIResponse($request),
             "_links" => $entity->getAPILinks(),
         ]);
     }

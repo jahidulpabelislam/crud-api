@@ -62,6 +62,22 @@ abstract class AbstractController {
     }
 
     /**
+     * Parse fields parameter from request and set it as an attribute.
+     *
+     * Extracts the comma-separated fields query parameter and converts it to an array,
+     * then stores it as a request attribute for consistent access throughout the request lifecycle.
+     */
+    protected function parseFieldsAttribute(): void {
+        $request = $this->getRequest();
+
+        $fields = $request->getQueryParam("fields");
+        if (!empty($fields) && is_string($fields)) {
+            $fieldsArray = array_map('trim', explode(',', $fields));
+            $request->setAttribute("fields", $fieldsArray);
+        }
+    }
+
+    /**
      * Retrieves all entities with optional pagination, search, filters, and sorting.
      */
     public function index(): Response {
@@ -73,6 +89,8 @@ abstract class AbstractController {
         ) {
             return static::getNotAuthorisedResponse();
         }
+
+        $this->parseFieldsAttribute();
 
         $entities = $this->getEntityInstance()::getCrudService()->index($request);
 
@@ -111,6 +129,8 @@ abstract class AbstractController {
         ) {
             return static::getNotAuthorisedResponse();
         }
+
+        $this->parseFieldsAttribute();
 
         $entity = $this->getEntityInstance()::getCrudService()->read($request);
         return $this->getEntityResponse($request, $entity, $id);

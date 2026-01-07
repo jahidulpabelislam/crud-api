@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace JPI\CRUD\API;
 
 use DateTime;
+use JPI\HTTP\Request;
 use JPI\ORM\Entity as BaseEntity;
 use JPI\ORM\Entity\Collection as EntityCollection;
 use JPI\Utils\URL;
@@ -40,21 +41,20 @@ abstract class AbstractEntity extends BaseEntity {
     }
 
     /**
-     * Generates the API response representation of this entity.
-     *
-     * DateTime objects are formatted according to their type (date or date_time).
-     *
      * @param AbstractEntity|null $parentEntity Parent entity to detect circular references
      */
-    public function getAPIResponse(?AbstractEntity $parentEntity = null): array {
+    public function getAPIResponse(Request $request, ?AbstractEntity $parentEntity = null): array {
         $response = [
             "id" => $this->getId(),
         ];
 
         $mapping = static::getDataMapping();
 
+        $fields = $request->getAttribute("fields");
+        $fields = $fields ? array_intersect(array_keys($mapping), $fields) : null;
+
         foreach ($this->data as $key => $value) {
-            if (!array_key_exists("value", $value)) {
+            if (!array_key_exists("value", $value) || ($fields && !in_array($key, $fields))) {
                 continue;
             }
 
@@ -65,7 +65,7 @@ abstract class AbstractEntity extends BaseEntity {
                     continue;
                 }
 
-                $value = $value->getAPIResponse($this);
+                $value = $value->getAPIResponse($request, $this);
             }
             else if ($value instanceof EntityCollection) {
                 if ($parentEntity && $mapping[$key]["entity"] === $parentEntity::class) {
@@ -74,8 +74,9 @@ abstract class AbstractEntity extends BaseEntity {
 
                 $entities = $value;
                 $value = [];
+                /** @var AbstractEntity $entity */
                 foreach ($entities as $entity) {
-                    $entityResponse = $entity->getAPIResponse($this);
+                    $entityResponse = $entity->getAPIResponse($request, $this);
                     $entityResponse["_links"] = $entity->getAPILinks();
                     $value[] = $entityResponse;
                 }
