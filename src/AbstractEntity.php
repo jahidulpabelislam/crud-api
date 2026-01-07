@@ -55,7 +55,7 @@ abstract class AbstractEntity extends BaseEntity {
         $mapping = static::getDataMapping();
 
         foreach ($this->data as $key => $value) {
-            if (!array_key_exists("value", $value)) {
+            if (!array_key_exists("value", $value) || ($fields && !in_array($key, $fields))) {
                 continue;
             }
 
@@ -91,12 +91,6 @@ abstract class AbstractEntity extends BaseEntity {
             }
 
             $response[$key] = $value;
-        }
-
-        // Filter response to only include requested fields (plus id which is always included)
-        if ($fields !== null) {
-            $allowedFields = array_merge(["id"], $fields);
-            $response = array_intersect_key($response, array_flip($allowedFields));
         }
 
         return $response;
