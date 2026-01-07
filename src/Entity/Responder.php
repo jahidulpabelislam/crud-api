@@ -21,6 +21,30 @@ trait Responder {
     abstract public function getEntityInstance(): AbstractEntity;
 
     /**
+     * Parse fields parameter from request.
+     *
+     * Returns array of field names or null if no fields parameter was provided.
+     */
+    protected function getFieldsFromRequest(Request $request): ?array {
+        $fields = $request->getQueryParam("fields");
+        if (!$fields) {
+            return null;
+        }
+
+        // Support both array format (?fields[]=name&fields[]=created_at)
+        // and comma-separated format (?fields=name,created_at)
+        if (is_array($fields)) {
+            return $fields;
+        }
+
+        if (is_string($fields)) {
+            return array_map('trim', explode(',', $fields));
+        }
+
+        return null;
+    }
+
+    /**
      * Response when collection of entities was requested.
      *
      * Includes entity data, HATEOAS links, and a message if none were found.
@@ -31,12 +55,13 @@ trait Responder {
         ?AbstractEntity $entityInstance = null
     ): Response {
         $entityInstance = $entityInstance ?? $this->getEntityInstance();
+        $fields = $this->getFieldsFromRequest($request);
 
         $count = count($entities);
         $data = [];
 
         foreach ($entities as $entity) {
-            $response = $entity->getAPIResponse();
+            $response = $entity->getAPIResponse(null, $fields);
             $response["_links"] = $entity->getAPILinks();
             $data[] = $response;
         }
@@ -127,8 +152,9 @@ trait Responder {
     }
 
     private function getEntityFoundResponse(Request $request, AbstractEntity $entity): Response {
+        $fields = $this->getFieldsFromRequest($request);
         return Response::json(200, [
-            "data" => $entity->getAPIResponse(),
+            "data" => $entity->getAPIResponse(null, $fields),
             "_links" => $entity->getAPILinks(),
         ]);
     }

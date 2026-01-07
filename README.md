@@ -15,6 +15,7 @@ A lightweight PHP framework for building RESTful CRUD APIs with built-in support
 - **Pagination**: Built-in pagination support with configurable page size
 - **Search & Filtering**: Flexible search and filter functionality for listing endpoints
 - **Sorting**: Sort results by multiple columns in ascending or descending order
+- **Field Selection**: Choose which fields to return in API responses to reduce payload size
 - **Authentication**: Built-in authentication checks for protected endpoints
 - **JSON Responses**: Standardised JSON response format with HATEOAS links
 - **Validation**: Comprehensive data validation with detailed error messages
@@ -254,6 +255,37 @@ GET /projects/?sort[]=created_at                            # Sort by created_at
 GET /projects/?sort[]=created_at:asc                        # Sort by created_at ascending (explicit)
 GET /projects/?sort[]=created_at:desc                       # Sort by created_at descending
 GET /projects/?sort[]=status:asc&sort[]=created_at:desc     # Sort by status ASC, then created_at DESC
+```
+
+### Field Selection
+
+You can choose which fields to include in the API response for list/index and read/single endpoints using the `fields` query parameter. This helps reduce payload size and improve performance by only returning the data you need.
+
+The `id` field is always included in the response.
+
+The `fields` parameter supports two formats:
+
+```
+# Array format
+GET /projects/?fields[]=name&fields[]=created_at
+
+# Comma-separated format  
+GET /projects/?fields=name,created_at
+```
+
+Both formats will return only the specified fields (plus `id`) in the response:
+
+```json
+{
+    "data": {
+        "id": 1,
+        "name": "Example Project",
+        "created_at": "2024-01-15 10:30:00 UTC"
+    },
+    "_links": {
+        "self": "https://api.example.com/projects/1/"
+    }
+}
 ```
 
 ## Support

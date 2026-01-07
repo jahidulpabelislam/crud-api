@@ -45,8 +45,9 @@ abstract class AbstractEntity extends BaseEntity {
      * DateTime objects are formatted according to their type (date or date_time).
      *
      * @param AbstractEntity|null $parentEntity Parent entity to detect circular references
+     * @param array|null $fields List of fields to include in response. If null, all fields are included.
      */
-    public function getAPIResponse(?AbstractEntity $parentEntity = null): array {
+    public function getAPIResponse(?AbstractEntity $parentEntity = null, ?array $fields = null): array {
         $response = [
             "id" => $this->getId(),
         ];
@@ -65,7 +66,7 @@ abstract class AbstractEntity extends BaseEntity {
                     continue;
                 }
 
-                $value = $value->getAPIResponse($this);
+                $value = $value->getAPIResponse($this, $fields);
             }
             else if ($value instanceof EntityCollection) {
                 if ($parentEntity && $mapping[$column]["entity"] === $parentEntity::class) {
@@ -75,7 +76,7 @@ abstract class AbstractEntity extends BaseEntity {
                 $entities = $value;
                 $value = [];
                 foreach ($entities as $entity) {
-                    $entityResponse = $entity->getAPIResponse($this);
+                    $entityResponse = $entity->getAPIResponse($this, $fields);
                     $entityResponse["_links"] = $entity->getAPILinks();
                     $value[] = $entityResponse;
                 }
@@ -90,6 +91,12 @@ abstract class AbstractEntity extends BaseEntity {
             }
 
             $response[$column] = $value;
+        }
+
+        // Filter response to only include requested fields (plus id which is always included)
+        if ($fields !== null) {
+            $allowedFields = array_merge(["id"], $fields);
+            $response = array_intersect_key($response, array_flip($allowedFields));
         }
 
         return $response;
