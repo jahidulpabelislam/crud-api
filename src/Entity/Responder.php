@@ -7,7 +7,6 @@ namespace JPI\CRUD\API\Entity;
 use JPI\CRUD\API\AbstractEntity;
 use JPI\HTTP\Request;
 use JPI\HTTP\Response;
-use JPI\ORM\Entity;
 use JPI\ORM\Entity\Collection as EntityCollection;
 use JPI\ORM\Entity\PaginatedCollection as PaginatedEntityCollection;
 
@@ -36,7 +35,7 @@ trait Responder {
         $count = count($entities);
         $data = [];
 
-        /** @var Entity $entity */
+        /** @var AbstractEntity $entity */
         foreach ($entities as $entity) {
             $response = $entity->getAPIResponse($request);
             $response["_links"] = $entity->getAPILinks();
