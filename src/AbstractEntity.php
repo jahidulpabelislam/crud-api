@@ -65,7 +65,7 @@ abstract class AbstractEntity extends BaseEntity {
                     continue;
                 }
 
-                $value = $value->getAPIResponse($parentEntity ?: $this);
+                $value = $value->getAPIResponse( $this);
             }
             else if ($value instanceof EntityCollection) {
                 if ($parentEntity && $mapping[$column]["entity"] === $parentEntity::class) {
@@ -75,7 +75,7 @@ abstract class AbstractEntity extends BaseEntity {
                 $entities = $value;
                 $value = [];
                 foreach ($entities as $entity) {
-                    $entityResponse = $entity->getAPIResponse($parentEntity ?: $this);
+                    $entityResponse = $entity->getAPIResponse($this);
                     $entityResponse["_links"] = $entity->getAPILinks();
                     $value[] = $entityResponse;
                 }
