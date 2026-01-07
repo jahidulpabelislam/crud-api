@@ -65,7 +65,7 @@ abstract class AbstractEntity extends BaseEntity {
                     continue;
                 }
 
-                $value = $value->getAPIResponse( $this);
+                $value = $value->getAPIResponse($this);
             }
             else if ($value instanceof EntityCollection) {
                 if ($parentEntity && $mapping[$column]["entity"] === $parentEntity::class) {
