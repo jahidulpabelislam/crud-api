@@ -53,7 +53,7 @@ abstract class AbstractEntity extends BaseEntity {
 
         $mapping = static::getDataMapping();
 
-        foreach ($this->data as $column => $value) {
+        foreach ($this->data as $key => $value) {
             if (!array_key_exists("value", $value)) {
                 continue;
             }
@@ -68,7 +68,7 @@ abstract class AbstractEntity extends BaseEntity {
                 $value = $value->getAPIResponse($this);
             }
             else if ($value instanceof EntityCollection) {
-                if ($parentEntity && $mapping[$column]["entity"] === $parentEntity::class) {
+                if ($parentEntity && $mapping[$key]["entity"] === $parentEntity::class) {
                     continue;
                 }
 
@@ -81,7 +81,7 @@ abstract class AbstractEntity extends BaseEntity {
                 }
             }
             else if ($value instanceof DateTime) {
-                if ($mapping[$column]["type"] === "date_time") {
+                if ($mapping[$key]["type"] === "date_time") {
                     $value = $value->format("Y-m-d H:i:s e");
                 }
                 else {
@@ -89,7 +89,7 @@ abstract class AbstractEntity extends BaseEntity {
                 }
             }
 
-            $response[$column] = $value;
+            $response[$key] = $value;
         }
 
         return $response;
