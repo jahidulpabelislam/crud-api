@@ -69,7 +69,7 @@ abstract class AbstractController {
      */
     protected function parseFieldsAttribute(): void {
         $request = $this->getRequest();
-        
+
         $fields = $request->getQueryParam("fields");
         if (!empty($fields) && is_string($fields)) {
             $fieldsArray = array_map('trim', explode(',', $fields));
