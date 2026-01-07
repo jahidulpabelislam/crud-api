@@ -29,7 +29,7 @@ abstract class AbstractEntity extends BaseEntity {
             return static::$displayName;
         }
 
-        return (new ReflectionClass(static::class))->getShortName();
+        return trim(preg_replace("/(?<!\s)[A-Z]/", " $0", (new ReflectionClass(static::class))->getShortName()), " ");
     }
 
     public static function getPluralDisplayName(): string {
