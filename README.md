@@ -263,17 +263,13 @@ You can choose which fields to include in the API response for list/index and re
 
 The `id` field is always included in the response.
 
-The `fields` parameter supports two formats:
+Use comma-separated field names:
 
 ```
-# Array format
-GET /projects/?fields[]=name&fields[]=created_at
-
-# Comma-separated format  
 GET /projects/?fields=name,created_at
 ```
 
-Both formats will return only the specified fields (plus `id`) in the response:
+This will return only the specified fields (plus `id`) in the response:
 
 ```json
 {

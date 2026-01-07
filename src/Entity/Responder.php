@@ -27,21 +27,11 @@ trait Responder {
      */
     protected function getFieldsFromRequest(Request $request): ?array {
         $fields = $request->getQueryParam("fields");
-        if (!$fields) {
+        if (!$fields || !is_string($fields)) {
             return null;
         }
 
-        // Support both array format (?fields[]=name&fields[]=created_at)
-        // and comma-separated format (?fields=name,created_at)
-        if (is_array($fields)) {
-            return $fields;
-        }
-
-        if (is_string($fields)) {
-            return array_map('trim', explode(',', $fields));
-        }
-
-        return null;
+        return array_map('trim', explode(',', $fields));
     }
 
     /**
