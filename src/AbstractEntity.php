@@ -42,13 +42,11 @@ abstract class AbstractEntity extends BaseEntity {
     /**
      * Generates the API response representation of this entity.
      *
-     * Handles nested entities up to a maximum depth of 3 to prevent circular references.
      * DateTime objects are formatted according to their type (date or date_time).
      *
-     * @param int $depth Current recursion depth
      * @param AbstractEntity|null $parentEntity Parent entity to detect circular references
      */
-    public function getAPIResponse(int $depth = 1, ?AbstractEntity $parentEntity = null): array {
+    public function getAPIResponse(?AbstractEntity $parentEntity = null): array {
         $response = [
             "id" => $this->getId(),
         ];
@@ -63,21 +61,21 @@ abstract class AbstractEntity extends BaseEntity {
             $value = $value["value"];
 
             if ($value instanceof self) {
-                if ($depth > 2 || $parentEntity === $value) {
+                if ($parentEntity === $value) {
                     continue;
                 }
 
-                $value = $value->getAPIResponse($depth + 1, $this);
+                $value = $value->getAPIResponse($this);
             }
             else if ($value instanceof EntityCollection) {
-                if ($depth > 2) {
+                if ($parentEntity && $mapping[$column]["entity"] === $parentEntity::class) {
                     continue;
                 }
 
                 $entities = $value;
                 $value = [];
                 foreach ($entities as $entity) {
-                    $entityResponse = $entity->getAPIResponse($depth + 1, $this);
+                    $entityResponse = $entity->getAPIResponse($this);
                     $entityResponse["_links"] = $entity->getAPILinks();
                     $value[] = $entityResponse;
                 }
