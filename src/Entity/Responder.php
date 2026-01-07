@@ -129,7 +129,6 @@ trait Responder {
     }
 
     private function getEntityFoundResponse(Request $request, AbstractEntity $entity): Response {
-        $fields = $request->getAttribute("fields");
         return Response::json(200, [
             "data" => $entity->getAPIResponse($request),
             "_links" => $entity->getAPILinks(),
