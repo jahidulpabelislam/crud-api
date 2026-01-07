@@ -269,8 +269,6 @@ Use comma-separated field names:
 GET /projects/?fields=name,created_at
 ```
 
-This will return only the specified fields (plus `id`) in the response:
-
 ```json
 {
     "data": {
