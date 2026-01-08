@@ -29,6 +29,6 @@ jobs:
     - name: Run PHP_CodeSniffer
       shell: bash
       run: phpcs
-    - name: Run PHPUnit Tests
+    - name: Run PHP Unit tests
       shell: bash
-      run: ./vendor/bin/phpunit
+      run: vendor/bin/phpunit tests
