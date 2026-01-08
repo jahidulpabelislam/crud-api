@@ -46,7 +46,7 @@ abstract class AbstractEntity extends BaseEntity {
     /**
      * Returns the API URL for this entity instance.
      */
-    public function getAPIURL(Request $request = null): URL
+    public function getAPIURL(?Request $request = null): URL
     {
         $baseURL = "/" . static::getAPIBasePath() . "/" . $this->getId() . "/";
         if (!$request) {
