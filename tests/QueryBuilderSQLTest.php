@@ -21,43 +21,30 @@ class QueryBuilderSQLTest extends TestCase {
         return $this->createMock(Database::class);
     }
 
-    private function createQueryBuilder(): QueryBuilder {
+    private function createQueryBuilder(?Database $database = null): QueryBuilder {
         $entity = new TestEntity();
-        return new QueryBuilder($this->createMockDatabase(), $entity);
-    }
-
-    /**
-     * Helper method to get WHERE clause SQL from query builder
-     */
-    private function getWhereClause(QueryBuilder $query): string {
-        $reflection = new \ReflectionClass($query);
-        $whereProperty = $reflection->getProperty('where');
-        $whereProperty->setAccessible(true);
-        return (string)$whereProperty->getValue($query);
-    }
-
-    /**
-     * Helper method to get ORDER BY clause SQL from query builder
-     */
-    private function getOrderByClause(QueryBuilder $query): string {
-        $reflection = new \ReflectionClass($query);
-        $orderByProperty = $reflection->getProperty('orderBy');
-        $orderByProperty->setAccessible(true);
-        return (string)$orderByProperty->getValue($query);
-    }
-
-    /**
-     * Helper method to get LIMIT value from query builder
-     */
-    private function getLimitValue(QueryBuilder $query): ?int {
-        $reflection = new \ReflectionClass($query);
-        $limitProperty = $reflection->getProperty('limit');
-        $limitProperty->setAccessible(true);
-        return $limitProperty->getValue($query);
+        return new QueryBuilder($database ?: $this->createMockDatabase(), $entity);
     }
 
     public function testFilteringGeneratesCorrectWhereClause(): void {
-        $query = $this->createQueryBuilder();
+        $database = $this->createMockDatabase();
+        
+        // Expect the selectAll method to be called with specific SQL
+        $database->expects($this->once())
+            ->method('selectAll')
+            ->with(
+                $this->equalTo("SELECT *
+FROM test_entities
+WHERE status = :status AND category = :category
+ORDER BY id ASC;"),
+                $this->equalTo([
+                    'status' => 'active',
+                    'category' => 'test',
+                ])
+            )
+            ->willReturn([]);
+        
+        $query = $this->createQueryBuilder($database);
         
         // Add filter for status = active
         TestEntity::addFiltersToQuery($query, [
@@ -65,61 +52,80 @@ class QueryBuilderSQLTest extends TestCase {
             'category' => 'test',
         ]);
         
-        // Get WHERE clause SQL
-        $whereSQL = $this->getWhereClause($query);
-        
-        // Should contain both status and category
-        $this->assertStringContainsString('status', $whereSQL);
-        $this->assertStringContainsString('category', $whereSQL);
-        
-        // Check params
-        $params = $query->getParams();
-        $this->assertArrayHasKey('status', $params);
-        $this->assertEquals('active', $params['status']);
-        $this->assertArrayHasKey('category', $params);
-        $this->assertEquals('test', $params['category']);
+        // Execute the query to trigger SQL generation
+        $query->select(false);
     }
 
     public function testSearchingGeneratesCorrectWhereClause(): void {
-        $query = $this->createQueryBuilder();
+        $database = $this->createMockDatabase();
+        
+        // Expect the select method to be called with specific SQL including OR conditions
+        $database->expects($this->once())
+            ->method('selectAll')
+            ->with(
+                $this->equalTo("SELECT *
+FROM test_entities
+WHERE (name LIKE :search OR name LIKE :searchReversed OR description LIKE :search OR description LIKE :searchReversed)
+ORDER BY id ASC;"),
+                $this->equalTo([
+                    'search' => '%hello%world%',
+                    'searchReversed' => '%world%hello%',
+                ])
+            )
+            ->willReturn([]);
+        
+        $query = $this->createQueryBuilder($database);
         
         // Add search query
         TestEntity::addSearchToQuery($query, 'hello world');
         
-        // Get params to verify search patterns
-        $params = $query->getParams();
-        
-        $this->assertArrayHasKey('search', $params);
-        $this->assertArrayHasKey('searchReversed', $params);
-        $this->assertEquals('%hello%world%', $params['search']);
-        $this->assertEquals('%world%hello%', $params['searchReversed']);
-        
-        // Get WHERE clause SQL
-        $whereSQL = $this->getWhereClause($query);
-        
-        // Should contain LIKE conditions for searchable columns
-        $this->assertStringContainsString('LIKE', $whereSQL);
-        $this->assertStringContainsString(':search', $whereSQL);
+        // Execute the query to trigger SQL generation
+        $query->select(false);
     }
 
     public function testSortingGeneratesCorrectOrderBy(): void {
-        $query = $this->createQueryBuilder();
+        $database = $this->createMockDatabase();
+        
+        // Expect the select method to be called with specific ORDER BY
+        $database->expects($this->once())
+            ->method('selectAll')
+            ->with(
+                $this->equalTo("SELECT *
+FROM test_entities
+ORDER BY name ASC, created_at DESC;"),
+                $this->equalTo([])
+            )
+            ->willReturn([]);
+        
+        $query = $this->createQueryBuilder($database);
         
         // Add sorting
         TestEntity::addSortToQuery($query, ['name:asc', 'created_at:desc']);
         
-        // Get ORDER BY clause SQL
-        $orderBySQL = $this->getOrderByClause($query);
-        
-        // Should contain both columns with correct directions
-        $this->assertStringContainsString('name', $orderBySQL);
-        $this->assertStringContainsString('created_at', $orderBySQL);
-        $this->assertStringContainsString('ASC', $orderBySQL);
-        $this->assertStringContainsString('DESC', $orderBySQL);
+        // Execute the query to trigger SQL generation
+        $query->select(false);
     }
 
     public function testMultipleFiltersWithSearch(): void {
-        $query = $this->createQueryBuilder();
+        $database = $this->createMockDatabase();
+        
+        // Expect the select method to be called with combined WHERE conditions
+        $database->expects($this->once())
+            ->method('selectAll')
+            ->with(
+                $this->equalTo("SELECT *
+FROM test_entities
+WHERE status = :status AND (name LIKE :search OR name LIKE :searchReversed OR description LIKE :search OR description LIKE :searchReversed)
+ORDER BY id ASC;"),
+                $this->equalTo([
+                    'status' => 'active',
+                    'search' => '%test%',
+                    'searchReversed' => '%test%',
+                ])
+            )
+            ->willReturn([]);
+        
+        $query = $this->createQueryBuilder($database);
         
         // Add filters
         TestEntity::addFiltersToQuery($query, [
@@ -129,21 +135,32 @@ class QueryBuilderSQLTest extends TestCase {
         // Add search
         TestEntity::addSearchToQuery($query, 'test');
         
-        // Get WHERE clause SQL
-        $whereSQL = $this->getWhereClause($query);
-        
-        // Should have both filter and search conditions
-        $this->assertStringContainsString('status', $whereSQL);
-        $this->assertStringContainsString('LIKE', $whereSQL);
-        
-        // Check params
-        $params = $query->getParams();
-        $this->assertArrayHasKey('status', $params);
-        $this->assertArrayHasKey('search', $params);
+        // Execute the query to trigger SQL generation
+        $query->select(false);
     }
 
     public function testComplexQueryWithFilterSearchAndSort(): void {
-        $query = $this->createQueryBuilder();
+        $database = $this->createMockDatabase();
+        
+        // Expect the select method to be called with all query modifications
+        $database->expects($this->once())
+            ->method('selectAll')
+            ->with(
+                $this->equalTo("SELECT *
+FROM test_entities
+WHERE status = :status AND category = :category AND (name LIKE :search OR name LIKE :searchReversed OR description LIKE :search OR description LIKE :searchReversed)
+ORDER BY name DESC, created_at ASC
+LIMIT 10 OFFSET 10;"),
+                $this->equalTo([
+                    'status' => 'active',
+                    'category' => 'test',
+                    'search' => '%hello%world%',
+                    'searchReversed' => '%world%hello%',
+                ])
+            )
+            ->willReturn([]);
+        
+        $query = $this->createQueryBuilder($database);
         
         // Add all query modifications
         TestEntity::addFiltersToQuery($query, [
@@ -158,23 +175,28 @@ class QueryBuilderSQLTest extends TestCase {
         // Add pagination
         $query->limit(10, 2); // 10 items, page 2
         
-        // Verify WHERE clause contains both filters and search
-        $whereSQL = $this->getWhereClause($query);
-        $this->assertStringContainsString('status', $whereSQL);
-        $this->assertStringContainsString('category', $whereSQL);
-        $this->assertStringContainsString('LIKE', $whereSQL);
-        
-        // Verify ORDER BY contains both columns
-        $orderBySQL = $this->getOrderByClause($query);
-        $this->assertStringContainsString('name', $orderBySQL);
-        $this->assertStringContainsString('created_at', $orderBySQL);
-        
-        // Verify LIMIT
-        $this->assertEquals(10, $this->getLimitValue($query));
+        // Execute the query to trigger SQL generation
+        $query->select(false);
     }
 
     public function testFilterIgnoresNonFilterableColumns(): void {
-        $query = $this->createQueryBuilder();
+        $database = $this->createMockDatabase();
+        
+        // Expect only filterable columns in WHERE clause
+        $database->expects($this->once())
+            ->method('selectAll')
+            ->with(
+                $this->equalTo("SELECT *
+FROM test_entities
+WHERE status = :status
+ORDER BY id ASC;"),
+                $this->equalTo([
+                    'status' => 'active',
+                ])
+            )
+            ->willReturn([]);
+        
+        $query = $this->createQueryBuilder($database);
         
         // Try to filter by a non-filterable column
         TestEntity::addFiltersToQuery($query, [
@@ -182,66 +204,80 @@ class QueryBuilderSQLTest extends TestCase {
             'nonexistent_column' => 'value',
         ]);
         
-        // Get WHERE clause SQL
-        $whereSQL = $this->getWhereClause($query);
-        
-        // Should only contain status
-        $this->assertStringContainsString('status', $whereSQL);
-        $this->assertStringNotContainsString('nonexistent_column', $whereSQL);
-        
-        // Verify only status is in params
-        $params = $query->getParams();
-        $this->assertArrayHasKey('status', $params);
-        $this->assertArrayNotHasKey('nonexistent_column', $params);
+        // Execute the query to trigger SQL generation
+        $query->select(false);
     }
 
     public function testSortIgnoresNonSortableColumns(): void {
-        $query = $this->createQueryBuilder();
+        $database = $this->createMockDatabase();
+        
+        // Expect only sortable columns in ORDER BY clause
+        $database->expects($this->once())
+            ->method('selectAll')
+            ->with(
+                $this->equalTo("SELECT *
+FROM test_entities
+ORDER BY name DESC;"),
+                $this->equalTo([])
+            )
+            ->willReturn([]);
+        
+        $query = $this->createQueryBuilder($database);
         
         // Try to sort by a non-sortable column
         TestEntity::addSortToQuery($query, ['nonexistent_column:asc', 'name:desc']);
         
-        // Get ORDER BY clause SQL
-        $orderBySQL = $this->getOrderByClause($query);
-        
-        // Should only contain name
-        $this->assertStringContainsString('name', $orderBySQL);
-        $this->assertStringNotContainsString('nonexistent_column', $orderBySQL);
+        // Execute the query to trigger SQL generation
+        $query->select(false);
     }
 
     public function testSearchWithMultipleWords(): void {
-        $query = $this->createQueryBuilder();
+        $database = $this->createMockDatabase();
+        
+        // Expect the select method to be called with multi-word search patterns
+        $database->expects($this->once())
+            ->method('selectAll')
+            ->with(
+                $this->equalTo("SELECT *
+FROM test_entities
+WHERE (name LIKE :search OR name LIKE :searchReversed OR description LIKE :search OR description LIKE :searchReversed)
+ORDER BY id ASC;"),
+                $this->equalTo([
+                    'search' => '%hello%world%test%',
+                    'searchReversed' => '%test%world%hello%',
+                ])
+            )
+            ->willReturn([]);
+        
+        $query = $this->createQueryBuilder($database);
         
         // Add multi-word search
         TestEntity::addSearchToQuery($query, 'hello world test');
         
-        // Check params
-        $params = $query->getParams();
-        
-        // Should have wildcards between words
-        $this->assertEquals('%hello%world%test%', $params['search']);
-        $this->assertEquals('%test%world%hello%', $params['searchReversed']);
-        
-        // Get WHERE clause SQL
-        $whereSQL = $this->getWhereClause($query);
-        
-        // Should have OR conditions for searchable columns
-        $this->assertStringContainsString('OR', $whereSQL);
-        $this->assertStringContainsString('name', $whereSQL);
-        $this->assertStringContainsString('description', $whereSQL);
+        // Execute the query to trigger SQL generation
+        $query->select(false);
     }
 
     public function testSortWithDefaultDirection(): void {
-        $query = $this->createQueryBuilder();
+        $database = $this->createMockDatabase();
+        
+        // Expect the select method to be called with default ASC direction
+        $database->expects($this->once())
+            ->method('selectAll')
+            ->with(
+                $this->equalTo("SELECT *
+FROM test_entities
+ORDER BY name ASC;"),
+                $this->equalTo([])
+            )
+            ->willReturn([]);
+        
+        $query = $this->createQueryBuilder($database);
         
         // Add sort without explicit direction (should default to ASC)
         TestEntity::addSortToQuery($query, ['name']);
         
-        // Get ORDER BY clause SQL
-        $orderBySQL = $this->getOrderByClause($query);
-        
-        // Should contain name with ASC (default)
-        $this->assertStringContainsString('name', $orderBySQL);
-        $this->assertStringContainsString('ASC', $orderBySQL);
+        // Execute the query to trigger SQL generation
+        $query->select(false);
     }
 }
