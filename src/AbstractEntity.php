@@ -19,11 +19,6 @@ abstract class AbstractEntity extends BaseEntity {
     /** @var class-string<CrudService> */
     protected static string $crudService = CrudService::class;
 
-    /**
-     * Returns the API URL for this entity instance.
-     */
-    abstract public function getAPIURL(): URL;
-
     public static function getDisplayName(): string {
         if (isset(static::$displayName)) {
             return static::$displayName;
@@ -38,6 +33,26 @@ abstract class AbstractEntity extends BaseEntity {
 
     public static function getCrudService(): CrudService {
         return new static::$crudService(static::class);
+    }
+
+    public function getAPIBasePath(): string
+    {
+        // Convert display name to lowercase and replace spaces with hyphens
+        $basePath = strtolower(static::getPluralDisplayName());
+        $basePath = str_replace(" ", "-", $basePath);
+        return $basePath;
+    }
+
+    /**
+     * Returns the API URL for this entity instance.
+     */
+    public function getAPIURL(Request $request = null): URL
+    {
+        $baseURL = "/" . static::getAPIBasePath() . "/" . $this->getID() . "/";
+        if (!$request) {
+            return new URL($baseURL);
+        }
+        return $request->makeURL($baseURL);
     }
 
     /**
@@ -77,7 +92,7 @@ abstract class AbstractEntity extends BaseEntity {
                 /** @var AbstractEntity $entity */
                 foreach ($entities as $entity) {
                     $entityResponse = $entity->getAPIResponse($request, $this);
-                    $entityResponse["_links"] = $entity->getAPILinks();
+                    $entityResponse["_links"] = $entity->getAPILinks($request);
                     $value[] = $entityResponse;
                 }
             }
@@ -96,9 +111,9 @@ abstract class AbstractEntity extends BaseEntity {
         return $response;
     }
 
-    public function getAPILinks(): array {
+    public function getAPILinks(Request $request): array {
         return [
-            "self" => $this->getAPIURL(),
+            "self" => $this->getAPIURL($request),
         ];
     }
 }

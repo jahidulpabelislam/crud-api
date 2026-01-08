@@ -45,9 +45,9 @@ $ composer require jpi/crud-api
 
 **Extra Set Up:**
 
-- `getAPIURL()`: Returns the API URL for the entity - MUST be implemented
 - `getDisplayName(): string`: Used in error messages - uses `$displayName` property if set otherwise returns the class name
 - `getPluralDisplayName(): string`: Used in error messages - simply appends an `s` to the display name (can be overridden for irregular plurals)
+- `getAPIURL()`: Returns the API URL for the entity - basic version implemented assuming the format is `/{pluralName}/{id}` - you can override if needed.
 
 ### 2. Create a Controller
 
