@@ -33,53 +33,58 @@ class CrudServiceIndexTest extends TestCase {
 
     public function testIndexParsesFilterQueryParam(): void {
         // Set up filter query parameters
-        $filters = new Collection([
+        $filters = [
             "status" => "active",
             "category" => "test",
-        ]);
-        $this->request->setQueryParam("filters", $filters);
+        ];
+        $queryParams = ["filters" => $filters];
+        $request = new Request([], [], $queryParams, []);
         
         // We can't easily test the actual SQL without a database
         // But we can verify the request parsing works
-        $filterParam = $this->request->getQueryParam("filters");
-        $this->assertInstanceOf(Collection::class, $filterParam);
+        $filterParam = $request->getQueryParam("filters");
         $this->assertEquals("active", $filterParam["status"]);
         $this->assertEquals("test", $filterParam["category"]);
     }
 
     public function testIndexParsesSearchQueryParam(): void {
-        $this->request->setQueryParam("search", "test search term");
+        $queryParams = ["search" => "test search term"];
+        $request = new Request([], [], $queryParams, []);
         
-        $search = $this->request->getQueryParam("search");
+        $search = $request->getQueryParam("search");
         $this->assertEquals("test search term", $search);
     }
 
     public function testIndexParsesSortQueryParam(): void {
-        $this->request->setQueryParam("sort", "name:asc,created_at:desc");
+        $queryParams = ["sort" => "name:asc,created_at:desc"];
+        $request = new Request([], [], $queryParams, []);
         
-        $sort = $this->request->getQueryParam("sort");
+        $sort = $request->getQueryParam("sort");
         $this->assertEquals("name:asc,created_at:desc", $sort);
     }
 
     public function testIndexParsesLimitQueryParam(): void {
-        $this->request->setQueryParam("limit", "20");
+        $queryParams = ["limit" => "20"];
+        $request = new Request([], [], $queryParams, []);
         
-        $limit = $this->request->getQueryParam("limit");
+        $limit = $request->getQueryParam("limit");
         $this->assertEquals("20", $limit);
     }
 
     public function testIndexParsesPageQueryParam(): void {
-        $this->request->setQueryParam("page", "2");
+        $queryParams = ["page" => "2"];
+        $request = new Request([], [], $queryParams, []);
         
-        $page = $this->request->getQueryParam("page");
+        $page = $request->getQueryParam("page");
         $this->assertEquals("2", $page);
     }
 
     public function testIndexWithMultipleSortColumns(): void {
         // Test that multiple sort columns are parsed correctly
-        $this->request->setQueryParam("sort", "status:asc,name:desc,created_at:asc");
+        $queryParams = ["sort" => "status:asc,name:desc,created_at:asc"];
+        $request = new Request([], [], $queryParams, []);
         
-        $sort = $this->request->getQueryParam("sort");
+        $sort = $request->getQueryParam("sort");
         $this->assertIsString($sort);
         
         // Verify it can be split correctly
@@ -92,25 +97,28 @@ class CrudServiceIndexTest extends TestCase {
 
     public function testIndexHandlesInvalidPageNumber(): void {
         // Test with invalid page number
-        $this->request->setQueryParam("page", "invalid");
+        $queryParams = ["page" => "invalid"];
+        $request = new Request([], [], $queryParams, []);
         
         // The service should handle this gracefully
         // by defaulting to page 1 (tested in integration)
-        $page = $this->request->getQueryParam("page");
+        $page = $request->getQueryParam("page");
         $this->assertEquals("invalid", $page); // Raw value
     }
 
     public function testIndexHandlesNegativePageNumber(): void {
-        $this->request->setQueryParam("page", "-1");
+        $queryParams = ["page" => "-1"];
+        $request = new Request([], [], $queryParams, []);
         
-        $page = $this->request->getQueryParam("page");
+        $page = $request->getQueryParam("page");
         $this->assertEquals("-1", $page);
     }
 
     public function testIndexHandlesZeroPageNumber(): void {
-        $this->request->setQueryParam("page", "0");
+        $queryParams = ["page" => "0"];
+        $request = new Request([], [], $queryParams, []);
         
-        $page = $this->request->getQueryParam("page");
+        $page = $request->getQueryParam("page");
         $this->assertEquals("0", $page);
     }
 

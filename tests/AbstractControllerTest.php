@@ -29,7 +29,7 @@ class AbstractControllerTest extends TestCase {
         $response = TestController::getNotAuthorisedResponse();
         
         $this->assertInstanceOf(Response::class, $response);
-        $this->assertEquals(401, $response->getStatus());
+        $this->assertEquals(401, $response->getStatusCode());
         
         $body = json_decode($response->getBody(), true);
         $this->assertIsArray($body);
@@ -46,7 +46,7 @@ class AbstractControllerTest extends TestCase {
         $response = $this->controller->getInvalidInputResponse($errors);
         
         $this->assertInstanceOf(Response::class, $response);
-        $this->assertEquals(400, $response->getStatus());
+        $this->assertEquals(400, $response->getStatusCode());
         
         $body = json_decode($response->getBody(), true);
         $this->assertIsArray($body);
@@ -68,7 +68,7 @@ class AbstractControllerTest extends TestCase {
         
         $response = $controller->index();
         
-        $this->assertEquals(401, $response->getStatus());
+        $this->assertEquals(401, $response->getStatusCode());
     }
 
     public function testIndexAllowsPublicAccess(): void {
@@ -100,7 +100,7 @@ class AbstractControllerTest extends TestCase {
         
         $response = $controller->create();
         
-        $this->assertEquals(401, $response->getStatus());
+        $this->assertEquals(401, $response->getStatusCode());
     }
 
     public function testCreateReturnsInvalidInputResponseOnValidationError(): void {
@@ -123,7 +123,7 @@ class AbstractControllerTest extends TestCase {
         
         $response = $controller->read(1);
         
-        $this->assertEquals(401, $response->getStatus());
+        $this->assertEquals(401, $response->getStatusCode());
     }
 
     public function testUpdateRequiresAuthenticationForProtectedAction(): void {
@@ -131,7 +131,7 @@ class AbstractControllerTest extends TestCase {
         
         $response = $this->controller->update(1);
         
-        $this->assertEquals(401, $response->getStatus());
+        $this->assertEquals(401, $response->getStatusCode());
     }
 
     public function testDeleteRequiresAuthenticationForProtectedAction(): void {
@@ -139,43 +139,49 @@ class AbstractControllerTest extends TestCase {
         
         $response = $this->controller->delete(1);
         
-        $this->assertEquals(401, $response->getStatus());
+        $this->assertEquals(401, $response->getStatusCode());
     }
 
     public function testParseFieldsAttribute(): void {
-        $this->request->setQueryParam("fields", "name,description,status");
+        $queryParams = ["fields" => "name,description,status"];
+        $request = new Request([], [], $queryParams, []);
+        $this->controller->setRequest($request);
         
         $reflectionClass = new \ReflectionClass($this->controller);
         $method = $reflectionClass->getMethod('parseFieldsAttribute');
         $method->setAccessible(true);
         $method->invoke($this->controller);
         
-        $fields = $this->request->getAttribute("fields");
+        $fields = $request->getAttribute("fields");
         $this->assertIsArray($fields);
         $this->assertEquals(["name", "description", "status"], $fields);
     }
 
     public function testParseFieldsAttributeHandlesEmptyString(): void {
-        $this->request->setQueryParam("fields", "");
+        $queryParams = ["fields" => ""];
+        $request = new Request([], [], $queryParams, []);
+        $this->controller->setRequest($request);
         
         $reflectionClass = new \ReflectionClass($this->controller);
         $method = $reflectionClass->getMethod('parseFieldsAttribute');
         $method->setAccessible(true);
         $method->invoke($this->controller);
         
-        $fields = $this->request->getAttribute("fields");
+        $fields = $request->getAttribute("fields");
         $this->assertNull($fields);
     }
 
     public function testParseFieldsAttributeTrimsWhitespace(): void {
-        $this->request->setQueryParam("fields", " name , description , status ");
+        $queryParams = ["fields" => " name , description , status "];
+        $request = new Request([], [], $queryParams, []);
+        $this->controller->setRequest($request);
         
         $reflectionClass = new \ReflectionClass($this->controller);
         $method = $reflectionClass->getMethod('parseFieldsAttribute');
         $method->setAccessible(true);
         $method->invoke($this->controller);
         
-        $fields = $this->request->getAttribute("fields");
+        $fields = $request->getAttribute("fields");
         $this->assertIsArray($fields);
         $this->assertEquals(["name", "description", "status"], $fields);
     }

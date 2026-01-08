@@ -26,6 +26,10 @@ class TestEntity extends AbstractEntity implements SearchableInterface, Filterab
     protected static array $filterableColumns = ["status", "category"];
     protected static array $sortableColumns = ["name", "created_at", "status"];
 
+    public static function getPluralDisplayName(): string {
+        return "Test Entities";
+    }
+
     protected static array $dataMapping = [
         "name" => [
             "type" => "string",
