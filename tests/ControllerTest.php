@@ -71,23 +71,6 @@ class ControllerTest extends TestCase {
         $this->assertEquals(401, $response->getStatusCode());
     }
 
-    public function testIndexAllowsPublicAccess(): void {
-        // Mock the CrudService to return empty collection
-        $mockService = $this->createMock(TestCrudService::class);
-        $mockService->method('index')
-            ->willReturn(new EntityCollection([]));
-        
-        // Mock the entity to return the mock service
-        $mockEntity = $this->createMock(TestEntity::class);
-        
-        // Since we can't easily mock static methods, we'll test with authentication instead
-        $this->request->setAttribute("is_authenticated", true);
-        
-        // The actual test would require more complex mocking of static methods
-        // This is a simplified version showing the structure
-        $this->assertTrue(true); // Placeholder
-    }
-
     public function testCreateRequiresAuthenticationForProtectedAction(): void {
         $controller = new TestController();
         $controller->setRequest($this->request);
@@ -101,14 +84,6 @@ class ControllerTest extends TestCase {
         $response = $controller->create();
         
         $this->assertEquals(401, $response->getStatusCode());
-    }
-
-    public function testCreateReturnsInvalidInputResponseOnValidationError(): void {
-        $this->request->setAttribute("is_authenticated", true);
-        
-        // This would require mocking the CrudService to throw InvalidDataException
-        // Simplified version
-        $this->assertTrue(true); // Placeholder
     }
 
     public function testReadRequiresAuthenticationForProtectedAction(): void {
