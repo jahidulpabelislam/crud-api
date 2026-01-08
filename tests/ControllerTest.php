@@ -14,7 +14,7 @@ use JPI\ORM\Entity\Collection as EntityCollection;
 use JPI\ORM\Entity\PaginatedCollection as PaginatedEntityCollection;
 use PHPUnit\Framework\TestCase;
 
-class AbstractControllerTest extends TestCase {
+class ControllerTest extends TestCase {
 
     private TestController $controller;
     private Request $request;
