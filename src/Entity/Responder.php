@@ -38,7 +38,7 @@ trait Responder {
         /** @var AbstractEntity $entity */
         foreach ($entities as $entity) {
             $response = $entity->getAPIResponse($request);
-            $response["_links"] = $entity->getAPILinks();
+            $response["_links"] = $entity->getAPILinks($request);
             $data[] = $response;
         }
 
@@ -130,7 +130,7 @@ trait Responder {
     private function getEntityFoundResponse(Request $request, AbstractEntity $entity): Response {
         return Response::json(200, [
             "data" => $entity->getAPIResponse($request),
-            "_links" => $entity->getAPILinks(),
+            "_links" => $entity->getAPILinks($request),
         ]);
     }
 
@@ -185,7 +185,7 @@ trait Responder {
         if ($entity && $entity->isLoaded()) {
             return $this->getEntityFoundResponse($request, $entity)
                 ->withStatus(201)
-                ->withHeader("Location", $entity->getAPIURL())
+                ->withHeader("Location", $entity->getAPIURL($request))
             ;
         }
 
