@@ -15,7 +15,7 @@ use JPI\ORM\Entity\QueryBuilder;
 trait Sortable {
 
     public static function getSortableColumns(): array {
-        if (property_exists(static::class, 'sortableColumns')) {
+        if (property_exists(static::class, "sortableColumns")) {
             return static::$sortableColumns;
         }
         $columns = static::getColumns();

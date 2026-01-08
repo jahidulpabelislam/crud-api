@@ -76,7 +76,7 @@ class CrudService {
             $sort = $request->getQueryParam("sort");
             if ($sort && is_string($sort)) {
                 // Comma-separated values
-                $sort = array_filter(array_map('trim', explode(',', $sort)));
+                $sort = array_filter(array_map("trim", explode(",", $sort)));
                 $entity::addSortToQuery($query, $sort);
             }
         }

@@ -72,7 +72,7 @@ abstract class AbstractController {
 
         $fields = $request->getQueryParam("fields");
         if (!empty($fields) && is_string($fields)) {
-            $fieldsArray = array_map('trim', explode(',', $fields));
+            $fieldsArray = array_map("trim", explode(",", $fields));
             $request->setAttribute("fields", $fieldsArray);
         }
     }
