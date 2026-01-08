@@ -26,6 +26,36 @@ class QueryBuilderSQLTest extends TestCase {
         return new QueryBuilder($this->createMockDatabase(), $entity);
     }
 
+    /**
+     * Helper method to get WHERE clause SQL from query builder
+     */
+    private function getWhereClause(QueryBuilder $query): string {
+        $reflection = new \ReflectionClass($query);
+        $whereProperty = $reflection->getProperty('where');
+        $whereProperty->setAccessible(true);
+        return (string)$whereProperty->getValue($query);
+    }
+
+    /**
+     * Helper method to get ORDER BY clause SQL from query builder
+     */
+    private function getOrderByClause(QueryBuilder $query): string {
+        $reflection = new \ReflectionClass($query);
+        $orderByProperty = $reflection->getProperty('orderBy');
+        $orderByProperty->setAccessible(true);
+        return (string)$orderByProperty->getValue($query);
+    }
+
+    /**
+     * Helper method to get LIMIT value from query builder
+     */
+    private function getLimitValue(QueryBuilder $query): ?int {
+        $reflection = new \ReflectionClass($query);
+        $limitProperty = $reflection->getProperty('limit');
+        $limitProperty->setAccessible(true);
+        return $limitProperty->getValue($query);
+    }
+
     public function testFilteringGeneratesCorrectWhereClause(): void {
         $query = $this->createQueryBuilder();
         
@@ -35,14 +65,8 @@ class QueryBuilderSQLTest extends TestCase {
             'category' => 'test',
         ]);
         
-        // Get the where clause object
-        $reflection = new \ReflectionClass($query);
-        $whereProperty = $reflection->getProperty('where');
-        $whereProperty->setAccessible(true);
-        $whereClause = $whereProperty->getValue($query);
-        
-        // Convert to SQL string
-        $whereSQL = (string)$whereClause;
+        // Get WHERE clause SQL
+        $whereSQL = $this->getWhereClause($query);
         
         // Should contain both status and category
         $this->assertStringContainsString('status', $whereSQL);
@@ -70,13 +94,8 @@ class QueryBuilderSQLTest extends TestCase {
         $this->assertEquals('%hello%world%', $params['search']);
         $this->assertEquals('%world%hello%', $params['searchReversed']);
         
-        // Check where clause was added
-        $reflection = new \ReflectionClass($query);
-        $whereProperty = $reflection->getProperty('where');
-        $whereProperty->setAccessible(true);
-        $whereClause = $whereProperty->getValue($query);
-        
-        $whereSQL = (string)$whereClause;
+        // Get WHERE clause SQL
+        $whereSQL = $this->getWhereClause($query);
         
         // Should contain LIKE conditions for searchable columns
         $this->assertStringContainsString('LIKE', $whereSQL);
@@ -89,14 +108,8 @@ class QueryBuilderSQLTest extends TestCase {
         // Add sorting
         TestEntity::addSortToQuery($query, ['name:asc', 'created_at:desc']);
         
-        // Get the order by clause object
-        $reflection = new \ReflectionClass($query);
-        $orderByProperty = $reflection->getProperty('orderBy');
-        $orderByProperty->setAccessible(true);
-        $orderByClause = $orderByProperty->getValue($query);
-        
-        // Convert to SQL string
-        $orderBySQL = (string)$orderByClause;
+        // Get ORDER BY clause SQL
+        $orderBySQL = $this->getOrderByClause($query);
         
         // Should contain both columns with correct directions
         $this->assertStringContainsString('name', $orderBySQL);
@@ -116,13 +129,8 @@ class QueryBuilderSQLTest extends TestCase {
         // Add search
         TestEntity::addSearchToQuery($query, 'test');
         
-        // Get where clause
-        $reflection = new \ReflectionClass($query);
-        $whereProperty = $reflection->getProperty('where');
-        $whereProperty->setAccessible(true);
-        $whereClause = $whereProperty->getValue($query);
-        
-        $whereSQL = (string)$whereClause;
+        // Get WHERE clause SQL
+        $whereSQL = $this->getWhereClause($query);
         
         // Should have both filter and search conditions
         $this->assertStringContainsString('status', $whereSQL);
@@ -150,33 +158,19 @@ class QueryBuilderSQLTest extends TestCase {
         // Add pagination
         $query->limit(10, 2); // 10 items, page 2
         
-        // Verify all components are present
-        $reflection = new \ReflectionClass($query);
-        
-        // Check where clause contains both filters and search
-        $whereProperty = $reflection->getProperty('where');
-        $whereProperty->setAccessible(true);
-        $whereClause = $whereProperty->getValue($query);
-        $whereSQL = (string)$whereClause;
-        
+        // Verify WHERE clause contains both filters and search
+        $whereSQL = $this->getWhereClause($query);
         $this->assertStringContainsString('status', $whereSQL);
         $this->assertStringContainsString('category', $whereSQL);
         $this->assertStringContainsString('LIKE', $whereSQL);
         
-        // Check order by contains both columns
-        $orderByProperty = $reflection->getProperty('orderBy');
-        $orderByProperty->setAccessible(true);
-        $orderByClause = $orderByProperty->getValue($query);
-        $orderBySQL = (string)$orderByClause;
-        
+        // Verify ORDER BY contains both columns
+        $orderBySQL = $this->getOrderByClause($query);
         $this->assertStringContainsString('name', $orderBySQL);
         $this->assertStringContainsString('created_at', $orderBySQL);
         
-        // Check limit
-        $limitProperty = $reflection->getProperty('limit');
-        $limitProperty->setAccessible(true);
-        $limitValue = $limitProperty->getValue($query);
-        $this->assertEquals(10, $limitValue);
+        // Verify LIMIT
+        $this->assertEquals(10, $this->getLimitValue($query));
     }
 
     public function testFilterIgnoresNonFilterableColumns(): void {
@@ -188,12 +182,8 @@ class QueryBuilderSQLTest extends TestCase {
             'nonexistent_column' => 'value',
         ]);
         
-        // Get where clause
-        $reflection = new \ReflectionClass($query);
-        $whereProperty = $reflection->getProperty('where');
-        $whereProperty->setAccessible(true);
-        $whereClause = $whereProperty->getValue($query);
-        $whereSQL = (string)$whereClause;
+        // Get WHERE clause SQL
+        $whereSQL = $this->getWhereClause($query);
         
         // Should only contain status
         $this->assertStringContainsString('status', $whereSQL);
@@ -211,12 +201,8 @@ class QueryBuilderSQLTest extends TestCase {
         // Try to sort by a non-sortable column
         TestEntity::addSortToQuery($query, ['nonexistent_column:asc', 'name:desc']);
         
-        // Get order by clause
-        $reflection = new \ReflectionClass($query);
-        $orderByProperty = $reflection->getProperty('orderBy');
-        $orderByProperty->setAccessible(true);
-        $orderByClause = $orderByProperty->getValue($query);
-        $orderBySQL = (string)$orderByClause;
+        // Get ORDER BY clause SQL
+        $orderBySQL = $this->getOrderByClause($query);
         
         // Should only contain name
         $this->assertStringContainsString('name', $orderBySQL);
@@ -236,12 +222,8 @@ class QueryBuilderSQLTest extends TestCase {
         $this->assertEquals('%hello%world%test%', $params['search']);
         $this->assertEquals('%test%world%hello%', $params['searchReversed']);
         
-        // Check where clause
-        $reflection = new \ReflectionClass($query);
-        $whereProperty = $reflection->getProperty('where');
-        $whereProperty->setAccessible(true);
-        $whereClause = $whereProperty->getValue($query);
-        $whereSQL = (string)$whereClause;
+        // Get WHERE clause SQL
+        $whereSQL = $this->getWhereClause($query);
         
         // Should have OR conditions for searchable columns
         $this->assertStringContainsString('OR', $whereSQL);
@@ -255,11 +237,8 @@ class QueryBuilderSQLTest extends TestCase {
         // Add sort without explicit direction (should default to ASC)
         TestEntity::addSortToQuery($query, ['name']);
         
-        $reflection = new \ReflectionClass($query);
-        $orderByProperty = $reflection->getProperty('orderBy');
-        $orderByProperty->setAccessible(true);
-        $orderByClause = $orderByProperty->getValue($query);
-        $orderBySQL = (string)$orderByClause;
+        // Get ORDER BY clause SQL
+        $orderBySQL = $this->getOrderByClause($query);
         
         // Should contain name with ASC (default)
         $this->assertStringContainsString('name', $orderBySQL);
