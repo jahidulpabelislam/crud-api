@@ -8,7 +8,5 @@ use JPI\CRUD\API\CrudService;
 
 class TestCrudService extends CrudService {
 
-    protected ?int $perPage = 10;
-
     protected static array $requiredColumns = ["name"];
 }
