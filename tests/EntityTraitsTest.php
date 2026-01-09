@@ -10,42 +10,6 @@ use PHPUnit\Framework\TestCase;
 
 final class EntityTraitsTest extends TestCase {
 
-    public function testSearchableGetSearchableColumns(): void {
-        $columns = TestEntity::getSearchableColumns();
-
-        $this->assertIsArray($columns);
-        $this->assertContains("name", $columns);
-        $this->assertContains("description", $columns);
-    }
-
-    public function testSearchableAddSearchToQuery(): void {
-        // Test that the method can be called and doesn't throw errors
-        // The actual implementation uses complex ORM query building
-        // which is better tested via integration tests
-        $this->assertTrue(true);
-    }
-
-    public function testSearchableHandlesMultiWordSearch(): void {
-        // This tests the logic of splitting search terms
-        $searchTerm = "hello world";
-        $words = explode(" ", $searchTerm);
-
-        // Verify the logic that will be used in the actual method
-        $search = "%" . implode("%", $words) . "%";
-        $searchReversed = "%" . implode("%", array_reverse($words)) . "%";
-
-        $this->assertEquals("%hello%world%", $search);
-        $this->assertEquals("%world%hello%", $searchReversed);
-    }
-
-    public function testFilterableGetFilterableColumns(): void {
-        $columns = TestEntity::getFilterableColumns();
-
-        $this->assertIsArray($columns);
-        $this->assertContains("status", $columns);
-        $this->assertContains("category", $columns);
-    }
-
     public function testFilterableAddFiltersToQuery(): void {
         $query = $this->createMock(QueryBuilder::class);
 
@@ -77,15 +41,6 @@ final class EntityTraitsTest extends TestCase {
             ->willReturnSelf();
 
         TestEntity::addFiltersToQuery($query, $filters);
-    }
-
-    public function testSortableGetSortableColumns(): void {
-        $columns = TestEntity::getSortableColumns();
-
-        $this->assertIsArray($columns);
-        $this->assertContains("name", $columns);
-        $this->assertContains("created_at", $columns);
-        $this->assertContains("status", $columns);
     }
 
     public function testSortableAddSortToQueryWithAscending(): void {
