@@ -81,10 +81,10 @@ final class ResponderTest extends TestCase {
         $entity2 = $this->createMockEntity(2, "Test 2");
 
         $collection = new PaginatedEntityCollection(
-            [$entity1, $entity2],
-            25, // total count
-            10, // limit
-            1   // page
+            items: [$entity1, $entity2],
+            totalCount: 25,
+            limit: 10,
+            page: 1
         );
 
         $response = $this->controller->getPaginatedEntitiesResponse($this->request, $collection);
@@ -113,10 +113,10 @@ final class ResponderTest extends TestCase {
         $entity = $this->createMockEntity(1, "Test");
 
         $collection = new PaginatedEntityCollection(
-            [$entity],
-            25, // total count
-            10, // limit
-            3   // page 3 (last page)
+            items: [$entity],
+            totalCount: 25,
+            limit: 10,
+            page: 3  // last page
         );
 
         $response = $this->controller->getPaginatedEntitiesResponse($this->request, $collection);
@@ -132,10 +132,10 @@ final class ResponderTest extends TestCase {
         $entity = $this->createMockEntity(1, "Test");
 
         $collection = new PaginatedEntityCollection(
-            [$entity],
-            30, // total count
-            10, // limit
-            2   // page 2 (middle page)
+            items: [$entity],
+            totalCount: 30,
+            limit: 10,
+            page: 2  // middle page
         );
 
         $response = $this->controller->getPaginatedEntitiesResponse($this->request, $collection);
