@@ -4,17 +4,12 @@ declare(strict_types=1);
 
 namespace JPI\CRUD\API\Tests;
 
-use JPI\CRUD\API\Entity\InvalidDataException;
 use JPI\CRUD\API\Tests\Fixtures\TestController;
-use JPI\CRUD\API\Tests\Fixtures\TestCrudService;
-use JPI\CRUD\API\Tests\Fixtures\TestEntity;
 use JPI\HTTP\Request;
 use JPI\HTTP\Response;
-use JPI\ORM\Entity\Collection as EntityCollection;
-use JPI\ORM\Entity\PaginatedCollection as PaginatedEntityCollection;
 use PHPUnit\Framework\TestCase;
 
-class ControllerTest extends TestCase {
+final class ControllerTest extends TestCase {
 
     private TestController $controller;
     private Request $request;
@@ -25,29 +20,17 @@ class ControllerTest extends TestCase {
         $this->controller->setRequest($this->request);
     }
 
-    public function testGetNotAuthorisedResponse(): void {
-        $response = TestController::getNotAuthorisedResponse();
-        
-        $this->assertInstanceOf(Response::class, $response);
-        $this->assertEquals(401, $response->getStatusCode());
-        
-        $body = json_decode($response->getBody(), true);
-        $this->assertIsArray($body);
-        $this->assertArrayHasKey("message", $body);
-        $this->assertEquals("You need to be logged in!", $body["message"]);
-    }
-
     public function testGetInvalidInputResponse(): void {
         $errors = [
             "name" => "`name` is required.",
             "email" => "`email` must be a valid email address.",
         ];
-        
+
         $response = $this->controller->getInvalidInputResponse($errors);
-        
+
         $this->assertInstanceOf(Response::class, $response);
         $this->assertEquals(400, $response->getStatusCode());
-        
+
         $body = json_decode($response->getBody(), true);
         $this->assertIsArray($body);
         $this->assertArrayHasKey("message", $body);
@@ -59,61 +42,61 @@ class ControllerTest extends TestCase {
     public function testIndexRequiresAuthenticationForProtectedAction(): void {
         $controller = new TestController();
         $controller->setRequest($this->request);
-        
+
         // Override public actions to make index protected
         $reflectionClass = new \ReflectionClass($controller);
         $property = $reflectionClass->getProperty('publicActions');
         $property->setAccessible(true);
         $property->setValue($controller, []);
-        
+
         $response = $controller->index();
-        
+
         $this->assertEquals(401, $response->getStatusCode());
     }
 
     public function testCreateRequiresAuthenticationForProtectedAction(): void {
         $controller = new TestController();
         $controller->setRequest($this->request);
-        
+
         // Override public actions to make create protected
         $reflectionClass = new \ReflectionClass($controller);
         $property = $reflectionClass->getProperty('publicActions');
         $property->setAccessible(true);
         $property->setValue($controller, []);
-        
+
         $response = $controller->create();
-        
+
         $this->assertEquals(401, $response->getStatusCode());
     }
 
     public function testReadRequiresAuthenticationForProtectedAction(): void {
         $controller = new TestController();
         $controller->setRequest($this->request);
-        
+
         // Override public actions to make read protected
         $reflectionClass = new \ReflectionClass($controller);
         $property = $reflectionClass->getProperty('publicActions');
         $property->setAccessible(true);
         $property->setValue($controller, []);
-        
+
         $response = $controller->read(1);
-        
+
         $this->assertEquals(401, $response->getStatusCode());
     }
 
     public function testUpdateRequiresAuthenticationForProtectedAction(): void {
         $this->request->setAttribute("route_params", ["id" => "1"]);
-        
+
         $response = $this->controller->update(1);
-        
+
         $this->assertEquals(401, $response->getStatusCode());
     }
 
     public function testDeleteRequiresAuthenticationForProtectedAction(): void {
         $this->request->setAttribute("route_params", ["id" => "1"]);
-        
+
         $response = $this->controller->delete(1);
-        
+
         $this->assertEquals(401, $response->getStatusCode());
     }
 
@@ -121,12 +104,12 @@ class ControllerTest extends TestCase {
         $queryParams = ["fields" => "name,description,status"];
         $request = new Request([], [], $queryParams, []);
         $this->controller->setRequest($request);
-        
+
         $reflectionClass = new \ReflectionClass($this->controller);
         $method = $reflectionClass->getMethod('parseFieldsAttribute');
         $method->setAccessible(true);
         $method->invoke($this->controller);
-        
+
         $fields = $request->getAttribute("fields");
         $this->assertIsArray($fields);
         $this->assertEquals(["name", "description", "status"], $fields);
@@ -136,12 +119,12 @@ class ControllerTest extends TestCase {
         $queryParams = ["fields" => ""];
         $request = new Request([], [], $queryParams, []);
         $this->controller->setRequest($request);
-        
+
         $reflectionClass = new \ReflectionClass($this->controller);
         $method = $reflectionClass->getMethod('parseFieldsAttribute');
         $method->setAccessible(true);
         $method->invoke($this->controller);
-        
+
         $fields = $request->getAttribute("fields");
         $this->assertNull($fields);
     }
@@ -150,12 +133,12 @@ class ControllerTest extends TestCase {
         $queryParams = ["fields" => " name , description , status "];
         $request = new Request([], [], $queryParams, []);
         $this->controller->setRequest($request);
-        
+
         $reflectionClass = new \ReflectionClass($this->controller);
         $method = $reflectionClass->getMethod('parseFieldsAttribute');
         $method->setAccessible(true);
         $method->invoke($this->controller);
-        
+
         $fields = $request->getAttribute("fields");
         $this->assertIsArray($fields);
         $this->assertEquals(["name", "description", "status"], $fields);

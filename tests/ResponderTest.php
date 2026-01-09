@@ -12,7 +12,7 @@ use JPI\ORM\Entity\PaginatedCollection as PaginatedEntityCollection;
 use JPI\Utils\URL;
 use PHPUnit\Framework\TestCase;
 
-class ResponderTest extends TestCase {
+final class ResponderTest extends TestCase {
 
     private TestController $controller;
     private Request $request;
@@ -31,11 +31,11 @@ class ResponderTest extends TestCase {
 
     public function testGetEntitiesResponseWithEmptyCollection(): void {
         $entities = new EntityCollection([]);
-        
+
         $response = $this->controller->getEntitiesResponse($this->request, $entities);
-        
+
         $this->assertEquals(200, $response->getStatusCode());
-        
+
         $body = json_decode($response->getBody(), true);
         $this->assertIsArray($body);
         $this->assertArrayHasKey("data", $body);
@@ -51,25 +51,25 @@ class ResponderTest extends TestCase {
         // Create mock entities
         $entity1 = $this->createMockEntity(1, "Test 1");
         $entity2 = $this->createMockEntity(2, "Test 2");
-        
+
         $entities = new EntityCollection([$entity1, $entity2]);
-        
+
         $response = $this->controller->getEntitiesResponse($this->request, $entities);
-        
+
         $this->assertEquals(200, $response->getStatusCode());
-        
+
         $body = json_decode($response->getBody(), true);
         $this->assertIsArray($body);
         $this->assertArrayHasKey("data", $body);
         $this->assertArrayHasKey("_links", $body);
         $this->assertArrayNotHasKey("message", $body);
         $this->assertCount(2, $body["data"]);
-        
+
         // Check first entity
         $this->assertArrayHasKey("id", $body["data"][0]);
         $this->assertArrayHasKey("_links", $body["data"][0]);
         $this->assertEquals(1, $body["data"][0]["id"]);
-        
+
         // Check second entity
         $this->assertArrayHasKey("id", $body["data"][1]);
         $this->assertArrayHasKey("_links", $body["data"][1]);
@@ -79,30 +79,30 @@ class ResponderTest extends TestCase {
     public function testGetPaginatedEntitiesResponseStructure(): void {
         $entity1 = $this->createMockEntity(1, "Test 1");
         $entity2 = $this->createMockEntity(2, "Test 2");
-        
+
         $collection = new PaginatedEntityCollection(
             [$entity1, $entity2],
             25, // total count
             10, // limit
             1   // page
         );
-        
+
         $response = $this->controller->getPaginatedEntitiesResponse($this->request, $collection);
-        
+
         $this->assertEquals(200, $response->getStatusCode());
-        
+
         $body = json_decode($response->getBody(), true);
         $this->assertIsArray($body);
-        
+
         // Check required pagination metadata
         $this->assertArrayHasKey("data", $body);
         $this->assertArrayHasKey("_total_count", $body);
         $this->assertArrayHasKey("_total_pages", $body);
         $this->assertArrayHasKey("_links", $body);
-        
+
         $this->assertEquals(25, $body["_total_count"]);
         $this->assertEquals(3, $body["_total_pages"]); // 25 / 10 = 3 pages
-        
+
         // Check links
         $this->assertArrayHasKey("self", $body["_links"]);
         $this->assertArrayHasKey("next_page", $body["_links"]);
@@ -111,18 +111,18 @@ class ResponderTest extends TestCase {
 
     public function testGetPaginatedEntitiesResponseLastPage(): void {
         $entity = $this->createMockEntity(1, "Test");
-        
+
         $collection = new PaginatedEntityCollection(
             [$entity],
             25, // total count
             10, // limit
             3   // page 3 (last page)
         );
-        
+
         $response = $this->controller->getPaginatedEntitiesResponse($this->request, $collection);
-        
+
         $body = json_decode($response->getBody(), true);
-        
+
         // Should have previous_page link but not next_page
         $this->assertArrayHasKey("previous_page", $body["_links"]);
         $this->assertArrayNotHasKey("next_page", $body["_links"]);
@@ -130,18 +130,18 @@ class ResponderTest extends TestCase {
 
     public function testGetPaginatedEntitiesResponseMiddlePage(): void {
         $entity = $this->createMockEntity(1, "Test");
-        
+
         $collection = new PaginatedEntityCollection(
             [$entity],
             30, // total count
             10, // limit
             2   // page 2 (middle page)
         );
-        
+
         $response = $this->controller->getPaginatedEntitiesResponse($this->request, $collection);
-        
+
         $body = json_decode($response->getBody(), true);
-        
+
         // Should have both previous_page and next_page links
         $this->assertArrayHasKey("previous_page", $body["_links"]);
         $this->assertArrayHasKey("next_page", $body["_links"]);
@@ -149,9 +149,9 @@ class ResponderTest extends TestCase {
 
     public function testGetEntityNotFoundResponse(): void {
         $response = $this->controller->getEntityNotFoundResponse($this->request, 123);
-        
+
         $this->assertEquals(404, $response->getStatusCode());
-        
+
         $body = json_decode($response->getBody(), true);
         $this->assertIsArray($body);
         $this->assertArrayHasKey("message", $body);
@@ -161,13 +161,13 @@ class ResponderTest extends TestCase {
 
     public function testGetEntityResponseWhenFound(): void {
         $entity = $this->createMockEntity(1, "Test Entity");
-        
+
         $this->request->setAttribute("route_params", ["id" => "1"]);
-        
+
         $response = $this->controller->getEntityResponse($this->request, $entity, 1);
-        
+
         $this->assertEquals(200, $response->getStatusCode());
-        
+
         $body = json_decode($response->getBody(), true);
         $this->assertIsArray($body);
         $this->assertArrayHasKey("data", $body);
@@ -177,9 +177,9 @@ class ResponderTest extends TestCase {
 
     public function testGetEntityResponseWhenNotFound(): void {
         $response = $this->controller->getEntityResponse($this->request, null, 999);
-        
+
         $this->assertEquals(404, $response->getStatusCode());
-        
+
         $body = json_decode($response->getBody(), true);
         $this->assertArrayHasKey("message", $body);
         $this->assertStringContainsString("999", $body["message"]);
@@ -187,12 +187,12 @@ class ResponderTest extends TestCase {
 
     public function testGetEntityCreateResponseSuccess(): void {
         $entity = $this->createMockEntity(1, "New Entity");
-        
+
         $response = $this->controller->getEntityCreateResponse($this->request, $entity);
-        
+
         $this->assertEquals(201, $response->getStatusCode());
         $this->assertTrue($response->hasHeader("Location"));
-        
+
         $body = json_decode($response->getBody(), true);
         $this->assertArrayHasKey("data", $body);
         $this->assertArrayHasKey("_links", $body);
@@ -201,9 +201,9 @@ class ResponderTest extends TestCase {
     public function testGetEntityCreateResponseFailure(): void {
         // Pass null to simulate creation failure
         $response = $this->controller->getEntityCreateResponse($this->request, null);
-        
+
         $this->assertEquals(500, $response->getStatusCode());
-        
+
         $body = json_decode($response->getBody(), true);
         $this->assertArrayHasKey("message", $body);
         $this->assertStringContainsString("Failed to create", $body["message"]);
@@ -211,11 +211,11 @@ class ResponderTest extends TestCase {
 
     public function testGetEntityUpdateResponseSuccess(): void {
         $entity = $this->createMockEntity(1, "Updated Entity");
-        
+
         $response = $this->controller->getEntityUpdateResponse($this->request, $entity, 1);
-        
+
         $this->assertEquals(200, $response->getStatusCode());
-        
+
         $body = json_decode($response->getBody(), true);
         $this->assertArrayHasKey("data", $body);
         $this->assertArrayHasKey("_links", $body);
@@ -223,9 +223,9 @@ class ResponderTest extends TestCase {
 
     public function testGetEntityUpdateResponseNotFound(): void {
         $response = $this->controller->getEntityUpdateResponse($this->request, null, 999);
-        
+
         $this->assertEquals(404, $response->getStatusCode());
-        
+
         $body = json_decode($response->getBody(), true);
         $this->assertArrayHasKey("message", $body);
         $this->assertStringContainsString("999", $body["message"]);
@@ -234,11 +234,11 @@ class ResponderTest extends TestCase {
     public function testGetEntityUpdateResponseFailure(): void {
         // Create a mock entity that's loaded but with wrong ID
         $entity = $this->createMockEntity(2, "Entity");
-        
+
         $response = $this->controller->getEntityUpdateResponse($this->request, $entity, 1);
-        
+
         $this->assertEquals(500, $response->getStatusCode());
-        
+
         $body = json_decode($response->getBody(), true);
         $this->assertArrayHasKey("message", $body);
         $this->assertStringContainsString("Failed to update", $body["message"]);
@@ -249,9 +249,9 @@ class ResponderTest extends TestCase {
         $entity->method('getId')->willReturn(1);
         $entity->method('isLoaded')->willReturn(true);
         $entity->method('isDeleted')->willReturn(true);
-        
+
         $response = $this->controller->getEntityDeleteResponse($this->request, $entity, 1);
-        
+
         $this->assertEquals(204, $response->getStatusCode());
         // 204 response typically has empty array body which becomes "{}" in JSON
         $body = $response->getBody();
@@ -260,9 +260,9 @@ class ResponderTest extends TestCase {
 
     public function testGetEntityDeleteResponseNotFound(): void {
         $response = $this->controller->getEntityDeleteResponse($this->request, null, 999);
-        
+
         $this->assertEquals(404, $response->getStatusCode());
-        
+
         $body = json_decode($response->getBody(), true);
         $this->assertArrayHasKey("message", $body);
     }
@@ -270,11 +270,11 @@ class ResponderTest extends TestCase {
     public function testGetEntityDeleteResponseFailure(): void {
         $entity = $this->createMockEntity(1, "Entity");
         $entity->method('isDeleted')->willReturn(false);
-        
+
         $response = $this->controller->getEntityDeleteResponse($this->request, $entity, 1);
-        
+
         $this->assertEquals(500, $response->getStatusCode());
-        
+
         $body = json_decode($response->getBody(), true);
         $this->assertArrayHasKey("message", $body);
         $this->assertStringContainsString("Failed to delete", $body["message"]);
@@ -292,7 +292,7 @@ class ResponderTest extends TestCase {
             "self" => new URL("https://api.example.com/test-entities/{$id}/"),
         ]);
         $entity->method('isDeleted')->willReturn(false);
-        
+
         return $entity;
     }
 }
