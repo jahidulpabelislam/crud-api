@@ -98,9 +98,7 @@ final class CrudServiceMutationTest extends TestCase {
             $service->create($request);
             $this->fail("Expected InvalidDataException to be thrown");
         } catch (InvalidDataException $e) {
-            $errors = $e->getErrors();
-            $this->assertArrayHasKey("name", $errors);
-            $this->assertEquals("`name` is required.", $errors["name"]);
+            $this->assertEquals(["name" => "`name` is required."], $e->getErrors());
         }
     }
 
@@ -116,9 +114,7 @@ final class CrudServiceMutationTest extends TestCase {
             $service->create($request);
             $this->fail("Expected InvalidDataException to be thrown");
         } catch (InvalidDataException $e) {
-            $errors = $e->getErrors();
-            $this->assertArrayHasKey("name", $errors);
-            $this->assertEquals("`name` cannot be empty.", $errors["name"]);
+            $this->assertEquals(["name" => "`name` cannot be empty."], $e->getErrors());
         }
     }
 
