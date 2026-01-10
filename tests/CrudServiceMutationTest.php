@@ -155,12 +155,12 @@ final class CrudServiceMutationTest extends TestCase {
             ->method("selectFirst")
             ->willReturnOnConsecutiveCalls(
                 [
-                    "id" => 1,
+                    "id" => 2,
                     "name" => "Old Name",
                     "description" => "Old Description",
                 ],
                 [
-                    "id" => 1,
+                    "id" => 2,
                     "name" => "New Name",
                     "description" => "New Description",
                 ]
@@ -178,7 +178,7 @@ final class CrudServiceMutationTest extends TestCase {
                 "name" => "New Name",
                 "description" => "New Description",
             ],
-            ["id" => "1"]
+            ["id" => "2"]
         );
 
         $service = new TestCrudService(TestEntity::class);
@@ -228,12 +228,12 @@ final class CrudServiceMutationTest extends TestCase {
             ->method("selectFirst")
             ->willReturnOnConsecutiveCalls(
                 [
-                    "id" => 1,
+                    "id" => 3,
                     "name" => "Existing Name",
                     "description" => "Old Description",
                 ],
                 [
-                    "id" => 1,
+                    "id" => 3,
                     "name" => "Existing Name",
                     "description" => "New Description",
                 ]
@@ -251,7 +251,7 @@ final class CrudServiceMutationTest extends TestCase {
                 // name not provided - should be ok for update
                 "description" => "New Description",
             ],
-            ["id" => "1"]
+            ["id" => "3"]
         );
 
         $service = new TestCrudService(TestEntity::class);
@@ -281,7 +281,7 @@ final class CrudServiceMutationTest extends TestCase {
         $database->expects($this->once())
             ->method("selectFirst")
             ->willReturn([
-                "id" => 1,
+                "id" => 4,
                 "name" => "Existing Name",
             ])
         ;
@@ -291,7 +291,7 @@ final class CrudServiceMutationTest extends TestCase {
                 "name" => "Updated Name",
                 "created_at" => "invalid-date",
             ],
-            ["id" => "1"]
+            ["id" => "4"]
         );
 
         $service = new TestCrudService(TestEntity::class);
