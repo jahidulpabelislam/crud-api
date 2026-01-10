@@ -156,7 +156,7 @@ final class ResponderTest extends TestCase {
         $body = json_decode($response->getBody(), true);
 
         $this->assertEquals(404, $response->getStatusCode());
-        $this->assertEquals(["message" => "No Test Entity identified by '123' found."], $body);
+        $this->assertEquals(["message" => "No Test Entity identified by `123` found."], $body);
     }
 
     public function testEntityFound(): void {
@@ -233,7 +233,7 @@ final class ResponderTest extends TestCase {
         $this->assertEquals(500, $response->getStatusCode());
         $this->assertEquals(
             [
-                "message" => "Failed to update the Test Entity identified by '1'.",
+                "message" => "Failed to update the Test Entity identified by `1`.",
             ],
             $body
         );
@@ -263,7 +263,7 @@ final class ResponderTest extends TestCase {
         $this->assertEquals(500, $response->getStatusCode());
         $this->assertEquals(
             [
-                "message" => "Failed to delete the Test Entity identified by '1'.",
+                "message" => "Failed to delete the Test Entity identified by `1`.",
             ],
             $body
         );
