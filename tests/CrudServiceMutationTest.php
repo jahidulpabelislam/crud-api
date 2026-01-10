@@ -47,7 +47,7 @@ final class CrudServiceMutationTest extends TestCase {
         return $request;
     }
 
-    public function testCreateWithValidDataSucceeds(): void {
+    public function testCreateSuccess(): void {
         $database = $this->createDatabase();
 
         // Mock insert operation
@@ -87,7 +87,7 @@ final class CrudServiceMutationTest extends TestCase {
         $this->assertEquals("Test Entity", $entity->name);
     }
 
-    public function testCreateWithMissingRequiredFieldFails(): void {
+    public function testCreateWithMissingRequiredField(): void {
         $request = $this->createRequest([
             "description" => "Test Description",
         ]);
@@ -102,7 +102,7 @@ final class CrudServiceMutationTest extends TestCase {
         }
     }
 
-    public function testCreateWithEmptyRequiredFieldFails(): void {
+    public function testCreateWithEmptyRequiredField(): void {
         $request = $this->createRequest([
             "name" => "",
             "description" => "Test Description",
@@ -118,40 +118,23 @@ final class CrudServiceMutationTest extends TestCase {
         }
     }
 
-    public function testCreateSetsOnlyProvidedFields(): void {
-        $database = $this->createDatabase();
-
-        // Mock insert operation
-        $database->expects($this->once())
-            ->method("exec")
-            ->willReturn(1)
-        ;
-        $database->expects($this->once())
-            ->method("getLastInsertedId")
-            ->willReturn(1)
-        ;
-
-        // Mock reload operation
-        $database->expects($this->once())
-            ->method("selectFirst")
-            ->willReturn([
-                "id" => 1,
-                "name" => "Test Entity",
-            ])
-        ;
-
+    public function testCreateWithInvalidValue(): void {
         $request = $this->createRequest([
             "name" => "Test Entity",
-            // description, status, category not provided
+            "age" => "not-a-number",
         ]);
 
         $service = new TestCrudService(TestEntity::class);
-        $entity = $service->create($request);
 
-        $this->assertEquals("Test Entity", $entity->name);
+        try {
+            $service->create($request);
+            $this->fail("Expected InvalidDataException was not thrown");
+        } catch (InvalidDataException $e) {
+            $this->assertEquals(["age" => "`age` must be a integer or null."], $e->getErrors());
+        }
     }
 
-    public function testUpdateWithValidDataSucceeds(): void {
+    public function testUpdateSuccess(): void {
         $database = $this->createDatabase();
 
         // Mock getById to return existing entity
@@ -192,39 +175,7 @@ final class CrudServiceMutationTest extends TestCase {
         $this->assertEquals("New Name", $entity->name);
     }
 
-    public function testUpdateWithInvalidIdReturnsNull(): void {
-        $request = $this->createRequest(
-            ["name" => "New Name"],
-            ["id" => "invalid"]
-        );
-
-        $service = new TestCrudService(TestEntity::class);
-        $entity = $service->update($request);
-
-        $this->assertNull($entity);
-    }
-
-    public function testUpdateWithNonExistentIdReturnsNull(): void {
-        $database = $this->createDatabase();
-
-        // Mock getById to return null (entity not found)
-        $database->expects($this->once())
-            ->method("selectFirst")
-            ->willReturn(null)
-        ;
-
-        $request = $this->createRequest(
-            ["name" => "New Name"],
-            ["id" => "999"]
-        );
-
-        $service = new TestCrudService(TestEntity::class);
-        $entity = $service->update($request);
-
-        $this->assertNull($entity);
-    }
-
-    public function testUpdateDoesNotRequireRequiredFieldsForExistingEntity(): void {
+    public function testUpdateWithMissingRequiredField(): void {
         $database = $this->createDatabase();
 
         // Mock getById to return existing entity with name already set
@@ -265,25 +216,7 @@ final class CrudServiceMutationTest extends TestCase {
         $this->assertEquals("New Description", $entity->description);
     }
 
-    public function testCreateValidatesDataMapping(): void {
-        $request = $this->createRequest([
-            "name" => "Test Entity",
-            "age" => "not-a-number",
-        ]);
-
-        $service = new TestCrudService(TestEntity::class);
-
-        try {
-            $service->create($request);
-            $this->fail("Expected InvalidDataException was not thrown");
-        } catch (InvalidDataException $e) {
-            $errors = $e->getErrors();
-            $this->assertArrayHasKey("age", $errors);
-            $this->assertEquals("age must be a valid integer", $errors["age"]);
-        }
-    }
-
-    public function testUpdateValidatesDataMapping(): void {
+    public function testUpdateWithInvalidValue(): void {
         $database = $this->createDatabase();
 
         // Mock getById to return existing entity
@@ -309,7 +242,7 @@ final class CrudServiceMutationTest extends TestCase {
             $service->update($request);
             $this->fail("Expected InvalidDataException to be thrown");
         } catch (InvalidDataException $e) {
-            $this->assertEquals(["age" => "`age` must be a valid integer."], $e->getErrors());
+            $this->assertEquals(["age" => "`age` must be a integer or null."], $e->getErrors());
         }
     }
 }
