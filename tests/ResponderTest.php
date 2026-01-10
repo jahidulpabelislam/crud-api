@@ -183,7 +183,7 @@ final class ResponderTest extends TestCase {
         $body = json_decode($response->getBody(), true);
 
         $this->assertEquals(201, $response->getStatusCode());
-        $this->assertTrue($response->hasHeader("Location"));
+        $this->assertEquals("https://api.example.com/test-entities/1/", $response->getHeaderString("Location"));
         $this->assertEquals(
             [
                 "data" => [
