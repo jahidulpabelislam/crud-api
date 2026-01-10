@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
  * Tests verify that filtering, searching, sorting, and pagination
  * produce the correct SQL queries as requested in the issue.
  */
-final class QueryBuilderSQLTest extends TestCase {
+final class CrudQueryTest extends TestCase {
 
     private function createMockDatabase(): Database {
         return $this->createMock(Database::class);
