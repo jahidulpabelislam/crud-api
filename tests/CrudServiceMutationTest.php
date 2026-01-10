@@ -300,8 +300,11 @@ final class CrudServiceMutationTest extends TestCase {
 
         $service = new TestCrudService(TestEntity::class);
 
-        $this->expectException(InvalidDataException::class);
-
-        $service->update($request);
+        try {
+            $service->update($request);
+            $this->fail("Expected InvalidDataException to be thrown");
+        } catch (InvalidDataException $e) {
+            $this->assertEquals(["age" => "`age` must be a valid integer."], $e->getErrors());
+        }
     }
 }
