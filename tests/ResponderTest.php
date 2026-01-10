@@ -10,8 +10,6 @@ use JPI\HTTP\Input;
 use JPI\HTTP\Request;
 use JPI\ORM\Entity\Collection as EntityCollection;
 use JPI\ORM\Entity\PaginatedCollection as PaginatedEntityCollection;
-use JPI\Utils\URL;
-use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 
 final class ResponderTest extends TestCase {
@@ -31,20 +29,8 @@ final class ResponderTest extends TestCase {
         $this->controller->setRequest($this->request);
     }
 
-    private function createEntity(int $id, string $name): TestEntity&Stub {
-        $entity = $this->createStub(TestEntity::class);
-        $entity->method("getId")->willReturn($id);
-        $entity->method("isLoaded")->willReturn(true);
-        $entity->method("getAPIResponse")->willReturn([
-            "id" => $id,
-            "name" => $name,
-        ]);
-        $entity->method("getAPILinks")->willReturn([
-            "self" => new URL("https://api.example.com/test-entities/{$id}/"),
-        ]);
-        $entity->method("isDeleted")->willReturn(false);
-
-        return $entity;
+    private function createEntity(int $id, string $name): TestEntity {
+        return TestEntity::loadFromDatabaseRow(["id" => $id, "name" => $name, "description" => null]);
     }
 
     public function testEmptyCollection(): void {
@@ -74,11 +60,21 @@ final class ResponderTest extends TestCase {
                     [
                         "id" => 1,
                         "name" => "Test 1",
+                        "description" => null,
+                        "status" => null,
+                        "category" => null,
+                        "age" => null,
+                        "created_at" => null,
                         "_links" => ["self" => "https://api.example.com/test-entities/1/"],
                     ],
                     [
                         "id" => 2,
                         "name" => "Test 2",
+                        "description" => null,
+                        "status" => null,
+                        "category" => null,
+                        "age" => null,
+                        "created_at" => null,
                         "_links" => ["self" => "https://api.example.com/test-entities/2/"],
                     ],
                 ],
@@ -170,6 +166,11 @@ final class ResponderTest extends TestCase {
                 "data" => [
                     "id" => 1,
                     "name" => "Test Entity",
+                    "description" => null,
+                    "status" => null,
+                    "category" => null,
+                    "age" => null,
+                    "created_at" => null,
                 ],
                 "_links" => ["self" => "https://api.example.com/test-entities/1/"],
             ],
@@ -188,6 +189,11 @@ final class ResponderTest extends TestCase {
                 "data" => [
                     "id" => 1,
                     "name" => "New Entity",
+                    "description" => null,
+                    "status" => null,
+                    "category" => null,
+                    "age" => null,
+                    "created_at" => null,
                 ],
                 "_links" => ["self" => "https://api.example.com/test-entities/1/"],
             ],
@@ -219,6 +225,11 @@ final class ResponderTest extends TestCase {
                 "data" => [
                     "id" => 1,
                     "name" => "Updated Entity",
+                    "description" => null,
+                    "status" => null,
+                    "category" => null,
+                    "age" => null,
+                    "created_at" => null,
                 ],
                 "_links" => ["self" => "https://api.example.com/test-entities/1/"],
             ],
@@ -255,7 +266,9 @@ final class ResponderTest extends TestCase {
     }
 
     public function testDeleteFailure(): void {
-        $entity = $this->createEntity(1, "Entity");
+        $entity = $this->createStub(TestEntity::class);
+        $entity->method("getId")->willReturn(1);
+        $entity->method("isLoaded")->willReturn(true);
         $entity->method("isDeleted")->willReturn(false);
 
         $response = $this->controller->getEntityDeleteResponse($this->request, $entity, 1);
