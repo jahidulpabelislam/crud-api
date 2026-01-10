@@ -10,6 +10,7 @@ use JPI\CRUD\API\Tests\Fixtures\TestEntity;
 use JPI\Database;
 use JPI\HTTP\Input;
 use JPI\HTTP\Request;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -21,13 +22,13 @@ use PHPUnit\Framework\TestCase;
  */
 final class CrudServiceMutationTest extends TestCase {
 
-    private function createMockDatabase(): Database {
+    private function createDatabase(): Database&MockObject {
         $database = $this->createMock(Database::class);
         TestEntity::setDatabase($database);
         return $database;
     }
 
-    private function createMockRequest(array $body = [], array $routeParams = []): Request {
+    private function createRequest(array $body = [], array $routeParams = []): Request {
         $request = $this->createStub(Request::class);
 
         $request->method("getArrayFromBody")
@@ -47,7 +48,7 @@ final class CrudServiceMutationTest extends TestCase {
     }
 
     public function testCreateWithValidDataSucceeds(): void {
-        $database = $this->createMockDatabase();
+        $database = $this->createDatabase();
 
         // Mock insert operation
         $database->expects($this->once())
@@ -72,7 +73,7 @@ final class CrudServiceMutationTest extends TestCase {
             ])
         ;
 
-        $request = $this->createMockRequest([
+        $request = $this->createRequest([
             "name" => "Test Entity",
             "description" => "Test Description",
             "status" => "active",
@@ -87,9 +88,7 @@ final class CrudServiceMutationTest extends TestCase {
     }
 
     public function testCreateWithMissingRequiredFieldFails(): void {
-        $this->createMockDatabase();
-
-        $request = $this->createMockRequest([
+        $request = $this->createRequest([
             "description" => "Test Description",
         ]);
 
@@ -102,9 +101,7 @@ final class CrudServiceMutationTest extends TestCase {
     }
 
     public function testCreateWithEmptyRequiredFieldFails(): void {
-        $this->createMockDatabase();
-
-        $request = $this->createMockRequest([
+        $request = $this->createRequest([
             "name" => "",
             "description" => "Test Description",
         ]);
@@ -118,7 +115,7 @@ final class CrudServiceMutationTest extends TestCase {
     }
 
     public function testCreateSetsOnlyProvidedFields(): void {
-        $database = $this->createMockDatabase();
+        $database = $this->createDatabase();
 
         // Mock insert operation
         $database->expects($this->once())
@@ -139,7 +136,7 @@ final class CrudServiceMutationTest extends TestCase {
             ])
         ;
 
-        $request = $this->createMockRequest([
+        $request = $this->createRequest([
             "name" => "Test Entity",
             // description, status, category not provided
         ]);
@@ -151,7 +148,7 @@ final class CrudServiceMutationTest extends TestCase {
     }
 
     public function testUpdateWithValidDataSucceeds(): void {
-        $database = $this->createMockDatabase();
+        $database = $this->createDatabase();
 
         // Mock getById to return existing entity
         $database->expects($this->exactly(2))
@@ -176,7 +173,7 @@ final class CrudServiceMutationTest extends TestCase {
             ->willReturn(1)
         ;
 
-        $request = $this->createMockRequest(
+        $request = $this->createRequest(
             [
                 "name" => "New Name",
                 "description" => "New Description",
@@ -192,7 +189,7 @@ final class CrudServiceMutationTest extends TestCase {
     }
 
     public function testUpdateWithInvalidIdReturnsNull(): void {
-        $request = $this->createMockRequest(
+        $request = $this->createRequest(
             ["name" => "New Name"],
             ["id" => "invalid"]
         );
@@ -204,7 +201,7 @@ final class CrudServiceMutationTest extends TestCase {
     }
 
     public function testUpdateWithNonExistentIdReturnsNull(): void {
-        $database = $this->createMockDatabase();
+        $database = $this->createDatabase();
 
         // Mock getById to return null (entity not found)
         $database->expects($this->once())
@@ -212,7 +209,7 @@ final class CrudServiceMutationTest extends TestCase {
             ->willReturn(null)
         ;
 
-        $request = $this->createMockRequest(
+        $request = $this->createRequest(
             ["name" => "New Name"],
             ["id" => "999"]
         );
@@ -224,7 +221,7 @@ final class CrudServiceMutationTest extends TestCase {
     }
 
     public function testUpdateDoesNotRequireRequiredFieldsForExistingEntity(): void {
-        $database = $this->createMockDatabase();
+        $database = $this->createDatabase();
 
         // Mock getById to return existing entity with name already set
         $database->expects($this->exactly(2))
@@ -249,7 +246,7 @@ final class CrudServiceMutationTest extends TestCase {
             ->willReturn(1)
         ;
 
-        $request = $this->createMockRequest(
+        $request = $this->createRequest(
             [
                 // name not provided - should be ok for update
                 "description" => "New Description",
@@ -265,7 +262,7 @@ final class CrudServiceMutationTest extends TestCase {
     }
 
     public function testCreateValidatesDataMapping(): void {
-        $request = $this->createMockRequest([
+        $request = $this->createRequest([
             "name" => "Test Entity",
             "created_at" => "invalid-date",
         ]);
@@ -278,7 +275,7 @@ final class CrudServiceMutationTest extends TestCase {
     }
 
     public function testUpdateValidatesDataMapping(): void {
-        $database = $this->createMockDatabase();
+        $database = $this->createDatabase();
 
         // Mock getById to return existing entity
         $database->expects($this->once())
@@ -289,7 +286,7 @@ final class CrudServiceMutationTest extends TestCase {
             ])
         ;
 
-        $request = $this->createMockRequest(
+        $request = $this->createRequest(
             [
                 "name" => "Updated Name",
                 "created_at" => "invalid-date",

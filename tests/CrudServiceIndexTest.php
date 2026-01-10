@@ -9,6 +9,7 @@ use JPI\CRUD\API\Tests\Fixtures\TestEntity;
 use JPI\Database;
 use JPI\HTTP\Request;
 use JPI\ORM\Entity\QueryBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -19,13 +20,13 @@ use PHPUnit\Framework\TestCase;
  */
 final class CrudServiceIndexTest extends TestCase {
 
-    private function createMockDatabase(): Database {
+    private function createDatabase(): Database&MockObject {
         $database = $this->createMock(Database::class);
         TestEntity::setDatabase($database);
         return $database;
     }
 
-    private function createMockRequest(array $queryParams = []): Request {
+    private function createRequest(array $queryParams = []): Request {
         $request = $this->createStub(Request::class);
 
         $request->method("getQueryParam")
@@ -53,7 +54,7 @@ final class CrudServiceIndexTest extends TestCase {
     }
 
     public function testFilteringGeneratesCorrectWhereClause(): void {
-        $database = $this->createMockDatabase();
+        $database = $this->createDatabase();
 
         // Expect the selectAll method to be called with specific SQL
         $database->expects($this->once())
@@ -72,7 +73,7 @@ LIMIT 10;"),
             ->willReturn([])
         ;
 
-        $request = $this->createMockRequest([
+        $request = $this->createRequest([
             "filters" => [
                 "status" => "active",
                 "category" => "test",
@@ -84,7 +85,7 @@ LIMIT 10;"),
     }
 
     public function testSearchingGeneratesCorrectWhereClause(): void {
-        $database = $this->createMockDatabase();
+        $database = $this->createDatabase();
 
         // Expect the select method to be called with specific SQL including OR conditions
         $database->expects($this->once())
@@ -103,7 +104,7 @@ LIMIT 10;"),
             ->willReturn([])
         ;
 
-        $request = $this->createMockRequest([
+        $request = $this->createRequest([
             "search" => "hello world",
         ]);
 
@@ -112,7 +113,7 @@ LIMIT 10;"),
     }
 
     public function testSortingGeneratesCorrectOrderBy(): void {
-        $database = $this->createMockDatabase();
+        $database = $this->createDatabase();
 
         // Expect the select method to be called with specific ORDER BY
         $database->expects($this->once())
@@ -127,7 +128,7 @@ LIMIT 10;"),
             ->willReturn([])
         ;
 
-        $request = $this->createMockRequest([
+        $request = $this->createRequest([
             "sort" => "name:asc,created_at:desc",
         ]);
 
@@ -136,7 +137,7 @@ LIMIT 10;"),
     }
 
     public function testMultipleFiltersWithSearch(): void {
-        $database = $this->createMockDatabase();
+        $database = $this->createDatabase();
 
         // Expect the select method to be called with combined WHERE conditions
         $database->expects($this->once())
@@ -156,7 +157,7 @@ LIMIT 10;"),
             ->willReturn([])
         ;
 
-        $request = $this->createMockRequest([
+        $request = $this->createRequest([
             "filters" => [
                 "status" => "active",
             ],
@@ -168,7 +169,7 @@ LIMIT 10;"),
     }
 
     public function testComplexQueryWithFilterSearchAndSort(): void {
-        $database = $this->createMockDatabase();
+        $database = $this->createDatabase();
 
         // Expect the select method to be called with all query modifications
         $database->expects($this->once())
@@ -194,7 +195,7 @@ LIMIT 10 OFFSET 10;"),
             ->willReturn(["count" => 20])
         ;
 
-        $request = $this->createMockRequest([
+        $request = $this->createRequest([
             "filters" => [
                 "status" => "active",
                 "category" => "test",
@@ -210,7 +211,7 @@ LIMIT 10 OFFSET 10;"),
     }
 
     public function testFilterIgnoresNonFilterableColumns(): void {
-        $database = $this->createMockDatabase();
+        $database = $this->createDatabase();
 
         // Expect only filterable columns in WHERE clause
         $database->expects($this->once())
@@ -229,7 +230,7 @@ LIMIT 10;"),
         ;
 
         // Try to filter by a non-filterable column
-        $request = $this->createMockRequest([
+        $request = $this->createRequest([
             "filters" => [
                 "status" => "active",
                 "nonexistent_column" => "value", // Should be ignored
@@ -241,7 +242,7 @@ LIMIT 10;"),
     }
 
     public function testSortIgnoresNonSortableColumns(): void {
-        $database = $this->createMockDatabase();
+        $database = $this->createDatabase();
 
         // Expect only sortable columns in ORDER BY clause
         $database->expects($this->once())
@@ -257,7 +258,7 @@ LIMIT 10;"),
         ;
 
         // Try to sort by a non-sortable column
-        $request = $this->createMockRequest([
+        $request = $this->createRequest([
             "sort" => "nonexistent_column:asc,name:desc",
         ]);
 
@@ -266,7 +267,7 @@ LIMIT 10;"),
     }
 
     public function testSearchWithMultipleWords(): void {
-        $database = $this->createMockDatabase();
+        $database = $this->createDatabase();
 
         // Expect the select method to be called with multi-word search patterns
         $database->expects($this->once())
@@ -286,7 +287,7 @@ LIMIT 10;"),
         ;
 
         // Add multi-word search
-        $request = $this->createMockRequest([
+        $request = $this->createRequest([
             "search" => "hello world test",
         ]);
 
@@ -295,7 +296,7 @@ LIMIT 10;"),
     }
 
     public function testSortWithDefaultDirection(): void {
-        $database = $this->createMockDatabase();
+        $database = $this->createDatabase();
 
         // Expect the select method to be called with default ASC direction
         $database->expects($this->once())
@@ -311,7 +312,7 @@ LIMIT 10;"),
         ;
 
         // Add sort without explicit direction (should default to ASC)
-        $request = $this->createMockRequest([
+        $request = $this->createRequest([
             "sort" => "name",
         ]);
 
@@ -320,7 +321,7 @@ LIMIT 10;"),
     }
 
     public function testSortHandlesCaseInsensitiveDirection(): void {
-        $database = $this->createMockDatabase();
+        $database = $this->createDatabase();
 
         // Expect the select method to handle case-insensitive direction (DESC)
         $database->expects($this->once())
@@ -336,7 +337,7 @@ LIMIT 10;"),
         ;
 
         // Add sort with uppercase DESC direction
-        $request = $this->createMockRequest([
+        $request = $this->createRequest([
             "sort" => "name:DESC",
         ]);
 
@@ -345,7 +346,7 @@ LIMIT 10;"),
     }
 
     public function testSortHandlesWhitespaceInDirective(): void {
-        $database = $this->createMockDatabase();
+        $database = $this->createDatabase();
 
         // Expect the select method to handle whitespace around colons
         $database->expects($this->once())
@@ -361,7 +362,7 @@ LIMIT 10;"),
         ;
 
         // Add sort with spaces around colon
-        $request = $this->createMockRequest([
+        $request = $this->createRequest([
             "sort" => "name : desc",
         ]);
 

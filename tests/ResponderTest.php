@@ -11,6 +11,7 @@ use JPI\HTTP\Request;
 use JPI\ORM\Entity\Collection as EntityCollection;
 use JPI\ORM\Entity\PaginatedCollection as PaginatedEntityCollection;
 use JPI\Utils\URL;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 
 final class ResponderTest extends TestCase {
@@ -30,7 +31,7 @@ final class ResponderTest extends TestCase {
         $this->controller->setRequest($this->request);
     }
 
-    private function createMockEntity(int $id, string $name) {
+    private function createEntity(int $id, string $name): TestEntity&Stub {
         $entity = $this->createStub(TestEntity::class);
         $entity->method("getId")->willReturn($id);
         $entity->method("isLoaded")->willReturn(true);
@@ -62,7 +63,7 @@ final class ResponderTest extends TestCase {
     }
 
     public function testEntities(): void {
-        $entities = new EntityCollection([$this->createMockEntity(1, "Test 1"), $this->createMockEntity(2, "Test 2")]);
+        $entities = new EntityCollection([$this->createEntity(1, "Test 1"), $this->createEntity(2, "Test 2")]);
         $response = $this->controller->getEntitiesResponse($this->request, $entities);
         $body = json_decode($response->getBody(), true);
 
@@ -89,7 +90,7 @@ final class ResponderTest extends TestCase {
 
     public function testPaginatedEntities(): void {
         $collection = new PaginatedEntityCollection(
-            items: [$this->createMockEntity(1, "Test 1"), $this->createMockEntity(2, "Test 2")],
+            items: [$this->createEntity(1, "Test 1"), $this->createEntity(2, "Test 2")],
             totalCount: 25,
             limit: 2,
             page: 1
@@ -112,7 +113,7 @@ final class ResponderTest extends TestCase {
 
     public function testPaginatedEntitiesLastPage(): void {
         $collection = new PaginatedEntityCollection(
-            items: [$this->createMockEntity(1, "Test")],
+            items: [$this->createEntity(1, "Test")],
             totalCount: 25,
             limit: 2,
             page: 13 // last page
@@ -132,7 +133,7 @@ final class ResponderTest extends TestCase {
 
     public function testPaginatedEntitiesMiddlePage(): void {
         $collection = new PaginatedEntityCollection(
-            items: [$this->createMockEntity(1, "Test")],
+            items: [$this->createEntity(1, "Test")],
             totalCount: 30,
             limit: 2,
             page: 6 // middle page
@@ -160,7 +161,7 @@ final class ResponderTest extends TestCase {
     }
 
     public function testEntityFound(): void {
-        $response = $this->controller->getEntityResponse($this->request, $this->createMockEntity(1, "Test Entity"), 1);
+        $response = $this->controller->getEntityResponse($this->request, $this->createEntity(1, "Test Entity"), 1);
         $body = json_decode($response->getBody(), true);
 
         $this->assertEquals(200, $response->getStatusCode());
@@ -177,7 +178,7 @@ final class ResponderTest extends TestCase {
     }
 
     public function testCreateSuccess(): void {
-        $response = $this->controller->getEntityCreateResponse($this->request, $this->createMockEntity(1, "New Entity"));
+        $response = $this->controller->getEntityCreateResponse($this->request, $this->createEntity(1, "New Entity"));
         $body = json_decode($response->getBody(), true);
 
         $this->assertEquals(201, $response->getStatusCode());
@@ -209,7 +210,7 @@ final class ResponderTest extends TestCase {
     }
 
     public function testUpdateSuccess(): void {
-        $response = $this->controller->getEntityUpdateResponse($this->request, $this->createMockEntity(1, "Updated Entity"), 1);
+        $response = $this->controller->getEntityUpdateResponse($this->request, $this->createEntity(1, "Updated Entity"), 1);
         $body = json_decode($response->getBody(), true);
 
         $this->assertEquals(200, $response->getStatusCode());
@@ -227,7 +228,7 @@ final class ResponderTest extends TestCase {
 
     public function testUpdateFailure(): void {
         // Create a mock entity that"s loaded but with wrong ID
-        $response = $this->controller->getEntityUpdateResponse($this->request, $this->createMockEntity(2, "Entity"), 1);
+        $response = $this->controller->getEntityUpdateResponse($this->request, $this->createEntity(2, "Entity"), 1);
         $body = json_decode($response->getBody(), true);
 
         $this->assertEquals(500, $response->getStatusCode());
@@ -254,7 +255,7 @@ final class ResponderTest extends TestCase {
     }
 
     public function testDeleteFailure(): void {
-        $entity = $this->createMockEntity(1, "Entity");
+        $entity = $this->createEntity(1, "Entity");
         $entity->method("isDeleted")->willReturn(false);
 
         $response = $this->controller->getEntityDeleteResponse($this->request, $entity, 1);
