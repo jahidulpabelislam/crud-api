@@ -30,7 +30,15 @@ final class ResponderTest extends TestCase {
     }
 
     private function createEntity(int $id, string $name): TestEntity {
-        return TestEntity::loadFromDatabaseRow(["id" => $id, "name" => $name, "description" => null]);
+        return TestEntity::loadFromDatabaseRow([
+            "id" => $id,
+            "name" => $name,
+            "description" => null,
+            "status" => null,
+            "category" => null,
+            "age" => null,
+            "created_at" => null,
+        ]);
     }
 
     public function testEmptyCollection(): void {
