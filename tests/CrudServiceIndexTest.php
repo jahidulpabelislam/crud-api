@@ -189,6 +189,11 @@ LIMIT 10 OFFSET 10;"),
             ->willReturn([])
         ;
 
+        $database->expects($this->once())
+            ->method("selectFirst")
+            ->willReturn(["count" => 20])
+        ;
+
         $request = $this->createMockRequest([
             "filters" => [
                 "status" => "active",
