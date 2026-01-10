@@ -59,4 +59,16 @@ final class ControllerTest extends TestCase {
         $fields = $this->request->getAttribute("fields");
         $this->assertNull($fields);
     }
+
+    public function testParseFieldsArray(): void {
+        $this->request->setQueryParams(new Input(["fields" => ["name", "description"]]));
+
+        $reflectionClass = new \ReflectionClass($this->controller);
+        $method = $reflectionClass->getMethod("parseFieldsAttribute");
+        $method->setAccessible(true);
+        $method->invoke($this->controller);
+
+        $fields = $this->request->getAttribute("fields");
+        $this->assertNull($fields);
+    }
 }
