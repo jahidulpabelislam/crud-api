@@ -94,10 +94,14 @@ final class CrudServiceMutationTest extends TestCase {
 
         $service = new TestCrudService(TestEntity::class);
 
-        $this->expectException(InvalidDataException::class);
-        $this->expectExceptionMessage("`name` is required");
-
-        $service->create($request);
+        try {
+            $service->create($request);
+            $this->fail("Expected InvalidDataException to be thrown");
+        } catch (InvalidDataException $e) {
+            $errors = $e->getErrors();
+            $this->assertArrayHasKey("name", $errors);
+            $this->assertEquals("`name` is required.", $errors["name"]);
+        }
     }
 
     public function testCreateWithEmptyRequiredFieldFails(): void {
@@ -108,10 +112,14 @@ final class CrudServiceMutationTest extends TestCase {
 
         $service = new TestCrudService(TestEntity::class);
 
-        $this->expectException(InvalidDataException::class);
-        $this->expectExceptionMessage("`name` cannot be empty");
-
-        $service->create($request);
+        try {
+            $service->create($request);
+            $this->fail("Expected InvalidDataException to be thrown");
+        } catch (InvalidDataException $e) {
+            $errors = $e->getErrors();
+            $this->assertArrayHasKey("name", $errors);
+            $this->assertEquals("`name` cannot be empty.", $errors["name"]);
+        }
     }
 
     public function testCreateSetsOnlyProvidedFields(): void {
@@ -264,7 +272,7 @@ final class CrudServiceMutationTest extends TestCase {
     public function testCreateValidatesDataMapping(): void {
         $request = $this->createRequest([
             "name" => "Test Entity",
-            "created_at" => "invalid-date",
+            "age" => "not-a-number",
         ]);
 
         $service = new TestCrudService(TestEntity::class);
@@ -289,7 +297,7 @@ final class CrudServiceMutationTest extends TestCase {
         $request = $this->createRequest(
             [
                 "name" => "Updated Name",
-                "created_at" => "invalid-date",
+                "age" => "not-a-number",
             ],
             ["id" => "4"]
         );

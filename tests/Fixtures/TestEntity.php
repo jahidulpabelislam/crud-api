@@ -45,6 +45,9 @@ class TestEntity extends AbstractEntity implements SearchableInterface, Filterab
         "category" => [
             "type" => "string",
         ],
+        "age" => [
+            "type" => "int",
+        ],
         "created_at" => [
             "type" => "date_time",
         ],
