@@ -35,8 +35,7 @@ abstract class AbstractEntity extends BaseEntity {
         return new static::$crudService(static::class);
     }
 
-    public function getAPIBasePath(): string
-    {
+    public function getAPIBasePath(): string {
         // Convert display name to lowercase and replace spaces with hyphens
         $basePath = strtolower(static::getPluralDisplayName());
         $basePath = str_replace(" ", "-", $basePath);
@@ -46,8 +45,7 @@ abstract class AbstractEntity extends BaseEntity {
     /**
      * Returns the API URL for this entity instance.
      */
-    public function getAPIURL(?Request $request = null): URL
-    {
+    public function getAPIURL(?Request $request = null): URL {
         $baseURL = "/" . static::getAPIBasePath() . "/" . $this->getId() . "/";
         if (!$request) {
             return new URL($baseURL);

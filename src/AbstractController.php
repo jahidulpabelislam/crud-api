@@ -113,7 +113,8 @@ abstract class AbstractController {
 
         try {
             $entity = $this->getEntityInstance()::getCrudService()->create($request);
-        } catch (InvalidDataException $exception) {
+        }
+        catch (InvalidDataException $exception) {
             return $this->getInvalidInputResponse($exception->getErrors());
         }
 
@@ -148,7 +149,8 @@ abstract class AbstractController {
 
         try {
             $entity = $this->getEntityInstance()::getCrudService()->update($request);
-        } catch (InvalidDataException $exception) {
+        }
+        catch (InvalidDataException $exception) {
             return $this->getInvalidInputResponse($exception->getErrors());
         }
 
