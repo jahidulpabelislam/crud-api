@@ -28,7 +28,7 @@ final class CrudServiceMutationTest extends TestCase {
     }
 
     private function createMockRequest(array $body = [], array $routeParams = []): Request {
-        $request = $this->createMock(Request::class);
+        $request = $this->createStub(Request::class);
 
         $request->method("getArrayFromBody")
             ->willReturn(new Input($body))

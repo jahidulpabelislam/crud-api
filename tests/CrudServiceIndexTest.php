@@ -26,7 +26,7 @@ final class CrudServiceIndexTest extends TestCase {
     }
 
     private function createMockRequest(array $queryParams = []): Request {
-        $request = $this->createMock(Request::class);
+        $request = $this->createStub(Request::class);
 
         $request->method("getQueryParam")
             ->willReturnCallback(function ($key) use ($queryParams) {
