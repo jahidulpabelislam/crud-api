@@ -20,17 +20,14 @@ use PHPUnit\Framework\TestCase;
 final class CrudQueryTest extends TestCase {
 
     private function createMockDatabase(): Database {
-        return $this->createMock(Database::class);
-    }
-
-    private function createQueryBuilder(?Database $database = null): QueryBuilder {
-        $entity = new TestEntity();
-        return new QueryBuilder($database ?: $this->createMockDatabase(), $entity);
+        $database = $this->createMock(Database::class);
+        TestEntity::setDatabase($database);
+        return $database;
     }
 
     private function createMockRequest(array $queryParams = []): Request {
         $request = $this->createMock(Request::class);
-        
+
         $request->method('getQueryParam')
             ->willReturnCallback(function ($key) use ($queryParams) {
                 $value = $queryParams[$key] ?? null;
@@ -43,13 +40,15 @@ final class CrudQueryTest extends TestCase {
                     return (string)$value;
                 }
                 return $value;
-            });
-        
+            })
+        ;
+
         $request->method('hasQueryParam')
             ->willReturnCallback(function ($key) use ($queryParams) {
                 return isset($queryParams[$key]);
-            });
-        
+            })
+        ;
+
         return $request;
     }
 
@@ -70,10 +69,8 @@ LIMIT 10;"),
                     'category' => 'test',
                 ])
             )
-            ->willReturn([]);
-
-        // Set database on entity
-        TestEntity::setDatabase($database);
+            ->willReturn([])
+        ;
 
         $request = $this->createMockRequest([
             'filters' => [
@@ -103,9 +100,8 @@ LIMIT 10;"),
                     'searchReversed' => '%world%hello%',
                 ])
             )
-            ->willReturn([]);
-
-        TestEntity::setDatabase($database);
+            ->willReturn([])
+        ;
 
         $request = $this->createMockRequest([
             'search' => 'hello world',
@@ -128,9 +124,8 @@ ORDER BY name ASC, created_at DESC
 LIMIT 10;"),
                 $this->equalTo([])
             )
-            ->willReturn([]);
-
-        TestEntity::setDatabase($database);
+            ->willReturn([])
+        ;
 
         $request = $this->createMockRequest([
             'sort' => 'name:asc,created_at:desc',
@@ -158,9 +153,8 @@ LIMIT 10;"),
                     'searchReversed' => '%test%',
                 ])
             )
-            ->willReturn([]);
-
-        TestEntity::setDatabase($database);
+            ->willReturn([])
+        ;
 
         $request = $this->createMockRequest([
             'filters' => [
@@ -192,9 +186,8 @@ LIMIT 10 OFFSET 10;"),
                     'searchReversed' => '%world%hello%',
                 ])
             )
-            ->willReturn([]);
-
-        TestEntity::setDatabase($database);
+            ->willReturn([])
+        ;
 
         $request = $this->createMockRequest([
             'filters' => [
@@ -227,9 +220,8 @@ LIMIT 10;"),
                     'status' => 'active',
                 ])
             )
-            ->willReturn([]);
-
-        TestEntity::setDatabase($database);
+            ->willReturn([])
+        ;
 
         // Try to filter by a non-filterable column
         $request = $this->createMockRequest([
@@ -256,9 +248,8 @@ ORDER BY name DESC
 LIMIT 10;"),
                 $this->equalTo([])
             )
-            ->willReturn([]);
-
-        TestEntity::setDatabase($database);
+            ->willReturn([])
+        ;
 
         // Try to sort by a non-sortable column
         $request = $this->createMockRequest([
@@ -286,9 +277,8 @@ LIMIT 10;"),
                     'searchReversed' => '%test%world%hello%',
                 ])
             )
-            ->willReturn([]);
-
-        TestEntity::setDatabase($database);
+            ->willReturn([])
+        ;
 
         // Add multi-word search
         $request = $this->createMockRequest([
@@ -312,9 +302,8 @@ ORDER BY name ASC
 LIMIT 10;"),
                 $this->equalTo([])
             )
-            ->willReturn([]);
-
-        TestEntity::setDatabase($database);
+            ->willReturn([])
+        ;
 
         // Add sort without explicit direction (should default to ASC)
         $request = $this->createMockRequest([
@@ -338,9 +327,8 @@ ORDER BY name DESC
 LIMIT 10;"),
                 $this->equalTo([])
             )
-            ->willReturn([]);
-
-        TestEntity::setDatabase($database);
+            ->willReturn([])
+        ;
 
         // Add sort with uppercase DESC direction
         $request = $this->createMockRequest([
@@ -364,9 +352,8 @@ ORDER BY name DESC
 LIMIT 10;"),
                 $this->equalTo([])
             )
-            ->willReturn([]);
-
-        TestEntity::setDatabase($database);
+            ->willReturn([])
+        ;
 
         // Add sort with spaces around colon
         $request = $this->createMockRequest([
@@ -388,7 +375,8 @@ LIMIT 10;"),
         // Expect where to be called twice (once for each filter)
         $query->expects($this->exactly(2))
             ->method('where')
-            ->willReturnSelf();
+            ->willReturnSelf()
+        ;
 
         TestEntity::addFiltersToQuery($query, $filters);
     }
@@ -405,7 +393,8 @@ LIMIT 10;"),
         $query->expects($this->once())
             ->method('where')
             ->with("status", "=", "active")
-            ->willReturnSelf();
+            ->willReturnSelf()
+        ;
 
         TestEntity::addFiltersToQuery($query, $filters);
     }
@@ -415,7 +404,8 @@ LIMIT 10;"),
 
         $query->expects($this->once())
             ->method('orderBy')
-            ->with("name", true); // true = ascending
+            ->with("name", true) // true = ascending
+        ;
 
         TestEntity::addSortToQuery($query, ["name:asc"]);
     }
@@ -425,7 +415,8 @@ LIMIT 10;"),
 
         $query->expects($this->once())
             ->method('orderBy')
-            ->with("created_at", false); // false = descending
+            ->with("created_at", false) // false = descending
+        ;
 
         TestEntity::addSortToQuery($query, ["created_at:desc"]);
     }
@@ -435,7 +426,8 @@ LIMIT 10;"),
 
         $query->expects($this->once())
             ->method('orderBy')
-            ->with("name", true); // true = ascending (default)
+            ->with("name", true) // true = ascending (default)
+        ;
 
         TestEntity::addSortToQuery($query, ["name"]); // No direction specified
     }
@@ -446,7 +438,8 @@ LIMIT 10;"),
         // Expect orderBy to be called multiple times
         $query->expects($this->exactly(3))
             ->method('orderBy')
-            ->willReturnSelf();
+            ->willReturnSelf()
+        ;
 
         TestEntity::addSortToQuery($query, ["name:asc", "created_at:desc", "status"]);
     }
@@ -456,7 +449,8 @@ LIMIT 10;"),
 
         // Should not call orderBy for non-sortable column
         $query->expects($this->never())
-            ->method('orderBy');
+            ->method('orderBy')
+        ;
 
         TestEntity::addSortToQuery($query, ["nonexistent_column:asc"]);
     }
@@ -466,7 +460,8 @@ LIMIT 10;"),
 
         $query->expects($this->once())
             ->method('orderBy')
-            ->with("name", false); // DESC
+            ->with("name", false) // DESC
+        ;
 
         TestEntity::addSortToQuery($query, ["name:DESC"]);
     }
@@ -476,7 +471,8 @@ LIMIT 10;"),
 
         $query->expects($this->once())
             ->method('orderBy')
-            ->with("name", false); // DESC
+            ->with("name", false) // DESC
+        ;
 
         TestEntity::addSortToQuery($query, ["name : desc"]); // Spaces around colon
     }

@@ -79,7 +79,7 @@ final class ResponderTest extends TestCase {
                         "id" => 2,
                         "name" => "Test 2",
                         "_links" => ["self" => "https://api.example.com/test-entities/2/"],
-                    ]
+                    ],
                 ],
                 "_links" => ["self" => "https://api.example.com/test-entities/"],
             ],
