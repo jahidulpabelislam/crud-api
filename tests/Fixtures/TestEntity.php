@@ -25,6 +25,8 @@ class TestEntity extends AbstractEntity implements SearchableInterface, Filterab
     protected static array $searchableColumns = ["name", "description"];
     protected static array $filterableColumns = ["status", "category"];
     protected static array $sortableColumns = ["name", "created_at", "status"];
+    
+    private static ?\JPI\Database $database = null;
 
     public static function getPluralDisplayName(): string {
         return "Test Entities";
@@ -48,9 +50,14 @@ class TestEntity extends AbstractEntity implements SearchableInterface, Filterab
         ],
     ];
 
+    public static function setDatabase(\JPI\Database $database): void {
+        self::$database = $database;
+    }
+
     public static function getDatabase(): \JPI\Database {
-        // Return a mock database for testing
-        // In real tests, this would be mocked
-        throw new \RuntimeException("Database not configured for tests");
+        if (self::$database === null) {
+            throw new \RuntimeException("Database not configured for tests");
+        }
+        return self::$database;
     }
 }

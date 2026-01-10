@@ -33,7 +33,16 @@ final class CrudQueryTest extends TestCase {
         
         $request->method('getQueryParam')
             ->willReturnCallback(function ($key) use ($queryParams) {
-                return $queryParams[$key] ?? null;
+                $value = $queryParams[$key] ?? null;
+                // Convert arrays to Input objects to match Request behavior
+                if (is_array($value)) {
+                    return new \JPI\HTTP\Input($value);
+                }
+                // Convert integers to strings to match Request behavior
+                if (is_int($value)) {
+                    return (string)$value;
+                }
+                return $value;
             });
         
         $request->method('hasQueryParam')
@@ -55,7 +64,7 @@ final class CrudQueryTest extends TestCase {
 FROM test_entities
 WHERE status = :status AND category = :category
 ORDER BY id ASC
-LIMIT 10 OFFSET 0;"),
+LIMIT 10;"),
                 $this->equalTo([
                     'status' => 'active',
                     'category' => 'test',
@@ -88,7 +97,7 @@ LIMIT 10 OFFSET 0;"),
 FROM test_entities
 WHERE (name LIKE :search OR name LIKE :searchReversed OR description LIKE :search OR description LIKE :searchReversed)
 ORDER BY id ASC
-LIMIT 10 OFFSET 0;"),
+LIMIT 10;"),
                 $this->equalTo([
                     'search' => '%hello%world%',
                     'searchReversed' => '%world%hello%',
@@ -116,7 +125,7 @@ LIMIT 10 OFFSET 0;"),
                 $this->equalTo("SELECT *
 FROM test_entities
 ORDER BY name ASC, created_at DESC
-LIMIT 10 OFFSET 0;"),
+LIMIT 10;"),
                 $this->equalTo([])
             )
             ->willReturn([]);
@@ -142,7 +151,7 @@ LIMIT 10 OFFSET 0;"),
 FROM test_entities
 WHERE status = :status AND (name LIKE :search OR name LIKE :searchReversed OR description LIKE :search OR description LIKE :searchReversed)
 ORDER BY id ASC
-LIMIT 10 OFFSET 0;"),
+LIMIT 10;"),
                 $this->equalTo([
                     'status' => 'active',
                     'search' => '%test%',
@@ -213,7 +222,7 @@ LIMIT 10 OFFSET 10;"),
 FROM test_entities
 WHERE status = :status
 ORDER BY id ASC
-LIMIT 10 OFFSET 0;"),
+LIMIT 10;"),
                 $this->equalTo([
                     'status' => 'active',
                 ])
@@ -244,7 +253,7 @@ LIMIT 10 OFFSET 0;"),
                 $this->equalTo("SELECT *
 FROM test_entities
 ORDER BY name DESC
-LIMIT 10 OFFSET 0;"),
+LIMIT 10;"),
                 $this->equalTo([])
             )
             ->willReturn([]);
@@ -271,7 +280,7 @@ LIMIT 10 OFFSET 0;"),
 FROM test_entities
 WHERE (name LIKE :search OR name LIKE :searchReversed OR description LIKE :search OR description LIKE :searchReversed)
 ORDER BY id ASC
-LIMIT 10 OFFSET 0;"),
+LIMIT 10;"),
                 $this->equalTo([
                     'search' => '%hello%world%test%',
                     'searchReversed' => '%test%world%hello%',
@@ -300,7 +309,7 @@ LIMIT 10 OFFSET 0;"),
                 $this->equalTo("SELECT *
 FROM test_entities
 ORDER BY name ASC
-LIMIT 10 OFFSET 0;"),
+LIMIT 10;"),
                 $this->equalTo([])
             )
             ->willReturn([]);
@@ -326,7 +335,7 @@ LIMIT 10 OFFSET 0;"),
                 $this->equalTo("SELECT *
 FROM test_entities
 ORDER BY name DESC
-LIMIT 10 OFFSET 0;"),
+LIMIT 10;"),
                 $this->equalTo([])
             )
             ->willReturn([]);
@@ -352,7 +361,7 @@ LIMIT 10 OFFSET 0;"),
                 $this->equalTo("SELECT *
 FROM test_entities
 ORDER BY name DESC
-LIMIT 10 OFFSET 0;"),
+LIMIT 10;"),
                 $this->equalTo([])
             )
             ->willReturn([]);
