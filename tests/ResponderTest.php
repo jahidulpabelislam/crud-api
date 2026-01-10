@@ -97,7 +97,7 @@ final class ResponderTest extends TestCase {
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertArrayHasKey("data", $body);
         $this->assertEquals(25, $body["_total_count"]);
-        $this->assertEquals(13, $body["_total_pages"]); // 25 / 2 = 3 pages
+        $this->assertEquals(13, $body["_total_pages"]); // 25 / 2 = 13 pages
         $this->assertEquals(
             [
                 "self" => "https://api.example.com/test-entities/",
