@@ -25,7 +25,7 @@ final class ControllerTest extends TestCase {
 
         // Make all protected
         $reflectionClass = new \ReflectionClass($controller);
-        $property = $reflectionClass->getProperty('publicActions');
+        $property = $reflectionClass->getProperty("publicActions");
         $property->setAccessible(true);
         $property->setValue($controller, []);
 
@@ -40,7 +40,7 @@ final class ControllerTest extends TestCase {
         $this->request->setQueryParams(new Input(["fields" => "name, description ,status"]));
 
         $reflectionClass = new \ReflectionClass($this->controller);
-        $method = $reflectionClass->getMethod('parseFieldsAttribute');
+        $method = $reflectionClass->getMethod("parseFieldsAttribute");
         $method->setAccessible(true);
         $method->invoke($this->controller);
 
@@ -52,7 +52,7 @@ final class ControllerTest extends TestCase {
         $this->request->setQueryParams(new Input(["fields" => ""]));
 
         $reflectionClass = new \ReflectionClass($this->controller);
-        $method = $reflectionClass->getMethod('parseFieldsAttribute');
+        $method = $reflectionClass->getMethod("parseFieldsAttribute");
         $method->setAccessible(true);
         $method->invoke($this->controller);
 

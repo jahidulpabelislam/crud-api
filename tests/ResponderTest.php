@@ -32,16 +32,16 @@ final class ResponderTest extends TestCase {
 
     private function createMockEntity(int $id, string $name) {
         $entity = $this->createStub(TestEntity::class);
-        $entity->method('getId')->willReturn($id);
-        $entity->method('isLoaded')->willReturn(true);
-        $entity->method('getAPIResponse')->willReturn([
+        $entity->method("getId")->willReturn($id);
+        $entity->method("isLoaded")->willReturn(true);
+        $entity->method("getAPIResponse")->willReturn([
             "id" => $id,
             "name" => $name,
         ]);
-        $entity->method('getAPILinks')->willReturn([
+        $entity->method("getAPILinks")->willReturn([
             "self" => new URL("https://api.example.com/test-entities/{$id}/"),
         ]);
-        $entity->method('isDeleted')->willReturn(false);
+        $entity->method("isDeleted")->willReturn(false);
 
         return $entity;
     }
@@ -226,7 +226,7 @@ final class ResponderTest extends TestCase {
     }
 
     public function testUpdateFailure(): void {
-        // Create a mock entity that's loaded but with wrong ID
+        // Create a mock entity that"s loaded but with wrong ID
         $response = $this->controller->getEntityUpdateResponse($this->request, $this->createMockEntity(2, "Entity"), 1);
         $body = json_decode($response->getBody(), true);
 
@@ -241,9 +241,9 @@ final class ResponderTest extends TestCase {
 
     public function testDeleteSuccess(): void {
         $entity = $this->createStub(TestEntity::class);
-        $entity->method('getId')->willReturn(1);
-        $entity->method('isLoaded')->willReturn(true);
-        $entity->method('isDeleted')->willReturn(true);
+        $entity->method("getId")->willReturn(1);
+        $entity->method("isLoaded")->willReturn(true);
+        $entity->method("isDeleted")->willReturn(true);
 
         $response = $this->controller->getEntityDeleteResponse($this->request, $entity, 1);
 
@@ -255,7 +255,7 @@ final class ResponderTest extends TestCase {
 
     public function testDeleteFailure(): void {
         $entity = $this->createMockEntity(1, "Entity");
-        $entity->method('isDeleted')->willReturn(false);
+        $entity->method("isDeleted")->willReturn(false);
 
         $response = $this->controller->getEntityDeleteResponse($this->request, $entity, 1);
         $body = json_decode($response->getBody(), true);

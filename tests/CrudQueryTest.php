@@ -28,7 +28,7 @@ final class CrudQueryTest extends TestCase {
     private function createMockRequest(array $queryParams = []): Request {
         $request = $this->createMock(Request::class);
 
-        $request->method('getQueryParam')
+        $request->method("getQueryParam")
             ->willReturnCallback(function ($key) use ($queryParams) {
                 $value = $queryParams[$key] ?? null;
                 // Convert arrays to Input objects to match Request behavior
@@ -43,7 +43,7 @@ final class CrudQueryTest extends TestCase {
             })
         ;
 
-        $request->method('hasQueryParam')
+        $request->method("hasQueryParam")
             ->willReturnCallback(function ($key) use ($queryParams) {
                 return isset($queryParams[$key]);
             })
@@ -57,7 +57,7 @@ final class CrudQueryTest extends TestCase {
 
         // Expect the selectAll method to be called with specific SQL
         $database->expects($this->once())
-            ->method('selectAll')
+            ->method("selectAll")
             ->with(
                 $this->equalTo("SELECT *
 FROM test_entities
@@ -65,17 +65,17 @@ WHERE status = :status AND category = :category
 ORDER BY id ASC
 LIMIT 10;"),
                 $this->equalTo([
-                    'status' => 'active',
-                    'category' => 'test',
+                    "status" => "active",
+                    "category" => "test",
                 ])
             )
             ->willReturn([])
         ;
 
         $request = $this->createMockRequest([
-            'filters' => [
-                'status' => 'active',
-                'category' => 'test',
+            "filters" => [
+                "status" => "active",
+                "category" => "test",
             ],
         ]);
 
@@ -88,7 +88,7 @@ LIMIT 10;"),
 
         // Expect the select method to be called with specific SQL including OR conditions
         $database->expects($this->once())
-            ->method('selectAll')
+            ->method("selectAll")
             ->with(
                 $this->equalTo("SELECT *
 FROM test_entities
@@ -96,15 +96,15 @@ WHERE (name LIKE :search OR name LIKE :searchReversed OR description LIKE :searc
 ORDER BY id ASC
 LIMIT 10;"),
                 $this->equalTo([
-                    'search' => '%hello%world%',
-                    'searchReversed' => '%world%hello%',
+                    "search" => "%hello%world%",
+                    "searchReversed" => "%world%hello%",
                 ])
             )
             ->willReturn([])
         ;
 
         $request = $this->createMockRequest([
-            'search' => 'hello world',
+            "search" => "hello world",
         ]);
 
         $service = new TestCrudService(TestEntity::class);
@@ -116,7 +116,7 @@ LIMIT 10;"),
 
         // Expect the select method to be called with specific ORDER BY
         $database->expects($this->once())
-            ->method('selectAll')
+            ->method("selectAll")
             ->with(
                 $this->equalTo("SELECT *
 FROM test_entities
@@ -128,7 +128,7 @@ LIMIT 10;"),
         ;
 
         $request = $this->createMockRequest([
-            'sort' => 'name:asc,created_at:desc',
+            "sort" => "name:asc,created_at:desc",
         ]);
 
         $service = new TestCrudService(TestEntity::class);
@@ -140,7 +140,7 @@ LIMIT 10;"),
 
         // Expect the select method to be called with combined WHERE conditions
         $database->expects($this->once())
-            ->method('selectAll')
+            ->method("selectAll")
             ->with(
                 $this->equalTo("SELECT *
 FROM test_entities
@@ -148,19 +148,19 @@ WHERE status = :status AND (name LIKE :search OR name LIKE :searchReversed OR de
 ORDER BY id ASC
 LIMIT 10;"),
                 $this->equalTo([
-                    'status' => 'active',
-                    'search' => '%test%',
-                    'searchReversed' => '%test%',
+                    "status" => "active",
+                    "search" => "%test%",
+                    "searchReversed" => "%test%",
                 ])
             )
             ->willReturn([])
         ;
 
         $request = $this->createMockRequest([
-            'filters' => [
-                'status' => 'active',
+            "filters" => [
+                "status" => "active",
             ],
-            'search' => 'test',
+            "search" => "test",
         ]);
 
         $service = new TestCrudService(TestEntity::class);
@@ -172,7 +172,7 @@ LIMIT 10;"),
 
         // Expect the select method to be called with all query modifications
         $database->expects($this->once())
-            ->method('selectAll')
+            ->method("selectAll")
             ->with(
                 $this->equalTo("SELECT *
 FROM test_entities
@@ -180,24 +180,24 @@ WHERE status = :status AND category = :category AND (name LIKE :search OR name L
 ORDER BY name DESC, created_at ASC
 LIMIT 10 OFFSET 10;"),
                 $this->equalTo([
-                    'status' => 'active',
-                    'category' => 'test',
-                    'search' => '%hello%world%',
-                    'searchReversed' => '%world%hello%',
+                    "status" => "active",
+                    "category" => "test",
+                    "search" => "%hello%world%",
+                    "searchReversed" => "%world%hello%",
                 ])
             )
             ->willReturn([])
         ;
 
         $request = $this->createMockRequest([
-            'filters' => [
-                'status' => 'active',
-                'category' => 'test',
+            "filters" => [
+                "status" => "active",
+                "category" => "test",
             ],
-            'search' => 'hello world',
-            'sort' => 'name:desc,created_at:asc',
-            'limit' => 10,
-            'page' => 2,
+            "search" => "hello world",
+            "sort" => "name:desc,created_at:asc",
+            "limit" => 10,
+            "page" => 2,
         ]);
 
         $service = new TestCrudService(TestEntity::class);
@@ -209,7 +209,7 @@ LIMIT 10 OFFSET 10;"),
 
         // Expect only filterable columns in WHERE clause
         $database->expects($this->once())
-            ->method('selectAll')
+            ->method("selectAll")
             ->with(
                 $this->equalTo("SELECT *
 FROM test_entities
@@ -217,7 +217,7 @@ WHERE status = :status
 ORDER BY id ASC
 LIMIT 10;"),
                 $this->equalTo([
-                    'status' => 'active',
+                    "status" => "active",
                 ])
             )
             ->willReturn([])
@@ -225,9 +225,9 @@ LIMIT 10;"),
 
         // Try to filter by a non-filterable column
         $request = $this->createMockRequest([
-            'filters' => [
-                'status' => 'active',
-                'nonexistent_column' => 'value', // Should be ignored
+            "filters" => [
+                "status" => "active",
+                "nonexistent_column" => "value", // Should be ignored
             ],
         ]);
 
@@ -240,7 +240,7 @@ LIMIT 10;"),
 
         // Expect only sortable columns in ORDER BY clause
         $database->expects($this->once())
-            ->method('selectAll')
+            ->method("selectAll")
             ->with(
                 $this->equalTo("SELECT *
 FROM test_entities
@@ -253,7 +253,7 @@ LIMIT 10;"),
 
         // Try to sort by a non-sortable column
         $request = $this->createMockRequest([
-            'sort' => 'nonexistent_column:asc,name:desc',
+            "sort" => "nonexistent_column:asc,name:desc",
         ]);
 
         $service = new TestCrudService(TestEntity::class);
@@ -265,7 +265,7 @@ LIMIT 10;"),
 
         // Expect the select method to be called with multi-word search patterns
         $database->expects($this->once())
-            ->method('selectAll')
+            ->method("selectAll")
             ->with(
                 $this->equalTo("SELECT *
 FROM test_entities
@@ -273,8 +273,8 @@ WHERE (name LIKE :search OR name LIKE :searchReversed OR description LIKE :searc
 ORDER BY id ASC
 LIMIT 10;"),
                 $this->equalTo([
-                    'search' => '%hello%world%test%',
-                    'searchReversed' => '%test%world%hello%',
+                    "search" => "%hello%world%test%",
+                    "searchReversed" => "%test%world%hello%",
                 ])
             )
             ->willReturn([])
@@ -282,7 +282,7 @@ LIMIT 10;"),
 
         // Add multi-word search
         $request = $this->createMockRequest([
-            'search' => 'hello world test',
+            "search" => "hello world test",
         ]);
 
         $service = new TestCrudService(TestEntity::class);
@@ -294,7 +294,7 @@ LIMIT 10;"),
 
         // Expect the select method to be called with default ASC direction
         $database->expects($this->once())
-            ->method('selectAll')
+            ->method("selectAll")
             ->with(
                 $this->equalTo("SELECT *
 FROM test_entities
@@ -307,7 +307,7 @@ LIMIT 10;"),
 
         // Add sort without explicit direction (should default to ASC)
         $request = $this->createMockRequest([
-            'sort' => 'name',
+            "sort" => "name",
         ]);
 
         $service = new TestCrudService(TestEntity::class);
@@ -319,7 +319,7 @@ LIMIT 10;"),
 
         // Expect the select method to handle case-insensitive direction (DESC)
         $database->expects($this->once())
-            ->method('selectAll')
+            ->method("selectAll")
             ->with(
                 $this->equalTo("SELECT *
 FROM test_entities
@@ -332,7 +332,7 @@ LIMIT 10;"),
 
         // Add sort with uppercase DESC direction
         $request = $this->createMockRequest([
-            'sort' => 'name:DESC',
+            "sort" => "name:DESC",
         ]);
 
         $service = new TestCrudService(TestEntity::class);
@@ -344,7 +344,7 @@ LIMIT 10;"),
 
         // Expect the select method to handle whitespace around colons
         $database->expects($this->once())
-            ->method('selectAll')
+            ->method("selectAll")
             ->with(
                 $this->equalTo("SELECT *
 FROM test_entities
@@ -357,7 +357,7 @@ LIMIT 10;"),
 
         // Add sort with spaces around colon
         $request = $this->createMockRequest([
-            'sort' => 'name : desc',
+            "sort" => "name : desc",
         ]);
 
         $service = new TestCrudService(TestEntity::class);
@@ -374,7 +374,7 @@ LIMIT 10;"),
 
         // Expect where to be called twice (once for each filter)
         $query->expects($this->exactly(2))
-            ->method('where')
+            ->method("where")
             ->willReturnSelf()
         ;
 
@@ -391,7 +391,7 @@ LIMIT 10;"),
 
         // Expect where to be called only once (for status)
         $query->expects($this->once())
-            ->method('where')
+            ->method("where")
             ->with("status", "=", "active")
             ->willReturnSelf()
         ;
@@ -403,7 +403,7 @@ LIMIT 10;"),
         $query = $this->createMock(QueryBuilder::class);
 
         $query->expects($this->once())
-            ->method('orderBy')
+            ->method("orderBy")
             ->with("name", true) // true = ascending
         ;
 
@@ -414,7 +414,7 @@ LIMIT 10;"),
         $query = $this->createMock(QueryBuilder::class);
 
         $query->expects($this->once())
-            ->method('orderBy')
+            ->method("orderBy")
             ->with("created_at", false) // false = descending
         ;
 
@@ -425,7 +425,7 @@ LIMIT 10;"),
         $query = $this->createMock(QueryBuilder::class);
 
         $query->expects($this->once())
-            ->method('orderBy')
+            ->method("orderBy")
             ->with("name", true) // true = ascending (default)
         ;
 
@@ -437,7 +437,7 @@ LIMIT 10;"),
 
         // Expect orderBy to be called multiple times
         $query->expects($this->exactly(3))
-            ->method('orderBy')
+            ->method("orderBy")
             ->willReturnSelf()
         ;
 
@@ -449,7 +449,7 @@ LIMIT 10;"),
 
         // Should not call orderBy for non-sortable column
         $query->expects($this->never())
-            ->method('orderBy')
+            ->method("orderBy")
         ;
 
         TestEntity::addSortToQuery($query, ["nonexistent_column:asc"]);
@@ -459,7 +459,7 @@ LIMIT 10;"),
         $query = $this->createMock(QueryBuilder::class);
 
         $query->expects($this->once())
-            ->method('orderBy')
+            ->method("orderBy")
             ->with("name", false) // DESC
         ;
 
@@ -470,7 +470,7 @@ LIMIT 10;"),
         $query = $this->createMock(QueryBuilder::class);
 
         $query->expects($this->once())
-            ->method('orderBy')
+            ->method("orderBy")
             ->with("name", false) // DESC
         ;
 
