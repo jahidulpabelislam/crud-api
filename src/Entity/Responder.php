@@ -144,7 +144,7 @@ trait Responder {
         $id = $id ?? $request->getAttribute("route_params")["id"];
 
         return Response::json(404, [
-            "message" => "No {$entityInstance::getDisplayName()} identified by '$id' found.",
+            "message" => "No {$entityInstance::getDisplayName()} identified by `$id` found.",
         ]);
     }
 
@@ -220,7 +220,7 @@ trait Responder {
         }
 
         return Response::json(500, [
-            "message" => "Failed to update the {$entityInstance::getDisplayName()} identified by '$id'.",
+            "message" => "Failed to update the {$entityInstance::getDisplayName()} identified by `$id`.",
         ]);
     }
 
@@ -248,7 +248,7 @@ trait Responder {
         }
 
         return Response::json(500, [
-            "message" => "Failed to delete the {$entityInstance::getDisplayName()} identified by '$id'.",
+            "message" => "Failed to delete the {$entityInstance::getDisplayName()} identified by `$id`.",
         ]);
     }
 }
