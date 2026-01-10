@@ -48,7 +48,7 @@ abstract class AbstractController {
         return new $this->entityClass();
     }
 
-    public static function getNotAuthorisedResponse(): Response {
+    public function getNotAuthorisedResponse(): Response {
         return Response::json(401, [
             "message" => "You need to be logged in!",
         ]);
@@ -87,7 +87,7 @@ abstract class AbstractController {
             !in_array("index", $this->getPublicActions())
             && !$request->getAttribute("is_authenticated")
         ) {
-            return static::getNotAuthorisedResponse();
+            return $this->getNotAuthorisedResponse();
         }
 
         $this->parseFieldsAttribute();
@@ -108,7 +108,7 @@ abstract class AbstractController {
             !in_array("create", $this->getPublicActions())
             && !$request->getAttribute("is_authenticated")
         ) {
-            return static::getNotAuthorisedResponse();
+            return $this->getNotAuthorisedResponse();
         }
 
         try {
@@ -127,7 +127,7 @@ abstract class AbstractController {
             !in_array("read", $this->getPublicActions())
             && !$request->getAttribute("is_authenticated")
         ) {
-            return static::getNotAuthorisedResponse();
+            return $this->getNotAuthorisedResponse();
         }
 
         $this->parseFieldsAttribute();
@@ -143,7 +143,7 @@ abstract class AbstractController {
             !in_array("update", $this->getPublicActions())
             && !$request->getAttribute("is_authenticated")
         ) {
-            return static::getNotAuthorisedResponse();
+            return $this->getNotAuthorisedResponse();
         }
 
         try {
@@ -162,7 +162,7 @@ abstract class AbstractController {
             !in_array("delete", $this->getPublicActions())
             && !$request->getAttribute("is_authenticated")
         ) {
-            return static::getNotAuthorisedResponse();
+            return $this->getNotAuthorisedResponse();
         }
 
         $entity = $this->getEntityInstance()::getCrudService()->delete($request);
