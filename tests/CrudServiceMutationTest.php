@@ -192,8 +192,6 @@ final class CrudServiceMutationTest extends TestCase {
     }
 
     public function testUpdateWithInvalidIdReturnsNull(): void {
-        $this->createMockDatabase();
-
         $request = $this->createMockRequest(
             ["name" => "New Name"],
             ["id" => "invalid"]
@@ -267,8 +265,6 @@ final class CrudServiceMutationTest extends TestCase {
     }
 
     public function testCreateValidatesDataMapping(): void {
-        $database = $this->createMockDatabase();
-
         $request = $this->createMockRequest([
             "name" => "Test Entity",
             "created_at" => "invalid-date",
