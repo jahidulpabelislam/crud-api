@@ -198,6 +198,22 @@ final class CrudServiceMutationTest extends TestCase {
         $this->assertEquals("New Description", $entity->description);
     }
 
+    public function testUpdateWithEmptyRequiredField(): void {
+        $request = $this->createRequest([
+            "name" => "",
+            "description" => "Test Description",
+        ]);
+
+        $service = new TestCrudService(TestEntity::class);
+
+        try {
+            $service->create($request);
+            $this->fail("Expected InvalidDataException to be thrown");
+        } catch (InvalidDataException $e) {
+            $this->assertEquals(["name" => "`name` cannot be empty."], $e->getErrors());
+        }
+    }
+
     public function testUpdateWithInvalidValue(): void {
         // Mock getById to return existing entity
         $this->createDatabase()->method("selectFirst")
