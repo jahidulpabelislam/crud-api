@@ -10,7 +10,7 @@ use JPI\CRUD\API\Tests\Fixtures\TestEntity;
 use JPI\Database;
 use JPI\HTTP\Input;
 use JPI\HTTP\Request;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -22,18 +22,16 @@ use PHPUnit\Framework\TestCase;
  */
 final class CrudServiceMutationTest extends TestCase {
 
-    private function createDatabase(): Database&MockObject {
-        $database = $this->createMock(Database::class);
+    private function createDatabase(): Database&Stub {
+        $database = $this->createStub(Database::class);
         TestEntity::setDatabase($database);
         return $database;
     }
 
-    private function createRequest(array $body = [], array $routeParams = []): Request {
+    private function createRequest(array $body = [], array $routeParams = []): Request&Stub {
         $request = $this->createStub(Request::class);
 
-        $request->method("getArrayFromBody")
-            ->willReturn(new Input($body))
-        ;
+        $request->method("getArrayFromBody")->willReturn(new Input($body));
 
         $request->method("getAttribute")
             ->willReturnCallback(function ($key) use ($routeParams) {
@@ -51,19 +49,11 @@ final class CrudServiceMutationTest extends TestCase {
         $database = $this->createDatabase();
 
         // Mock insert operation
-        $database->expects($this->once())
-            ->method("exec")
-            ->willReturn(1)
-        ;
-
-        $database->expects($this->once())
-            ->method("getLastInsertedId")
-            ->willReturn(1)
-        ;
+        $database->method("exec")->willReturn(1);
+        $database->method("getLastInsertedId")->willReturn(1);
 
         // Mock reload operation
-        $database->expects($this->once())
-            ->method("selectFirst")
+        $database->method("selectFirst")
             ->willReturn([
                 "id" => 1,
                 "name" => "Test Entity",
@@ -138,8 +128,7 @@ final class CrudServiceMutationTest extends TestCase {
         $database = $this->createDatabase();
 
         // Mock getById to return existing entity
-        $database->expects($this->exactly(2))
-            ->method("selectFirst")
+        $database->method("selectFirst")
             ->willReturnOnConsecutiveCalls(
                 [
                     "id" => 2,
@@ -155,10 +144,7 @@ final class CrudServiceMutationTest extends TestCase {
         ;
 
         // Mock update operation
-        $database->expects($this->once())
-            ->method("exec")
-            ->willReturn(1)
-        ;
+        $database->method("exec")->willReturn(1);
 
         $request = $this->createRequest(
             [
@@ -179,8 +165,7 @@ final class CrudServiceMutationTest extends TestCase {
         $database = $this->createDatabase();
 
         // Mock getById to return existing entity with name already set
-        $database->expects($this->exactly(2))
-            ->method("selectFirst")
+        $database->method("selectFirst")
             ->willReturnOnConsecutiveCalls(
                 [
                     "id" => 3,
@@ -196,10 +181,7 @@ final class CrudServiceMutationTest extends TestCase {
         ;
 
         // Mock update operation
-        $database->expects($this->once())
-            ->method("exec")
-            ->willReturn(1)
-        ;
+        $database->method("exec")->willReturn(1);
 
         $request = $this->createRequest(
             [
@@ -217,11 +199,8 @@ final class CrudServiceMutationTest extends TestCase {
     }
 
     public function testUpdateWithInvalidValue(): void {
-        $database = $this->createDatabase();
-
         // Mock getById to return existing entity
-        $database->expects($this->once())
-            ->method("selectFirst")
+        $this->createDatabase()->method("selectFirst")
             ->willReturn([
                 "id" => 4,
                 "name" => "Existing Name",

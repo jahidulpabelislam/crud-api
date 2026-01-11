@@ -10,6 +10,7 @@ use JPI\Database;
 use JPI\HTTP\Request;
 use JPI\ORM\Entity\QueryBuilder;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -26,7 +27,7 @@ final class CrudServiceIndexTest extends TestCase {
         return $database;
     }
 
-    private function createRequest(array $queryParams = []): Request {
+    private function createRequest(array $queryParams = []): Request&Stub {
         $request = $this->createStub(Request::class);
 
         $request->method("getQueryParam")
