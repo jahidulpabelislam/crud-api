@@ -68,6 +68,7 @@ final class CrudServiceMutationTest extends TestCase {
             "description" => "Test Description",
             "status" => "active",
             "category" => "test",
+            "created_at" => "2026-01-01 12:00:00",
         ]);
 
         $service = new TestCrudService(TestEntity::class);
@@ -77,7 +78,7 @@ final class CrudServiceMutationTest extends TestCase {
         $this->assertEquals("Test Entity", $entity->name);
     }
 
-    public function testCreateWithMissingRequiredField(): void {
+    public function testCreateWithMissingRequiredFields(): void {
         $request = $this->createRequest([
             "description" => "Test Description",
         ]);
@@ -88,14 +89,21 @@ final class CrudServiceMutationTest extends TestCase {
             $service->create($request);
             $this->fail("Expected InvalidDataException to be thrown");
         } catch (InvalidDataException $e) {
-            $this->assertEquals(["name" => "`name` is required."], $e->getErrors());
+            $this->assertEquals(
+                [
+                    "name" => "`name` is required.",
+                    "created_at" => "`created_at` is required.",
+                ],
+                $e->getErrors()
+            );
         }
     }
 
-    public function testCreateWithEmptyRequiredField(): void {
+    public function testCreateWithEmptyRequiredFields(): void {
         $request = $this->createRequest([
             "name" => "",
             "description" => "Test Description",
+            "created_at" => "",
         ]);
 
         $service = new TestCrudService(TestEntity::class);
@@ -104,14 +112,21 @@ final class CrudServiceMutationTest extends TestCase {
             $service->create($request);
             $this->fail("Expected InvalidDataException to be thrown");
         } catch (InvalidDataException $e) {
-            $this->assertEquals(["name" => "`name` cannot be empty."], $e->getErrors());
+            $this->assertEquals(
+                [
+                    "name" => "`name` cannot be empty.",
+                    "created_at" => "`created_at` cannot be empty.",
+                ],
+                $e->getErrors()
+            );
         }
     }
 
-    public function testCreateWithInvalidValue(): void {
+    public function testCreateWithInvalidValues(): void {
         $request = $this->createRequest([
             "name" => "Test Entity",
             "age" => "not-a-number",
+            "created_at" => "not-a-date",
         ]);
 
         $service = new TestCrudService(TestEntity::class);
@@ -120,7 +135,14 @@ final class CrudServiceMutationTest extends TestCase {
             $service->create($request);
             $this->fail("Expected InvalidDataException was not thrown");
         } catch (InvalidDataException $e) {
-            $this->assertEquals(["age" => "`age` must be a integer or null."], $e->getErrors());
+            $this->assertEquals(
+                [
+                    "age" => "`age` must be a integer or null.",
+                    // Cos its required it doesn't say `or null`
+                    "created_at" => "`created_at` must be instance of \DateTime or valid format for creation.",
+                ],
+                $e->getErrors()
+            );
         }
     }
 
@@ -161,7 +183,7 @@ final class CrudServiceMutationTest extends TestCase {
         $this->assertEquals("New Name", $entity->name);
     }
 
-    public function testUpdateWithMissingRequiredField(): void {
+    public function testUpdateWithMissingRequiredFields(): void {
         $database = $this->createDatabase();
 
         // Mock getById to return existing entity with name already set
@@ -185,7 +207,7 @@ final class CrudServiceMutationTest extends TestCase {
 
         $request = $this->createRequest(
             [
-                // name not provided - should be ok for update
+                // name & created_at not provided but ok for update
                 "description" => "New Description",
             ],
             ["id" => "3"]
@@ -198,23 +220,7 @@ final class CrudServiceMutationTest extends TestCase {
         $this->assertEquals("New Description", $entity->description);
     }
 
-    public function testUpdateWithEmptyRequiredField(): void {
-        $request = $this->createRequest([
-            "name" => "",
-            "description" => "Test Description",
-        ]);
-
-        $service = new TestCrudService(TestEntity::class);
-
-        try {
-            $service->create($request);
-            $this->fail("Expected InvalidDataException to be thrown");
-        } catch (InvalidDataException $e) {
-            $this->assertEquals(["name" => "`name` cannot be empty."], $e->getErrors());
-        }
-    }
-
-    public function testUpdateWithInvalidValue(): void {
+    public function testUpdateWithEmptyRequiredFields(): void {
         // Mock getById to return existing entity
         $this->createDatabase()->method("selectFirst")
             ->willReturn([
@@ -225,8 +231,9 @@ final class CrudServiceMutationTest extends TestCase {
 
         $request = $this->createRequest(
             [
-                "name" => "Updated Name",
-                "age" => "not-a-number",
+                "name" => "",
+                "description" => "Test Description",
+                "created_at" => "",
             ],
             ["id" => "4"]
         );
@@ -237,7 +244,48 @@ final class CrudServiceMutationTest extends TestCase {
             $service->update($request);
             $this->fail("Expected InvalidDataException to be thrown");
         } catch (InvalidDataException $e) {
-            $this->assertEquals(["age" => "`age` must be a integer or null."], $e->getErrors());
+            $this->assertEquals(
+                [
+                    "name" => "`name` cannot be empty.",
+                    "created_at" => "`created_at` cannot be empty.",
+                ],
+                $e->getErrors()
+            );
+        }
+    }
+
+    public function testUpdateWithInvalidValues(): void {
+        // Mock getById to return existing entity
+        $this->createDatabase()->method("selectFirst")
+            ->willReturn([
+                "id" => 5,
+                "name" => "Existing Name",
+            ])
+        ;
+
+        $request = $this->createRequest(
+            [
+                "name" => "Updated Name",
+                "age" => "not-a-number",
+                "created_at" => "not-a-date",
+            ],
+            ["id" => "5"]
+        );
+
+        $service = new TestCrudService(TestEntity::class);
+
+        try {
+            $service->update($request);
+            $this->fail("Expected InvalidDataException to be thrown");
+        } catch (InvalidDataException $e) {
+            $this->assertEquals(
+                [
+                    "age" => "`age` must be a integer or null.",
+                    // Cos its required it doesn't say `or null`
+                    "created_at" => "`created_at` must be instance of \DateTime or valid format for creation.",
+                ],
+                $e->getErrors()
+            );
         }
     }
 }
