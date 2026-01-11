@@ -274,10 +274,7 @@ final class ResponderTest extends TestCase {
     }
 
     public function testDeleteFailure(): void {
-        $entity = $this->createStub(TestEntity::class);
-        $entity->method("getId")->willReturn(1);
-        $entity->method("isLoaded")->willReturn(true);
-        $entity->method("isDeleted")->willReturn(false);
+        $entity = $this->createEntity(1, "");
 
         $response = $this->controller->getEntityDeleteResponse($this->request, $entity, 1);
         $body = json_decode($response->getBody(), true);
