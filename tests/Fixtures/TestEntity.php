@@ -24,7 +24,7 @@ class TestEntity extends AbstractEntity implements SearchableInterface, Filterab
 
     protected static array $searchableColumns = ["name", "description"];
     protected static array $filterableColumns = ["status", "category"];
-    protected static array $sortableColumns = ["name", "created_at", "status"];
+    protected static array $sortableColumns = ["id", "name", "created_at", "status"];
 
     private static ?\JPI\Database $database = null;
 
