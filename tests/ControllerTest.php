@@ -9,6 +9,9 @@ use JPI\HTTP\Input;
 use JPI\HTTP\Request;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers \JPI\CRUD\API\AbstractController::parseFieldsAttribute
+ */
 final class ControllerTest extends TestCase {
 
     private TestController $controller;

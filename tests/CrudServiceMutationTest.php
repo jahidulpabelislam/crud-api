@@ -19,6 +19,10 @@ use PHPUnit\Framework\TestCase;
  * Tests verify that setValuesFromRequest correctly validates and sets
  * entity properties from request data, handling required fields,
  * validation errors, and data mapping.
+ *
+ * @covers \JPI\CRUD\API\CrudService::create
+ * @covers \JPI\CRUD\API\CrudService::update
+ * @covers \JPI\CRUD\API\CrudService::setValuesFromRequest
  */
 final class CrudServiceMutationTest extends TestCase {
 

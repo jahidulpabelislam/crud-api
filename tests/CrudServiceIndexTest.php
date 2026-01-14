@@ -17,6 +17,11 @@ use PHPUnit\Framework\TestCase;
  *
  * Tests verify that filtering, searching, sorting, and pagination
  * produce the correct SQL queries as requested in the issue.
+ *
+ * @covers \JPI\CRUD\API\CrudService::index
+ * @covers \JPI\CRUD\API\Entity\FilterableTrait
+ * @covers \JPI\CRUD\API\Entity\SearchableTrait
+ * @covers \JPI\CRUD\API\Entity\SortableTrait
  */
 final class CrudServiceIndexTest extends TestCase {
 

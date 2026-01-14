@@ -12,6 +12,9 @@ use JPI\ORM\Entity\Collection as EntityCollection;
 use JPI\ORM\Entity\PaginatedCollection as PaginatedEntityCollection;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers \JPI\CRUD\API\Entity\Responder
+ */
 final class ResponderTest extends TestCase {
 
     private TestController $controller;
