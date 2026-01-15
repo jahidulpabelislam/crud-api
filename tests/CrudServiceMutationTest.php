@@ -141,7 +141,7 @@ final class CrudServiceMutationTest extends TestCase {
         } catch (InvalidDataException $e) {
             $this->assertSame(
                 [
-                    "age" => "`age` must be a integer or null.",
+                    "age" => "`age` must be an integer or null.",
                     // Cos its required it doesn't say `or null`
                     "created_at" => "`created_at` must be instance of \DateTime or valid format for creation.",
                 ],
@@ -284,7 +284,7 @@ final class CrudServiceMutationTest extends TestCase {
         } catch (InvalidDataException $e) {
             $this->assertSame(
                 [
-                    "age" => "`age` must be a integer or null.",
+                    "age" => "`age` must be an integer or null.",
                     // Cos its required it doesn't say `or null`
                     "created_at" => "`created_at` must be instance of \DateTime or valid format for creation.",
                 ],
