@@ -32,11 +32,11 @@ final class ControllerTest extends TestCase {
         $property->setAccessible(true);
         $property->setValue($controller, []);
 
-        $this->assertEquals(401, $controller->index()->getStatusCode());
-        $this->assertEquals(401, $controller->create()->getStatusCode());
-        $this->assertEquals(401, $controller->read(1)->getStatusCode());
-        $this->assertEquals(401, $controller->update(1)->getStatusCode());
-        $this->assertEquals(401, $controller->delete(1)->getStatusCode());
+        $this->assertSame(401, $controller->index()->getStatusCode());
+        $this->assertSame(401, $controller->create()->getStatusCode());
+        $this->assertSame(401, $controller->read(1)->getStatusCode());
+        $this->assertSame(401, $controller->update(1)->getStatusCode());
+        $this->assertSame(401, $controller->delete(1)->getStatusCode());
     }
 
     public function testParseFields(): void {
@@ -48,7 +48,7 @@ final class ControllerTest extends TestCase {
         $method->invoke($this->controller);
 
         $fields = $this->request->getAttribute("fields");
-        $this->assertEquals(["name", "description", "status"], $fields);
+        $this->assertSame(["name", "description", "status"], $fields);
     }
 
     public function testParseFieldsEmptyString(): void {

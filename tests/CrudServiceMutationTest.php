@@ -79,7 +79,7 @@ final class CrudServiceMutationTest extends TestCase {
         $entity = $service->create($request);
 
         $this->assertInstanceOf(TestEntity::class, $entity);
-        $this->assertEquals("Test Entity", $entity->name);
+        $this->assertSame("Test Entity", $entity->name);
     }
 
     public function testCreateWithMissingRequiredFields(): void {
@@ -93,7 +93,7 @@ final class CrudServiceMutationTest extends TestCase {
             $service->create($request);
             $this->fail("Expected InvalidDataException to be thrown");
         } catch (InvalidDataException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 [
                     "name" => "`name` is required.",
                     "created_at" => "`created_at` is required.",
@@ -116,7 +116,7 @@ final class CrudServiceMutationTest extends TestCase {
             $service->create($request);
             $this->fail("Expected InvalidDataException to be thrown");
         } catch (InvalidDataException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 [
                     "name" => "`name` cannot be empty.",
                     "created_at" => "`created_at` cannot be empty.",
@@ -139,7 +139,7 @@ final class CrudServiceMutationTest extends TestCase {
             $service->create($request);
             $this->fail("Expected InvalidDataException was not thrown");
         } catch (InvalidDataException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 [
                     "age" => "`age` must be a integer or null.",
                     // Cos its required it doesn't say `or null`
@@ -184,7 +184,7 @@ final class CrudServiceMutationTest extends TestCase {
         $entity = $service->update($request);
 
         $this->assertInstanceOf(TestEntity::class, $entity);
-        $this->assertEquals("New Name", $entity->name);
+        $this->assertSame("New Name", $entity->name);
     }
 
     public function testUpdateWithMissingRequiredFields(): void {
@@ -221,7 +221,7 @@ final class CrudServiceMutationTest extends TestCase {
         $entity = $service->update($request);
 
         $this->assertInstanceOf(TestEntity::class, $entity);
-        $this->assertEquals("New Description", $entity->description);
+        $this->assertSame("New Description", $entity->description);
     }
 
     public function testUpdateWithEmptyRequiredFields(): void {
@@ -248,7 +248,7 @@ final class CrudServiceMutationTest extends TestCase {
             $service->update($request);
             $this->fail("Expected InvalidDataException to be thrown");
         } catch (InvalidDataException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 [
                     "name" => "`name` cannot be empty.",
                     "created_at" => "`created_at` cannot be empty.",
@@ -282,7 +282,7 @@ final class CrudServiceMutationTest extends TestCase {
             $service->update($request);
             $this->fail("Expected InvalidDataException to be thrown");
         } catch (InvalidDataException $e) {
-            $this->assertEquals(
+            $this->assertSame(
                 [
                     "age" => "`age` must be a integer or null.",
                     // Cos its required it doesn't say `or null`

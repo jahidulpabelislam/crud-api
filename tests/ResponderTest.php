@@ -48,12 +48,12 @@ final class ResponderTest extends TestCase {
         $response = $this->controller->getEntitiesResponse($this->request, new EntityCollection([]));
         $body = json_decode($response->getBody(), true);
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals(
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame(
             [
-                "message" => "No Test Entities found.",
                 "data" => [],
                 "_links" => ["self" => "https://api.example.com/test-entities/"],
+                "message" => "No Test Entities found.",
             ],
             $body
         );
@@ -64,8 +64,8 @@ final class ResponderTest extends TestCase {
         $response = $this->controller->getEntitiesResponse($this->request, $entities);
         $body = json_decode($response->getBody(), true);
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals(
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame(
             [
                 "data" => [
                     [
@@ -105,11 +105,11 @@ final class ResponderTest extends TestCase {
         $response = $this->controller->getPaginatedEntitiesResponse($this->request, $collection);
         $body = json_decode($response->getBody(), true);
 
-        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertSame(200, $response->getStatusCode());
         $this->assertArrayHasKey("data", $body);
-        $this->assertEquals(25, $body["_total_count"]);
-        $this->assertEquals(13, $body["_total_pages"]); // 25 / 2 = 13 pages
-        $this->assertEquals(
+        $this->assertSame(25, $body["_total_count"]);
+        $this->assertSame(13, $body["_total_pages"]); // 25 / 2 = 13 pages
+        $this->assertSame(
             [
                 "self" => "https://api.example.com/test-entities/",
                 "next_page" => "https://api.example.com/test-entities/?page=2",
@@ -129,7 +129,7 @@ final class ResponderTest extends TestCase {
         $response = $this->controller->getPaginatedEntitiesResponse($this->request, $collection);
         $body = json_decode($response->getBody(), true);
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 "self" => "https://api.example.com/test-entities/?page=13",
                 "previous_page" => "https://api.example.com/test-entities/?page=12",
@@ -149,7 +149,7 @@ final class ResponderTest extends TestCase {
         $response = $this->controller->getPaginatedEntitiesResponse($this->request, $collection);
         $body = json_decode($response->getBody(), true);
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 "self" => "https://api.example.com/test-entities/?page=6",
                 "previous_page" => "https://api.example.com/test-entities/?page=5",
@@ -163,16 +163,16 @@ final class ResponderTest extends TestCase {
         $response = $this->controller->getEntityNotFoundResponse($this->request, 123);
         $body = json_decode($response->getBody(), true);
 
-        $this->assertEquals(404, $response->getStatusCode());
-        $this->assertEquals(["message" => "No Test Entity identified by `123` found."], $body);
+        $this->assertSame(404, $response->getStatusCode());
+        $this->assertSame(["message" => "No Test Entity identified by `123` found."], $body);
     }
 
     public function testEntityFound(): void {
         $response = $this->controller->getEntityResponse($this->request, $this->createEntity(1, "Test Entity"), 1);
         $body = json_decode($response->getBody(), true);
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals(
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame(
             [
                 "data" => [
                     "id" => 1,
@@ -193,9 +193,9 @@ final class ResponderTest extends TestCase {
         $response = $this->controller->getEntityCreateResponse($this->request, $this->createEntity(1, "New Entity"));
         $body = json_decode($response->getBody(), true);
 
-        $this->assertEquals(201, $response->getStatusCode());
-        $this->assertEquals("https://api.example.com/test-entities/1/", $response->getHeaderString("Location"));
-        $this->assertEquals(
+        $this->assertSame(201, $response->getStatusCode());
+        $this->assertSame("https://api.example.com/test-entities/1/", $response->getHeaderString("Location"));
+        $this->assertSame(
             [
                 "data" => [
                     "id" => 1,
@@ -217,8 +217,8 @@ final class ResponderTest extends TestCase {
         $response = $this->controller->getEntityCreateResponse($this->request, null);
         $body = json_decode($response->getBody(), true);
 
-        $this->assertEquals(500, $response->getStatusCode());
-        $this->assertEquals(
+        $this->assertSame(500, $response->getStatusCode());
+        $this->assertSame(
             [
                 "message" => "Failed to create the new Test Entity.",
             ],
@@ -230,8 +230,8 @@ final class ResponderTest extends TestCase {
         $response = $this->controller->getEntityUpdateResponse($this->request, $this->createEntity(1, "Updated Entity"), 1);
         $body = json_decode($response->getBody(), true);
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals(
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame(
             [
                 "data" => [
                     "id" => 1,
@@ -253,8 +253,8 @@ final class ResponderTest extends TestCase {
         $response = $this->controller->getEntityUpdateResponse($this->request, $this->createEntity(2, "Entity"), 1);
         $body = json_decode($response->getBody(), true);
 
-        $this->assertEquals(500, $response->getStatusCode());
-        $this->assertEquals(
+        $this->assertSame(500, $response->getStatusCode());
+        $this->assertSame(
             [
                 "message" => "Failed to update the Test Entity identified by `1`.",
             ],
@@ -270,7 +270,7 @@ final class ResponderTest extends TestCase {
 
         $response = $this->controller->getEntityDeleteResponse($this->request, $entity, 1);
 
-        $this->assertEquals(204, $response->getStatusCode());
+        $this->assertSame(204, $response->getStatusCode());
         // 204 response typically has empty array body which becomes "{}" in JSON
         $body = $response->getBody();
         $this->assertEmpty(json_decode($body, true));
@@ -282,8 +282,8 @@ final class ResponderTest extends TestCase {
         $response = $this->controller->getEntityDeleteResponse($this->request, $entity, 1);
         $body = json_decode($response->getBody(), true);
 
-        $this->assertEquals(500, $response->getStatusCode());
-        $this->assertEquals(
+        $this->assertSame(500, $response->getStatusCode());
+        $this->assertSame(
             [
                 "message" => "Failed to delete the Test Entity identified by `1`.",
             ],
