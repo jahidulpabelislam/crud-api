@@ -77,13 +77,36 @@ LIMIT 3;"),
     }
 
     public function testInvalidLimitValue(): void {
+        $database = $this->createDatabase();
+
+        // Test with string value - should use default limit of 10
+        $database->expects($this->exactly(4))
+            ->method("selectAll")
+            ->with(
+                $this->equalTo("SELECT *
+FROM test_entities
+ORDER BY id ASC
+LIMIT 10;"),
+                $this->equalTo([])
+            )
+            ->willReturn([])
+        ;
+
+        $database->method("selectFirst")->willReturn(["count" => 20]);
+
         $service = new TestCrudService(TestEntity::class);
 
+        // String value (non-numeric)
         $service->index($this->createRequest(["limit" => "not a number"]));
 
+        // Array value
         $service->index($this->createRequest(["limit" => ["2"]]));
 
-        $this->expectNotToPerformAssertions();
+        // Negative number
+        $service->index($this->createRequest(["limit" => -5]));
+
+        // Zero
+        $service->index($this->createRequest(["limit" => 0]));
     }
 
     public function testPagination(): void {
@@ -112,13 +135,36 @@ LIMIT 10 OFFSET 20;"),
     }
 
     public function testInvalidPaginationValue(): void {
+        $database = $this->createDatabase();
+
+        // Test with invalid page values - should use page 1 (no OFFSET)
+        $database->expects($this->exactly(4))
+            ->method("selectAll")
+            ->with(
+                $this->equalTo("SELECT *
+FROM test_entities
+ORDER BY id ASC
+LIMIT 10;"),
+                $this->equalTo([])
+            )
+            ->willReturn([])
+        ;
+
+        $database->method("selectFirst")->willReturn(["count" => 20]);
+
         $service = new TestCrudService(TestEntity::class);
 
+        // String value (non-numeric)
         $service->index($this->createRequest(["page" => "not a number"]));
 
+        // Array value
         $service->index($this->createRequest(["page" => ["2"]]));
 
-        $this->expectNotToPerformAssertions();
+        // Negative number
+        $service->index($this->createRequest(["page" => -2]));
+
+        // Zero
+        $service->index($this->createRequest(["page" => 0]));
     }
 
     public function testFiltering(): void {
@@ -151,13 +197,30 @@ LIMIT 10;"),
     }
 
     public function testInvalidFilterValue(): void {
+        $database = $this->createDatabase();
+
+        // Test with invalid filter values - should not include WHERE clause
+        $database->expects($this->exactly(2))
+            ->method("selectAll")
+            ->with(
+                $this->equalTo("SELECT *
+FROM test_entities
+ORDER BY id ASC
+LIMIT 10;"),
+                $this->equalTo([])
+            )
+            ->willReturn([])
+        ;
+
+        $database->method("selectFirst")->willReturn(["count" => 20]);
+
         $service = new TestCrudService(TestEntity::class);
 
+        // String value instead of array
         $service->index($this->createRequest(["filters" => "im a string filter"]));
 
+        // Nested array values (invalid filter values)
         $service->index($this->createRequest(["filters" => ["key" => ["im nested"]]]));
-
-        $this->expectNotToPerformAssertions();
     }
 
     public function testSearching(): void {
@@ -186,9 +249,27 @@ LIMIT 10;"),
     }
 
     public function testInvalidSearchValue(): void {
+        $database = $this->createDatabase();
+
+        // Test with invalid search values - should not include WHERE clause with search
+        $database->expects($this->once())
+            ->method("selectAll")
+            ->with(
+                $this->equalTo("SELECT *
+FROM test_entities
+ORDER BY id ASC
+LIMIT 10;"),
+                $this->equalTo([])
+            )
+            ->willReturn([])
+        ;
+
+        $database->method("selectFirst")->willReturn(["count" => 20]);
+
         $service = new TestCrudService(TestEntity::class);
+
+        // Array value instead of string
         $service->index($this->createRequest(["search" => ["in array"]]));
-        $this->expectNotToPerformAssertions();
     }
 
     public function testSorting(): void {
@@ -213,9 +294,27 @@ LIMIT 10;"),
     }
 
     public function testInvalidSortValue(): void {
+        $database = $this->createDatabase();
+
+        // Test with invalid sort values - should only use default sort (id ASC)
+        $database->expects($this->once())
+            ->method("selectAll")
+            ->with(
+                $this->equalTo("SELECT *
+FROM test_entities
+ORDER BY id ASC
+LIMIT 10;"),
+                $this->equalTo([])
+            )
+            ->willReturn([])
+        ;
+
+        $database->method("selectFirst")->willReturn(["count" => 20]);
+
         $service = new TestCrudService(TestEntity::class);
+
+        // Array value instead of string
         $service->index($this->createRequest(["sort" => ["in array"]]));
-        $this->expectNotToPerformAssertions();
     }
 
     public function testFiltersWithSearch(): void {
