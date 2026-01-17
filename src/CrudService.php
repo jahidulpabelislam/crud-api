@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace JPI\CRUD\API;
 
+use ArrayAccess;
 use JPI\CRUD\API\Entity\FilterableInterface;
 use JPI\CRUD\API\Entity\InvalidDataException;
 use JPI\CRUD\API\Entity\SearchableInterface;
@@ -60,21 +61,21 @@ class CrudService {
 
         if ($entity instanceof FilterableInterface) {
             $filters = $request->getQueryParam("filters");
-            if ($filters) {
+            if (is_array($filters) || $filters instanceof ArrayAccess) {
                 $entity::addFiltersToQuery($query, $filters);
             }
         }
 
         if ($entity instanceof SearchableInterface) {
             $search = $request->getQueryParam("search");
-            if ($search) {
+            if (is_string($search)) {
                 $entity::addSearchToQuery($query, $search);
             }
         }
 
         if ($entity instanceof SortableInterface) {
             $sort = $request->getQueryParam("sort");
-            if ($sort && is_string($sort)) {
+            if (is_string($sort)) {
                 // Comma-separated values
                 $sort = array_filter(array_map("trim", explode(",", $sort)));
                 $entity::addSortToQuery($query, $sort);
@@ -85,23 +86,19 @@ class CrudService {
             return $query->select();
         }
 
-        $limit = (int)$request->getQueryParam("limit");
-        if (!$limit) {
+        $limit = $request->getQueryParam("limit");
+        if (!$limit || !is_numeric($limit) || $limit < 1) {
             $limit = $this->perPage;
         }
 
         $page = $request->hasQueryParam("page") ? $request->getQueryParam("page") : 1;
 
-        if (is_numeric($page)) {
-            $page = (int)$page;
-        }
-
         // If invalid use page 1
-        if (!$page || $page < 1) {
+        if (!$page || !is_numeric($page) || $page < 1) {
             $page = 1;
         }
 
-        $query->limit($limit, $page);
+        $query->limit((int)$limit, (int)$page);
 
         $entities = $query->select();
 
