@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace JPI\CRUD\API\Entity;
 
+use ArrayAccess;
 use JPI\ORM\Entity\QueryBuilder;
 
 /**
@@ -17,7 +18,7 @@ trait Filterable {
         return static::$filterableColumns ?? static::getColumns();
     }
 
-    public static function addFiltersToQuery(QueryBuilder $query, \ArrayAccess|array $filters): void {
+    public static function addFiltersToQuery(QueryBuilder $query, ArrayAccess|array $filters): void {
         foreach (static::getFilterableColumns() as $column) {
             if (isset($filters[$column])) {
                 $query->where($column, "=", $filters[$column]);
