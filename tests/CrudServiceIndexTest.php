@@ -8,6 +8,7 @@ use JPI\CRUD\API\Tests\Fixtures\TestCrudService;
 use JPI\CRUD\API\Tests\Fixtures\TestEntity;
 use JPI\Database;
 use JPI\HTTP\Request;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
@@ -76,11 +77,20 @@ LIMIT 3;"),
         $service->index($request);
     }
 
-    public function testInvalidLimitValue(): void {
+    public static function invalidLimitValueProvider(): array {
+        return [
+            "string value (non-numeric)" => ["not a number"],
+            "array value" => [["2"]],
+            "negative number" => [-5],
+            "zero" => [0],
+        ];
+    }
+
+    #[DataProvider('invalidLimitValueProvider')]
+    public function testInvalidLimitValue(mixed $invalidLimit): void {
         $database = $this->createDatabase();
 
-        // Test with string value - should use default limit of 10
-        $database->expects($this->exactly(4))
+        $database->expects($this->once())
             ->method("selectAll")
             ->with(
                 $this->equalTo("SELECT *
@@ -95,18 +105,7 @@ LIMIT 10;"),
         $database->method("selectFirst")->willReturn(["count" => 20]);
 
         $service = new TestCrudService(TestEntity::class);
-
-        // String value (non-numeric)
-        $service->index($this->createRequest(["limit" => "not a number"]));
-
-        // Array value
-        $service->index($this->createRequest(["limit" => ["2"]]));
-
-        // Negative number
-        $service->index($this->createRequest(["limit" => -5]));
-
-        // Zero
-        $service->index($this->createRequest(["limit" => 0]));
+        $service->index($this->createRequest(["limit" => $invalidLimit]));
     }
 
     public function testPagination(): void {
@@ -134,11 +133,20 @@ LIMIT 10 OFFSET 20;"),
         $service->index($request);
     }
 
-    public function testInvalidPaginationValue(): void {
+    public static function invalidPaginationValueProvider(): array {
+        return [
+            "string value (non-numeric)" => ["not a number"],
+            "array value" => [["2"]],
+            "negative number" => [-2],
+            "zero" => [0],
+        ];
+    }
+
+    #[DataProvider('invalidPaginationValueProvider')]
+    public function testInvalidPaginationValue(mixed $invalidPage): void {
         $database = $this->createDatabase();
 
-        // Test with invalid page values - should use page 1 (no OFFSET)
-        $database->expects($this->exactly(4))
+        $database->expects($this->once())
             ->method("selectAll")
             ->with(
                 $this->equalTo("SELECT *
@@ -153,18 +161,7 @@ LIMIT 10;"),
         $database->method("selectFirst")->willReturn(["count" => 20]);
 
         $service = new TestCrudService(TestEntity::class);
-
-        // String value (non-numeric)
-        $service->index($this->createRequest(["page" => "not a number"]));
-
-        // Array value
-        $service->index($this->createRequest(["page" => ["2"]]));
-
-        // Negative number
-        $service->index($this->createRequest(["page" => -2]));
-
-        // Zero
-        $service->index($this->createRequest(["page" => 0]));
+        $service->index($this->createRequest(["page" => $invalidPage]));
     }
 
     public function testFiltering(): void {
@@ -196,11 +193,18 @@ LIMIT 10;"),
         $service->index($request);
     }
 
-    public function testInvalidFilterValue(): void {
+    public static function invalidFilterValueProvider(): array {
+        return [
+            "string value instead of array" => ["im a string filter"],
+            "nested array values" => [["key" => ["im nested"]]],
+        ];
+    }
+
+    #[DataProvider('invalidFilterValueProvider')]
+    public function testInvalidFilterValue(mixed $invalidFilters): void {
         $database = $this->createDatabase();
 
-        // Test with invalid filter values - should not include WHERE clause
-        $database->expects($this->exactly(2))
+        $database->expects($this->once())
             ->method("selectAll")
             ->with(
                 $this->equalTo("SELECT *
@@ -215,12 +219,7 @@ LIMIT 10;"),
         $database->method("selectFirst")->willReturn(["count" => 20]);
 
         $service = new TestCrudService(TestEntity::class);
-
-        // String value instead of array
-        $service->index($this->createRequest(["filters" => "im a string filter"]));
-
-        // Nested array values (invalid filter values)
-        $service->index($this->createRequest(["filters" => ["key" => ["im nested"]]]));
+        $service->index($this->createRequest(["filters" => $invalidFilters]));
     }
 
     public function testSearching(): void {
@@ -248,10 +247,16 @@ LIMIT 10;"),
         $service->index($request);
     }
 
-    public function testInvalidSearchValue(): void {
+    public static function invalidSearchValueProvider(): array {
+        return [
+            "array value instead of string" => [["in array"]],
+        ];
+    }
+
+    #[DataProvider('invalidSearchValueProvider')]
+    public function testInvalidSearchValue(mixed $invalidSearch): void {
         $database = $this->createDatabase();
 
-        // Test with invalid search values - should not include WHERE clause with search
         $database->expects($this->once())
             ->method("selectAll")
             ->with(
@@ -267,9 +272,7 @@ LIMIT 10;"),
         $database->method("selectFirst")->willReturn(["count" => 20]);
 
         $service = new TestCrudService(TestEntity::class);
-
-        // Array value instead of string
-        $service->index($this->createRequest(["search" => ["in array"]]));
+        $service->index($this->createRequest(["search" => $invalidSearch]));
     }
 
     public function testSorting(): void {
@@ -293,10 +296,16 @@ LIMIT 10;"),
         $service->index($request);
     }
 
-    public function testInvalidSortValue(): void {
+    public static function invalidSortValueProvider(): array {
+        return [
+            "array value instead of string" => [["in array"]],
+        ];
+    }
+
+    #[DataProvider('invalidSortValueProvider')]
+    public function testInvalidSortValue(mixed $invalidSort): void {
         $database = $this->createDatabase();
 
-        // Test with invalid sort values - should only use default sort (id ASC)
         $database->expects($this->once())
             ->method("selectAll")
             ->with(
@@ -312,9 +321,7 @@ LIMIT 10;"),
         $database->method("selectFirst")->willReturn(["count" => 20]);
 
         $service = new TestCrudService(TestEntity::class);
-
-        // Array value instead of string
-        $service->index($this->createRequest(["sort" => ["in array"]]));
+        $service->index($this->createRequest(["sort" => $invalidSort]));
     }
 
     public function testFiltersWithSearch(): void {
