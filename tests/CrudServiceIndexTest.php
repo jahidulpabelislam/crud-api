@@ -8,6 +8,7 @@ use JPI\CRUD\API\Tests\Fixtures\TestCrudService;
 use JPI\CRUD\API\Tests\Fixtures\TestEntity;
 use JPI\Database;
 use JPI\HTTP\Request;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
@@ -76,16 +77,6 @@ LIMIT 3;"),
         $service->index($request);
     }
 
-    public function testInvalidLimitValue(): void {
-        $service = new TestCrudService(TestEntity::class);
-
-        $service->index($this->createRequest(["limit" => "not a number"]));
-
-        $service->index($this->createRequest(["limit" => ["2"]]));
-
-        $this->expectNotToPerformAssertions();
-    }
-
     public function testPagination(): void {
         $database = $this->createDatabase();
 
@@ -109,16 +100,6 @@ LIMIT 10 OFFSET 20;"),
 
         $service = new TestCrudService(TestEntity::class);
         $service->index($request);
-    }
-
-    public function testInvalidPaginationValue(): void {
-        $service = new TestCrudService(TestEntity::class);
-
-        $service->index($this->createRequest(["page" => "not a number"]));
-
-        $service->index($this->createRequest(["page" => ["2"]]));
-
-        $this->expectNotToPerformAssertions();
     }
 
     public function testFiltering(): void {
@@ -150,16 +131,6 @@ LIMIT 10;"),
         $service->index($request);
     }
 
-    public function testInvalidFilterValue(): void {
-        $service = new TestCrudService(TestEntity::class);
-
-        $service->index($this->createRequest(["filters" => "im a string filter"]));
-
-        $service->index($this->createRequest(["filters" => ["key" => ["im nested"]]]));
-
-        $this->expectNotToPerformAssertions();
-    }
-
     public function testSearching(): void {
         $this->createDatabase()->expects($this->once())
             ->method("selectAll")
@@ -185,12 +156,6 @@ LIMIT 10;"),
         $service->index($request);
     }
 
-    public function testInvalidSearchValue(): void {
-        $service = new TestCrudService(TestEntity::class);
-        $service->index($this->createRequest(["search" => ["in array"]]));
-        $this->expectNotToPerformAssertions();
-    }
-
     public function testSorting(): void {
         $this->createDatabase()->expects($this->once())
             ->method("selectAll")
@@ -210,12 +175,6 @@ LIMIT 10;"),
 
         $service = new TestCrudService(TestEntity::class);
         $service->index($request);
-    }
-
-    public function testInvalidSortValue(): void {
-        $service = new TestCrudService(TestEntity::class);
-        $service->index($this->createRequest(["sort" => ["in array"]]));
-        $this->expectNotToPerformAssertions();
     }
 
     public function testFiltersWithSearch(): void {
@@ -283,5 +242,44 @@ LIMIT 10 OFFSET 10;"),
 
         $service = new TestCrudService(TestEntity::class);
         $service->index($request);
+    }
+
+    public static function invalidValueProvider(): array {
+        return [
+            "limit: string value (non-numeric)" => [["limit" => "not a number"]],
+            "limit: array value" => [["limit" => ["2"]]],
+            "limit: negative number" => [["limit" => -5]],
+            "limit: zero" => [["limit" => 0]],
+            "page: string value (non-numeric)" => [["page" => "not a number"]],
+            "page: array value" => [["page" => ["2"]]],
+            "page: negative number" => [["page" => -2]],
+            "page: zero" => [["page" => 0]],
+            "filters: string value instead of array" => [["filters" => "im a string filter"]],
+            "filters: nested array values" => [["filters" => ["key" => ["im nested"]]]],
+            "search: array value instead of string" => [["search" => ["in array"]]],
+            "sort: array value instead of string" => [["sort" => ["in array"]]],
+        ];
+    }
+
+    #[DataProvider('invalidValueProvider')]
+    public function testInvalidValue(array $queryParams): void {
+        $database = $this->createDatabase();
+
+        $database->expects($this->once())
+            ->method("selectAll")
+            ->with(
+                $this->equalTo("SELECT *
+FROM test_entities
+ORDER BY id ASC
+LIMIT 10;"),
+                $this->equalTo([])
+            )
+            ->willReturn([])
+        ;
+
+        $database->method("selectFirst")->willReturn(["count" => 20]);
+
+        $service = new TestCrudService(TestEntity::class);
+        $service->index($this->createRequest($queryParams));
     }
 }
