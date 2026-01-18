@@ -77,45 +77,6 @@ LIMIT 3;"),
         $service->index($request);
     }
 
-    public static function invalidValueProvider(): array {
-        return [
-            "limit: string value (non-numeric)" => [["limit" => "not a number"]],
-            "limit: array value" => [["limit" => ["2"]]],
-            "limit: negative number" => [["limit" => -5]],
-            "limit: zero" => [["limit" => 0]],
-            "page: string value (non-numeric)" => [["page" => "not a number"]],
-            "page: array value" => [["page" => ["2"]]],
-            "page: negative number" => [["page" => -2]],
-            "page: zero" => [["page" => 0]],
-            "filters: string value instead of array" => [["filters" => "im a string filter"]],
-            "filters: nested array values" => [["filters" => ["key" => ["im nested"]]]],
-            "search: array value instead of string" => [["search" => ["in array"]]],
-            "sort: array value instead of string" => [["sort" => ["in array"]]],
-        ];
-    }
-
-    #[DataProvider('invalidValueProvider')]
-    public function testInvalidValue(array $queryParams): void {
-        $database = $this->createDatabase();
-
-        $database->expects($this->once())
-            ->method("selectAll")
-            ->with(
-                $this->equalTo("SELECT *
-FROM test_entities
-ORDER BY id ASC
-LIMIT 10;"),
-                $this->equalTo([])
-            )
-            ->willReturn([])
-        ;
-
-        $database->method("selectFirst")->willReturn(["count" => 20]);
-
-        $service = new TestCrudService(TestEntity::class);
-        $service->index($this->createRequest($queryParams));
-    }
-
     public function testPagination(): void {
         $database = $this->createDatabase();
 
@@ -281,5 +242,44 @@ LIMIT 10 OFFSET 10;"),
 
         $service = new TestCrudService(TestEntity::class);
         $service->index($request);
+    }
+
+    public static function invalidValueProvider(): array {
+        return [
+            "limit: string value (non-numeric)" => [["limit" => "not a number"]],
+            "limit: array value" => [["limit" => ["2"]]],
+            "limit: negative number" => [["limit" => -5]],
+            "limit: zero" => [["limit" => 0]],
+            "page: string value (non-numeric)" => [["page" => "not a number"]],
+            "page: array value" => [["page" => ["2"]]],
+            "page: negative number" => [["page" => -2]],
+            "page: zero" => [["page" => 0]],
+            "filters: string value instead of array" => [["filters" => "im a string filter"]],
+            "filters: nested array values" => [["filters" => ["key" => ["im nested"]]]],
+            "search: array value instead of string" => [["search" => ["in array"]]],
+            "sort: array value instead of string" => [["sort" => ["in array"]]],
+        ];
+    }
+
+    #[DataProvider('invalidValueProvider')]
+    public function testInvalidValue(array $queryParams): void {
+        $database = $this->createDatabase();
+
+        $database->expects($this->once())
+            ->method("selectAll")
+            ->with(
+                $this->equalTo("SELECT *
+FROM test_entities
+ORDER BY id ASC
+LIMIT 10;"),
+                $this->equalTo([])
+            )
+            ->willReturn([])
+        ;
+
+        $database->method("selectFirst")->willReturn(["count" => 20]);
+
+        $service = new TestCrudService(TestEntity::class);
+        $service->index($this->createRequest($queryParams));
     }
 }
