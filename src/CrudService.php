@@ -43,9 +43,19 @@ class CrudService {
             return null;
         }
 
-        return $this->getEntityInstance()
-            ->getById((int)$request->getAttribute("route_params")["id"])
-        ;
+        $entity = $this->getEntityInstance();
+        $query = $entity::newQuery()->where("id", (int)$id);
+
+        // Handle eager loading of relationships via 'include' parameter
+        $include = $request->getQueryParam("include");
+        if (is_string($include) && !empty($include)) {
+            $relations = array_filter(array_map("trim", explode(",", $include)));
+            if (!empty($relations)) {
+                $query->with(...$relations);
+            }
+        }
+
+        return $query->select();
     }
 
     /**
@@ -79,6 +89,15 @@ class CrudService {
                 // Comma-separated values
                 $sort = array_filter(array_map("trim", explode(",", $sort)));
                 $entity::addSortToQuery($query, $sort);
+            }
+        }
+
+        // Handle eager loading of relationships via 'include' parameter
+        $include = $request->getQueryParam("include");
+        if (is_string($include) && !empty($include)) {
+            $relations = array_filter(array_map("trim", explode(",", $include)));
+            if (!empty($relations)) {
+                $query->with(...$relations);
             }
         }
 

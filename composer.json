@@ -18,7 +18,7 @@
         "php": "^8.0",
         "ext-json": "*",
         "jpi/http": "^1.0",
-        "jpi/orm": "^2.1",
+        "jpi/orm": "dev-copilot/support-eager-loading-entities",
         "jpi/utils": "^1.0"
     },
     "require-dev": {
@@ -43,6 +43,10 @@
         {
             "type": "git",
             "url": "https://github.com/jahidulpabelislam/http.git"
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/jahidulpabelislam/orm.git"
         }
     ]
 }
