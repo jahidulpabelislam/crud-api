@@ -298,7 +298,7 @@ LIMIT 10;"),
 FROM test_entities
 ORDER BY id ASC
 LIMIT 10;"),
-                $this->anything()
+                $this->equalTo([])
             )
             ->willReturn([])
         ;
