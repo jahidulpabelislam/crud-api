@@ -294,8 +294,10 @@ LIMIT 10;"),
         $database->expects($this->once())
             ->method("selectAll")
             ->with(
-                $this->stringContains("SELECT *
-FROM test_entities"),
+                $this->equalTo("SELECT *
+FROM test_entities
+ORDER BY id ASC
+LIMIT 10;"),
                 $this->anything()
             )
             ->willReturn([])
@@ -309,53 +311,5 @@ FROM test_entities"),
 
         $service = new TestCrudService(TestEntity::class);
         $service->index($request);
-    }
-
-    /**
-     * Test that the include parameter works for read action.
-     * Similar to testIncludeParameter but for single entity retrieval.
-     */
-    public function testIncludeParameterForRead(): void {
-        $database = $this->createDatabase();
-
-        $database->expects($this->once())
-            ->method("selectAll")
-            ->with(
-                $this->stringContains("SELECT *
-FROM test_entities
-WHERE id = :id"),
-                $this->equalTo(["id" => 5])
-            )
-            ->willReturn([
-                [
-                    "id" => 5,
-                    "name" => "Test Entity",
-                ],
-            ])
-        ;
-
-        $request = $this->createStub(Request::class);
-        
-        $request->method("getAttribute")
-            ->willReturnCallback(function ($key) {
-                if ($key === "route_params") {
-                    return ["id" => "5"];
-                }
-                return null;
-            })
-        ;
-
-        $queryParams = new \JPI\HTTP\Input(["include" => "author,category"]);
-        $request->method("getQueryParam")
-            ->willReturnCallback(function ($key) use ($queryParams) {
-                return $queryParams[$key] ?? null;
-            })
-        ;
-
-        $service = new TestCrudService(TestEntity::class);
-        $result = $service->read($request);
-
-        $this->assertInstanceOf(TestEntity::class, $result);
-        $this->assertSame(5, $result->getId());
     }
 }
