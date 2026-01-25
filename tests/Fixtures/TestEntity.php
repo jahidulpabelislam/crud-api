@@ -51,6 +51,11 @@ class TestEntity extends AbstractEntity implements SearchableInterface, Filterab
         "created_at" => [
             "type" => "date_time",
         ],
+        "author" => [
+            "type" => "belongs_to",
+            "entity" => RelatedTestEntity::class,
+            "column" => "author_id",
+        ],
     ];
 
     public static function setDatabase(\JPI\Database $database): void {
