@@ -62,7 +62,7 @@ class CrudService {
         if (!empty($relations)) {
             // Use query builder with eager loading when relationships are requested
             $entity = $this->getEntityInstance();
-            $query = $entity::newQuery()->where("id", (int)$id);
+            $query = $entity::newQuery()->where("id", "=", (int)$id);
             $query->with(...$relations);
             return $query->select();
         }
