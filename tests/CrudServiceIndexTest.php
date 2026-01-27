@@ -306,7 +306,7 @@ LIMIT 10;"),
         $database->method("selectFirst")->willReturn(["count" => 20]);
 
         $request = $this->createRequest([
-            "include" => "author,category",
+            "include" => "related,child,children",
         ]);
 
         $service = new TestCrudService(TestEntity::class);

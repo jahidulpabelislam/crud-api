@@ -62,7 +62,7 @@ LIMIT 1;"),
             ->willReturn([
                 "id" => 5,
                 "name" => "Test Entity",
-                "author_id" => "2",
+                "related_id" => "2",
             ])
         ;
 
@@ -82,7 +82,7 @@ LIMIT 1;"),
         ;
 
         $request = $this->createRequest([
-            "include" => "author,category",
+            "include" => "related,child,children",
         ]);
 
         $request->method("getAttribute")
@@ -100,7 +100,7 @@ LIMIT 1;"),
         $this->assertInstanceOf(TestEntity::class, $result);
         $this->assertSame(5, $result->getId());
 
-        $this->assertInstanceOf(TestRelatedEntity::class, $result->author);
-        $this->assertSame(2, $result->author->getId());
+        $this->assertInstanceOf(TestRelatedEntity::class, $result->related);
+        $this->assertSame(2, $result->related->getId());
     }
 }

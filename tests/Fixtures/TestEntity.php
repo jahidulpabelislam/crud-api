@@ -51,10 +51,19 @@ class TestEntity extends AbstractEntity implements SearchableInterface, Filterab
         "created_at" => [
             "type" => "date_time",
         ],
-        "author" => [
+        "related" => [
             "type" => "belongs_to",
             "entity" => TestRelatedEntity::class,
-            "column" => "author_id",
+        ],
+        "child" => [
+            "type" => "has_one",
+            "entity" => TestRelatedEntity::class,
+            "column" => "parent",
+        ],
+        "children" => [
+            "type" => "has_many",
+            "entity" => TestRelatedEntity::class,
+            "column" => "parent",
         ],
     ];
 
