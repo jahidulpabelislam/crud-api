@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use JPI\CRUD\API\Tests\Fixtures\TestCrudService;
 use JPI\CRUD\API\Tests\Fixtures\TestEntity;
+use JPI\CRUD\API\Tests\Fixtures\TestRelatedEntity;
 use JPI\Database;
 use JPI\HTTP\Request;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -17,9 +18,10 @@ use PHPUnit\Framework\TestCase;
  */
 final class CrudServiceReadTest extends TestCase {
 
-    private function createDatabase(): Database&MockObject {
+    private function createDatabase(string $entity = TestEntity::class): Database&MockObject {
         $database = $this->createMock(Database::class);
-        TestEntity::setDatabase($database);
+        $entity::setDatabase($database);
+        TestRelatedEntity::setDatabase($database);
         return $database;
     }
 
@@ -48,9 +50,7 @@ final class CrudServiceReadTest extends TestCase {
      * Similar to testIncludeParameter but for single entity retrieval.
      */
     public function testIncludeParameter(): void {
-        $database = $this->createDatabase();
-
-        $database->expects($this->once())
+        $this->createDatabase()->expects($this->once())
             ->method("selectFirst")
             ->with(
                 $this->equalTo("SELECT *
@@ -62,6 +62,22 @@ LIMIT 1;"),
             ->willReturn([
                 "id" => 5,
                 "name" => "Test Entity",
+                "author_id" => "2",
+            ])
+        ;
+
+        $this->createDatabase(TestRelatedEntity::class)->expects($this->once())
+            ->method("selectFirst")
+            ->with(
+                $this->equalTo("SELECT *
+FROM related_test_entities
+WHERE id = :id
+LIMIT 1;"),
+                $this->equalTo(["id" => 2])
+            )
+            ->willReturn([
+                "id" => 2,
+                "name" => "Related Entity",
             ])
         ;
 
@@ -83,5 +99,8 @@ LIMIT 1;"),
 
         $this->assertInstanceOf(TestEntity::class, $result);
         $this->assertSame(5, $result->getId());
+
+        $this->assertInstanceOf(TestRelatedEntity::class, $result->author);
+        $this->assertSame(2, $result->author->getId());
     }
 }
