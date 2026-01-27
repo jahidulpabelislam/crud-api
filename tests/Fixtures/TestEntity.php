@@ -53,7 +53,7 @@ class TestEntity extends AbstractEntity implements SearchableInterface, Filterab
         ],
         "author" => [
             "type" => "belongs_to",
-            "entity" => RelatedTestEntity::class,
+            "entity" => TestRelatedEntity::class,
             "column" => "author_id",
         ],
     ];

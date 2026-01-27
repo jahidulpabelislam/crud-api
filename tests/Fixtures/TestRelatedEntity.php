@@ -10,7 +10,7 @@ use JPI\CRUD\API\AbstractEntity;
  * A related test entity for testing relationship functionality.
  * This can represent related entities like authors, categories, etc.
  */
-class RelatedTestEntity extends AbstractEntity {
+class TestRelatedEntity extends AbstractEntity {
 
     protected static string $displayName = "Related Test Entity";
     protected static string $table = "related_test_entities";
