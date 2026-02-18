@@ -323,8 +323,6 @@ GET /projects/?include=author,comments
 - Works with both single entity and collection endpoints
 - Can be combined with other query parameters (fields, filters, sorting, etc.)
 
-**Note:** The relationships must be properly defined in your entity's data mapping using the ORM's relationship features. See [jpi/orm](https://packagist.org/packages/jpi/orm) documentation for details on defining relationships.
-
 ## Support
 
 If you found this library interesting or useful please spread the word about this library: share on your socials, star on GitHub, etc.
