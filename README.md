@@ -317,12 +317,6 @@ GET /projects/?include=author,comments
 }
 ```
 
-**Benefits:**
-- Reduces the number of SQL queries (avoids N+1 problem)
-- Improves API performance when related data is needed
-- Works with both single entity and collection endpoints
-- Can be combined with other query parameters (fields, filters, sorting, etc.)
-
 ## Support
 
 If you found this library interesting or useful please spread the word about this library: share on your socials, star on GitHub, etc.
