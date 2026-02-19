@@ -48,9 +48,6 @@ class TestEntity extends AbstractEntity implements SearchableInterface, Filterab
         "age" => [
             "type" => "int",
         ],
-        "created_at" => [
-            "type" => "date_time",
-        ],
         "related" => [
             "type" => "belongs_to",
             "entity" => TestRelatedEntity::class,
@@ -64,6 +61,9 @@ class TestEntity extends AbstractEntity implements SearchableInterface, Filterab
             "type" => "has_many",
             "entity" => TestRelatedEntity::class,
             "column" => "parent",
+        ],
+        "created_at" => [
+            "type" => "date_time",
         ],
     ];
 

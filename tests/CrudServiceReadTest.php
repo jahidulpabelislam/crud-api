@@ -61,12 +61,12 @@ final class CrudServiceReadTest extends TestCase {
 FROM test_entities
 WHERE id = :id
 LIMIT 1;"),
-                $this->equalTo(["id" => 5])
+                $this->equalTo(["id" => 6])
             )
             ->willReturn([
-                "id" => 5,
+                "id" => 6,
                 "name" => "Test Entity",
-                "related_id" => "2",
+                "related_id" => 60,
             ])
         ;
 
@@ -77,22 +77,20 @@ LIMIT 1;"),
 FROM related_test_entities
 WHERE id = :id
 LIMIT 1;"),
-                $this->equalTo(["id" => 2])
+                $this->equalTo(["id" => 60])
             )
             ->willReturn([
-                "id" => 2,
+                "id" => 60,
                 "name" => "Related Entity",
             ])
         ;
 
-        $request = $this->createRequest([
-            "include" => "related,child,children",
-        ]);
+        $request = $this->createRequest(["include" => "related,child,children"]);
 
         $request->method("getAttribute")
             ->willReturnCallback(function ($key) {
                 if ($key === "route_params") {
-                    return ["id" => "5"];
+                    return ["id" => 6];
                 }
                 return null;
             })
@@ -102,10 +100,10 @@ LIMIT 1;"),
         $result = $service->read($request);
 
         $this->assertInstanceOf(TestEntity::class, $result);
-        $this->assertSame(5, $result->getId());
+        $this->assertSame(6, $result->getId());
 
         $this->assertInstanceOf(TestRelatedEntity::class, $result->related);
-        $this->assertSame(2, $result->related->getId());
+        $this->assertSame(60, $result->related->getId());
     }
 
     /**
@@ -119,12 +117,12 @@ LIMIT 1;"),
 FROM test_entities
 WHERE id = :id
 LIMIT 1;"),
-                $this->equalTo(["id" => 1])
+                $this->equalTo(["id" => 7])
             )
             ->willReturn([
-                "id" => 1,
+                "id" => 7,
                 "name" => "Main Entity",
-                "related_id" => "10",
+                "related_id" => 70,
             ])
         ;
 
@@ -135,48 +133,45 @@ LIMIT 1;"),
 FROM related_test_entities
 WHERE id = :id
 LIMIT 1;"),
-                $this->equalTo(["id" => 10])
+                $this->equalTo(["id" => 70])
             )
             ->willReturn([
-                "id" => 10,
+                "id" => 70,
                 "name" => "Related Entity Name",
                 "description" => "Related Entity Description",
             ])
         ;
 
-        $request = $this->createRequest([
-            "include" => "related",
-        ]);
+        $request = $this->createRequest(["include" => "related"]);
 
         $request->method("getAttribute")
             ->willReturnCallback(function ($key) {
                 if ($key === "route_params") {
-                    return ["id" => "1"];
+                    return ["id" => 7];
                 }
                 return null;
             })
         ;
 
         $service = new TestCrudService(TestEntity::class);
-        $entity = $service->read($request);
 
-        // Verify the entity and relationship are loaded
-        $this->assertInstanceOf(TestEntity::class, $entity);
-        $this->assertInstanceOf(TestRelatedEntity::class, $entity->related);
-
-        // Test the API response structure
-        $response = $entity->getAPIResponse($request);
-
-        $this->assertIsArray($response);
-        $this->assertArrayHasKey("id", $response);
-        $this->assertArrayHasKey("name", $response);
-        $this->assertArrayHasKey("related", $response);
-
-        // Verify belongs_to relationship is included as a nested object
-        $this->assertIsArray($response["related"]);
-        $this->assertSame(10, $response["related"]["id"]);
-        $this->assertSame("Related Entity Name", $response["related"]["name"]);
-        $this->assertSame("Related Entity Description", $response["related"]["description"]);
+        $this->assertSame(
+            [
+                "id" => 7,
+                "name" => "Main Entity",
+                "description" => null,
+                "status" => null,
+                "category" => null,
+                "age" => null,
+                "related" => [
+                    "id" => 70,
+                    "name" => "Related Entity Name",
+                    "description" => "Related Entity Description",
+                ],
+                "created_at" => null,
+            ],
+            $service->read($request)->getAPIResponse($request)
+        );
     }
 
     /**
@@ -190,63 +185,61 @@ LIMIT 1;"),
 FROM test_entities
 WHERE id = :id
 LIMIT 1;"),
-                $this->equalTo(["id" => 2])
+                $this->equalTo(["id" => 8])
             )
             ->willReturn([
-                "id" => 2,
+                "id" => 8,
                 "name" => "Parent Entity",
             ])
         ;
 
         $this->createDatabase(TestRelatedEntity::class)->expects($this->once())
-            ->method("selectFirst")
+            ->method("selectAll")
             ->with(
                 $this->equalTo("SELECT *
 FROM related_test_entities
-WHERE parent = :parent
-LIMIT 1;"),
-                $this->equalTo(["parent" => 2])
+WHERE parent_id = :parent_id
+ORDER BY id ASC;"),
+                $this->equalTo(["parent_id" => 8])
             )
-            ->willReturn([
-                "id" => 20,
+            ->willReturn([[
+                "id" => 80,
                 "name" => "Child Entity",
                 "description" => "Child Description",
-            ])
+                "parent_id" => 8,
+            ]])
         ;
 
-        $request = $this->createRequest([
-            "include" => "child",
-        ]);
+        $request = $this->createRequest(["include" => "child"]);
 
         $request->method("getAttribute")
             ->willReturnCallback(function ($key) {
                 if ($key === "route_params") {
-                    return ["id" => "2"];
+                    return ["id" => 8];
                 }
                 return null;
             })
         ;
 
         $service = new TestCrudService(TestEntity::class);
-        $entity = $service->read($request);
 
-        // Verify the entity and relationship are loaded
-        $this->assertInstanceOf(TestEntity::class, $entity);
-        $this->assertInstanceOf(TestRelatedEntity::class, $entity->child);
-
-        // Test the API response structure
-        $response = $entity->getAPIResponse($request);
-
-        $this->assertIsArray($response);
-        $this->assertArrayHasKey("id", $response);
-        $this->assertArrayHasKey("name", $response);
-        $this->assertArrayHasKey("child", $response);
-
-        // Verify has_one relationship is included as a nested object
-        $this->assertIsArray($response["child"]);
-        $this->assertSame(20, $response["child"]["id"]);
-        $this->assertSame("Child Entity", $response["child"]["name"]);
-        $this->assertSame("Child Description", $response["child"]["description"]);
+        $this->assertSame(
+            [
+                "id" => 8,
+                "name" => "Parent Entity",
+                "description" => null,
+                "status" => null,
+                "category" => null,
+                "age" => null,
+                "child" => [
+                    "id" => 80,
+                    "name" => "Child Entity",
+                    "description" => "Child Description",
+                ],
+                "created_at" => null,
+            ],
+            $service->read($request)->getAPIResponse($request)
+        );
     }
 
     /**
@@ -260,10 +253,10 @@ LIMIT 1;"),
 FROM test_entities
 WHERE id = :id
 LIMIT 1;"),
-                $this->equalTo(["id" => 3])
+                $this->equalTo(["id" => 9])
             )
             ->willReturn([
-                "id" => 3,
+                "id" => 9,
                 "name" => "Parent Entity",
             ])
         ;
@@ -273,66 +266,68 @@ LIMIT 1;"),
             ->with(
                 $this->equalTo("SELECT *
 FROM related_test_entities
-WHERE parent = :parent;"),
-                $this->equalTo(["parent" => 3])
+WHERE parent_id = :parent_id
+ORDER BY id ASC;"),
+                $this->equalTo(["parent_id" => 9])
             )
             ->willReturn([
                 [
-                    "id" => 30,
+                    "id" => 90,
                     "name" => "Child 1",
                     "description" => "First child",
+                    "parent_id" => 9,
                 ],
                 [
-                    "id" => 31,
+                    "id" => 91,
                     "name" => "Child 2",
                     "description" => "Second child",
+                    "parent_id" => 9,
                 ],
             ])
         ;
 
-        $request = $this->createRequest([
-            "include" => "children",
-        ]);
+        $request = $this->createRequest(["include" => "children"]);
 
         $request->method("getAttribute")
             ->willReturnCallback(function ($key) {
                 if ($key === "route_params") {
-                    return ["id" => "3"];
+                    return ["id" => 9];
                 }
                 return null;
             })
         ;
 
         $service = new TestCrudService(TestEntity::class);
-        $entity = $service->read($request);
 
-        // Verify the entity is loaded
-        $this->assertInstanceOf(TestEntity::class, $entity);
-
-        // Test the API response structure
-        $response = $entity->getAPIResponse($request);
-
-        $this->assertIsArray($response);
-        $this->assertArrayHasKey("id", $response);
-        $this->assertArrayHasKey("name", $response);
-        $this->assertArrayHasKey("children", $response);
-
-        // Verify has_many relationship is included as an array of objects
-        $this->assertIsArray($response["children"]);
-        $this->assertCount(2, $response["children"]);
-
-        // Check first child
-        $this->assertIsArray($response["children"][0]);
-        $this->assertSame(30, $response["children"][0]["id"]);
-        $this->assertSame("Child 1", $response["children"][0]["name"]);
-        $this->assertSame("First child", $response["children"][0]["description"]);
-        $this->assertArrayHasKey("_links", $response["children"][0]);
-
-        // Check second child
-        $this->assertIsArray($response["children"][1]);
-        $this->assertSame(31, $response["children"][1]["id"]);
-        $this->assertSame("Child 2", $response["children"][1]["name"]);
-        $this->assertSame("Second child", $response["children"][1]["description"]);
-        $this->assertArrayHasKey("_links", $response["children"][1]);
+        $this->assertSame(
+            [
+                "id" => 9,
+                "name" => "Parent Entity",
+                "description" => null,
+                "status" => null,
+                "category" => null,
+                "age" => null,
+                "children" => [
+                    [
+                        "id" => 90,
+                        "name" => "Child 1",
+                        "description" => "First child",
+                        '_links' => [
+                            'self' => '',
+                        ],
+                    ],
+                    [
+                        "id" => 91,
+                        "name" => "Child 2",
+                        "description" => "Second child",
+                        '_links' => [
+                            'self' => '',
+                        ],
+                    ],
+                ],
+                "created_at" => null,
+            ],
+            json_decode(json_encode($service->read($request)->getAPIResponse($request)), true)
+        );
     }
 }

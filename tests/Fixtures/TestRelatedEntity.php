@@ -28,6 +28,10 @@ class TestRelatedEntity extends AbstractEntity {
         "description" => [
             "type" => "string",
         ],
+        "parent" => [
+            "type" => "belongs_to",
+            "entity" => TestEntity::class,
+        ],
     ];
 
     public static function setDatabase(\JPI\Database $database): void {
