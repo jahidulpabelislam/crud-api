@@ -66,8 +66,6 @@ class CrudService {
                 ->select();
         }
 
-        // Use the simpler getById() method when no relationships are requested
-        // This maintains backward compatibility and uses entity registry cache
         return $this->getEntityInstance()->getById((int)$id);
     }
 
