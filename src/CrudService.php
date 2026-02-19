@@ -57,14 +57,13 @@ class CrudService {
             return null;
         }
 
-        // Handle eager loading of relationships via 'include' parameter
         $relations = $this->getRelationsFromRequest($request);
         if (!empty($relations)) {
             // Use query builder with eager loading when relationships are requested
-            $entity = $this->getEntityInstance();
-            $query = $entity::newQuery()->where("id", "=", (int)$id);
-            $query->with(...$relations);
-            return $query->select();
+            return $this->getEntityInstance()::newQuery()
+                ->where("id", "=", (int)$id)
+                ->with(...$relations)
+                ->select();
         }
 
         // Use the simpler getById() method when no relationships are requested
