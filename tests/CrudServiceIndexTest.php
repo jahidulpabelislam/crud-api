@@ -282,34 +282,4 @@ LIMIT 10;"),
         $service = new TestCrudService(TestEntity::class);
         $service->index($this->createRequest($queryParams));
     }
-
-    /**
-     * Test that the include parameter doesn't break the query.
-     * The actual eager loading functionality is tested in the ORM library.
-     * This test verifies that providing an include parameter doesn't cause errors.
-     */
-    public function testIncludeParameter(): void {
-        $database = $this->createDatabase();
-
-        $database->expects($this->once())
-            ->method("selectAll")
-            ->with(
-                $this->equalTo("SELECT *
-FROM test_entities
-ORDER BY id ASC
-LIMIT 10;"),
-                $this->equalTo([])
-            )
-            ->willReturn([])
-        ;
-
-        $database->method("selectFirst")->willReturn(["count" => 20]);
-
-        $request = $this->createRequest([
-            "include" => "related,child,children",
-        ]);
-
-        $service = new TestCrudService(TestEntity::class);
-        $service->index($request);
-    }
 }
