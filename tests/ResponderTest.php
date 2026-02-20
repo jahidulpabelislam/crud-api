@@ -159,6 +159,29 @@ final class ResponderTest extends TestCase {
         );
     }
 
+    public function testEntitiesWithFields(): void {
+        $this->request->setAttribute("fields", ["name", "status"]);
+        $entities = new EntityCollection([$this->createEntity(1, "Test 1")]);
+        $response = $this->controller->getEntitiesResponse($this->request, $entities);
+        $body = json_decode($response->getBody(), true);
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame(
+            [
+                "data" => [
+                    [
+                        "id" => 1,
+                        "name" => "Test 1",
+                        "status" => null,
+                        "_links" => ["self" => "https://api.example.com/test-entities/1/"],
+                    ],
+                ],
+                "_links" => ["self" => "https://api.example.com/test-entities/"],
+            ],
+            $body
+        );
+    }
+
     public function testEntityNotFound(): void {
         $response = $this->controller->getEntityNotFoundResponse($this->request, 123);
         $body = json_decode($response->getBody(), true);
@@ -182,6 +205,24 @@ final class ResponderTest extends TestCase {
                     "category" => null,
                     "age" => null,
                     "created_at" => null,
+                ],
+                "_links" => ["self" => "https://api.example.com/test-entities/1/"],
+            ],
+            $body
+        );
+    }
+
+    public function testEntityWithFields(): void {
+        $this->request->setAttribute("fields", ["name", "status"]);
+        $response = $this->controller->getEntityResponse($this->request, $this->createEntity(1, "Test 1"), 1);
+        $body = json_decode($response->getBody(), true);
+
+        $this->assertSame(
+            [
+                "data" => [
+                    "id" => 1,
+                    "name" => "Test 1",
+                    "status" => null,
                 ],
                 "_links" => ["self" => "https://api.example.com/test-entities/1/"],
             ],
