@@ -219,13 +219,13 @@ ORDER BY id ASC;"),
             )
             ->willReturn([
                 [
-                    "id" => 100,
+                    "id" => 101,
                     "name" => "Child 1",
                     "description" => "First child",
                     "parent_id" => 10,
                 ],
                 [
-                    "id" => 101,
+                    "id" => 102,
                     "name" => "Child 2",
                     "description" => "Second child",
                     "parent_id" => 10,
@@ -247,7 +247,7 @@ ORDER BY id ASC;"),
 
         $this->assertTrue(isset($result->child));
         $this->assertSame(TestRelatedEntity::class, $result->child::class);
-        $this->assertSame(100, $result->child->getId());
+        $this->assertSame(101, $result->child->getId());
 
         $this->assertTrue(isset($result->children));
         $this->assertSame(Collection::class, $result->children::class);
