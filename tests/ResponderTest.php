@@ -354,6 +354,9 @@ final class ResponderTest extends TestCase {
                         "id" => 20,
                         "name" => "Related Entity Name",
                         "description" => null,
+                        '_links' => [
+                            'self' => 'https://api.example.com/related-test-entities/20/',
+                        ],
                     ],
                     "created_at" => null,
                 ],
@@ -383,6 +386,9 @@ final class ResponderTest extends TestCase {
                         "id" => 30,
                         "name" => "Child Entity",
                         "description" => null,
+                        '_links' => [
+                            'self' => 'https://api.example.com/related-test-entities/30/',
+                        ],
                     ],
                     "created_at" => null,
                 ],
@@ -462,11 +468,17 @@ final class ResponderTest extends TestCase {
                         "id" => 50,
                         "name" => "Related Entity Name",
                         "description" => null,
+                        '_links' => [
+                            'self' => 'https://api.example.com/related-test-entities/50/',
+                        ],
                     ],
                     "child" => [
                         "id" => 51,
                         "name" => "Child Entity",
                         "description" => null,
+                        '_links' => [
+                            'self' => 'https://api.example.com/related-test-entities/51/',
+                        ],
                     ],
                     "children" => [
                         [
