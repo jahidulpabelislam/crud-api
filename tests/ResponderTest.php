@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace JPI\CRUD\API\Tests;
 
+use JPI\CRUD\API\AbstractEntity;
 use JPI\CRUD\API\Tests\Fixtures\TestController;
 use JPI\CRUD\API\Tests\Fixtures\TestEntity;
+use JPI\CRUD\API\Tests\Fixtures\TestRelatedEntity;
 use JPI\HTTP\Input;
 use JPI\HTTP\Request;
 use JPI\ORM\Entity\Collection as EntityCollection;
@@ -32,8 +34,8 @@ final class ResponderTest extends TestCase {
         $this->controller->setRequest($this->request);
     }
 
-    private function createEntity(int $id, string $name): TestEntity {
-        return TestEntity::loadFromDatabaseRow([
+    private function createEntity(int $id, string $name, string $entity = TestEntity::class): AbstractEntity {
+        return $entity::loadFromDatabaseRow([
             "id" => $id,
             "name" => $name,
             "description" => null,
@@ -327,6 +329,166 @@ final class ResponderTest extends TestCase {
         $this->assertSame(
             [
                 "message" => "Failed to delete the Test Entity identified by `1`.",
+            ],
+            $body
+        );
+    }
+
+    public function testEntityWithBelongsTo(): void {
+        $entity = $this->createEntity(2, "Main Entity");
+        $entity->related = $this->createEntity(20, "Related Entity Name", TestRelatedEntity::class);
+
+        $response = $this->controller->getEntityResponse($this->request, $entity, 2);
+        $body = json_decode($response->getBody(), true);
+
+        $this->assertSame(
+            [
+                "data" => [
+                    "id" => 2,
+                    "name" => "Main Entity",
+                    "description" => null,
+                    "status" => null,
+                    "category" => null,
+                    "age" => null,
+                    "related" => [
+                        "id" => 20,
+                        "name" => "Related Entity Name",
+                        "description" => null,
+                    ],
+                    "created_at" => null,
+                ],
+                "_links" => ["self" => "https://api.example.com/test-entities/2/"],
+            ],
+            $body
+        );
+    }
+
+    public function testEntityWithHasOne(): void {
+        $entity = $this->createEntity(3, "Parent Entity");
+        $entity->child = $this->createEntity(30, "Child Entity", TestRelatedEntity::class);
+
+        $response = $this->controller->getEntityResponse($this->request, $entity, 3);
+        $body = json_decode($response->getBody(), true);
+
+        $this->assertSame(
+            [
+                "data" => [
+                    "id" => 3,
+                    "name" => "Parent Entity",
+                    "description" => null,
+                    "status" => null,
+                    "category" => null,
+                    "age" => null,
+                    "child" => [
+                        "id" => 30,
+                        "name" => "Child Entity",
+                        "description" => null,
+                    ],
+                    "created_at" => null,
+                ],
+                "_links" => ["self" => "https://api.example.com/test-entities/3/"],
+            ],
+            $body
+        );
+    }
+
+    public function testEntityWithHasMany(): void {
+        $entity = $this->createEntity(4, "Parent Entity");
+        $entity->children = [
+            $this->createEntity(40, "Child 1", TestRelatedEntity::class),
+            $this->createEntity(41, "Child 2", TestRelatedEntity::class),
+        ];
+
+        $response = $this->controller->getEntityResponse($this->request, $entity, 4);
+        $body = json_decode($response->getBody(), true);
+
+        $this->assertSame(
+            [
+                "data" => [
+                    "id" => 4,
+                    "name" => "Parent Entity",
+                    "description" => null,
+                    "status" => null,
+                    "category" => null,
+                    "age" => null,
+                    "children" => [
+                        [
+                            "id" => 40,
+                            "name" => "Child 1",
+                            "description" => null,
+                            '_links' => [
+                                'self' => 'https://api.example.com/related-test-entities/40/',
+                            ],
+                        ],
+                        [
+                            "id" => 41,
+                            "name" => "Child 2",
+                            "description" => null,
+                            '_links' => [
+                                'self' => 'https://api.example.com/related-test-entities/41/',
+                            ],
+                        ],
+                    ],
+                    "created_at" => null,
+                ],
+                "_links" => ["self" => "https://api.example.com/test-entities/4/"],
+            ],
+            $body
+        );
+    }
+
+    public function testEntityWithMultipleIncludes(): void {
+        $entity = $this->createEntity(5, "Parent Entity");
+        $entity->related = $this->createEntity(50, "Related Entity Name", TestRelatedEntity::class);
+        $entity->child = $this->createEntity(51, "Child Entity", TestRelatedEntity::class);
+        $entity->children = [
+            $this->createEntity(52, "Child 1", TestRelatedEntity::class),
+            $this->createEntity(53, "Child 2", TestRelatedEntity::class),
+        ];
+
+        $response = $this->controller->getEntityResponse($this->request, $entity, 5);
+        $body = json_decode($response->getBody(), true);
+
+        $this->assertSame(
+            [
+                "data" => [
+                    "id" => 5,
+                    "name" => "Parent Entity",
+                    "description" => null,
+                    "status" => null,
+                    "category" => null,
+                    "age" => null,
+                    "related" => [
+                        "id" => 50,
+                        "name" => "Related Entity Name",
+                        "description" => null,
+                    ],
+                    "child" => [
+                        "id" => 51,
+                        "name" => "Child Entity",
+                        "description" => null,
+                    ],
+                    "children" => [
+                        [
+                            "id" => 52,
+                            "name" => "Child 1",
+                            "description" => null,
+                            '_links' => [
+                                'self' => 'https://api.example.com/related-test-entities/52/',
+                            ],
+                        ],
+                        [
+                            "id" => 53,
+                            "name" => "Child 2",
+                            "description" => null,
+                            '_links' => [
+                                'self' => 'https://api.example.com/related-test-entities/53/',
+                            ],
+                        ],
+                    ],
+                    "created_at" => null,
+                ],
+                "_links" => ["self" => "https://api.example.com/test-entities/5/"],
             ],
             $body
         );
