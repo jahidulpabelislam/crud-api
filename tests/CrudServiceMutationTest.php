@@ -7,6 +7,7 @@ namespace JPI\CRUD\API\Tests;
 use JPI\CRUD\API\Entity\InvalidDataException;
 use JPI\CRUD\API\Tests\Fixtures\TestCrudService;
 use JPI\CRUD\API\Tests\Fixtures\TestEntity;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 
 /**
  * Test CrudService create and update operations
@@ -21,6 +22,7 @@ use JPI\CRUD\API\Tests\Fixtures\TestEntity;
  */
 final class CrudServiceMutationTest extends AbstractCrudServiceTestCase {
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testCreateSuccess(): void {
         $database = $this->createDatabase();
 
@@ -122,6 +124,7 @@ final class CrudServiceMutationTest extends AbstractCrudServiceTestCase {
         }
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testUpdateSuccess(): void {
         $database = $this->createDatabase();
 
@@ -159,6 +162,7 @@ final class CrudServiceMutationTest extends AbstractCrudServiceTestCase {
         $this->assertSame("New Name", $entity->name);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testUpdateWithMissingRequiredFields(): void {
         $database = $this->createDatabase();
 
@@ -196,6 +200,7 @@ final class CrudServiceMutationTest extends AbstractCrudServiceTestCase {
         $this->assertSame("New Description", $entity->description);
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testUpdateWithEmptyRequiredFields(): void {
         // Mock getById to return existing entity
         $this->createDatabase()->method("selectFirst")
@@ -230,6 +235,7 @@ final class CrudServiceMutationTest extends AbstractCrudServiceTestCase {
         }
     }
 
+    #[AllowMockObjectsWithoutExpectations]
     public function testUpdateWithInvalidValues(): void {
         // Mock getById to return existing entity
         $this->createDatabase()->method("selectFirst")
