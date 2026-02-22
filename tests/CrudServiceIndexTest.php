@@ -251,4 +251,200 @@ LIMIT 10;"),
         $service = new TestCrudService(TestEntity::class);
         $service->index($this->createRequest(queryParams: $queryParams));
     }
+
+    /**
+     * Test index response format when including a belongs_to relationship.
+     */
+    public function testIndexWithBelongsTo(): void {
+        $database = $this->createDatabase();
+
+        $database->expects($this->once())
+            ->method("selectAll")
+            ->with(
+                $this->stringContains("SELECT *
+FROM test_entities"),
+                $this->anything()
+            )
+            ->willReturn([
+                [
+                    "id" => 1,
+                    "name" => "Entity 1",
+                    "description" => null,
+                    "status" => null,
+                    "category" => null,
+                    "age" => null,
+                    "created_at" => null,
+                    "related_id" => 10,
+                ],
+                [
+                    "id" => 2,
+                    "name" => "Entity 2",
+                    "description" => null,
+                    "status" => null,
+                    "category" => null,
+                    "age" => null,
+                    "created_at" => null,
+                    "related_id" => 11,
+                ],
+            ])
+        ;
+
+        $database->method("selectFirst")
+            ->willReturnOnConsecutiveCalls(
+                ["count" => 2],
+                ["id" => 10, "name" => "Related 1", "description" => null],
+                ["id" => 11, "name" => "Related 2", "description" => null]
+            )
+        ;
+
+        $request = $this->createRequest(queryParams: ["include" => "related"]);
+
+        $service = new TestCrudService(TestEntity::class);
+        $entities = $service->index($request);
+
+        $this->assertCount(2, $entities);
+
+        // Verify relationships are loaded
+        $this->assertTrue(isset($entities[0]->related));
+        $this->assertSame(10, $entities[0]->related->getId());
+        $this->assertSame("Related 1", $entities[0]->related->name);
+
+        $this->assertTrue(isset($entities[1]->related));
+        $this->assertSame(11, $entities[1]->related->getId());
+        $this->assertSame("Related 2", $entities[1]->related->name);
+    }
+
+    /**
+     * Test index response format when including a has_one relationship.
+     */
+    public function testIndexWithHasOne(): void {
+        $database = $this->createDatabase();
+
+        $database->expects($this->once())
+            ->method("selectAll")
+            ->with(
+                $this->stringContains("SELECT *
+FROM test_entities"),
+                $this->anything()
+            )
+            ->willReturn([
+                [
+                    "id" => 1,
+                    "name" => "Parent 1",
+                    "description" => null,
+                    "status" => null,
+                    "category" => null,
+                    "age" => null,
+                    "created_at" => null,
+                ],
+                [
+                    "id" => 2,
+                    "name" => "Parent 2",
+                    "description" => null,
+                    "status" => null,
+                    "category" => null,
+                    "age" => null,
+                    "created_at" => null,
+                ],
+            ])
+        ;
+
+        $database->method("selectFirst")
+            ->willReturnOnConsecutiveCalls(
+                ["count" => 2],
+                ["id" => 20, "name" => "Child 1", "description" => null, "parent_id" => 1],
+                ["id" => 21, "name" => "Child 2", "description" => null, "parent_id" => 2]
+            )
+        ;
+
+        $request = $this->createRequest(queryParams: ["include" => "child"]);
+
+        $service = new TestCrudService(TestEntity::class);
+        $entities = $service->index($request);
+
+        $this->assertCount(2, $entities);
+
+        // Verify relationships are loaded
+        $this->assertTrue(isset($entities[0]->child));
+        $this->assertSame(20, $entities[0]->child->getId());
+        $this->assertSame("Child 1", $entities[0]->child->name);
+
+        $this->assertTrue(isset($entities[1]->child));
+        $this->assertSame(21, $entities[1]->child->getId());
+        $this->assertSame("Child 2", $entities[1]->child->name);
+    }
+
+    /**
+     * Test index response format when including a has_many relationship.
+     */
+    public function testIndexWithHasMany(): void {
+        $database = $this->createDatabase();
+
+        $database->expects($this->once())
+            ->method("selectAll")
+            ->with(
+                $this->stringContains("SELECT *
+FROM test_entities"),
+                $this->anything()
+            )
+            ->willReturn([
+                [
+                    "id" => 1,
+                    "name" => "Parent 1",
+                    "description" => null,
+                    "status" => null,
+                    "category" => null,
+                    "age" => null,
+                    "created_at" => null,
+                ],
+                [
+                    "id" => 2,
+                    "name" => "Parent 2",
+                    "description" => null,
+                    "status" => null,
+                    "category" => null,
+                    "age" => null,
+                    "created_at" => null,
+                ],
+            ])
+        ;
+
+        $database->method("selectFirst")->willReturn(["count" => 2]);
+
+        $database->method("selectAll")
+            ->willReturnOnConsecutiveCalls(
+                // Main query already handled by expects above
+                null,
+                // Children for entity 1
+                [
+                    ["id" => 30, "name" => "Child 1a", "description" => null, "parent_id" => 1],
+                    ["id" => 31, "name" => "Child 1b", "description" => null, "parent_id" => 1],
+                ],
+                // Children for entity 2
+                [
+                    ["id" => 32, "name" => "Child 2a", "description" => null, "parent_id" => 2],
+                ]
+            )
+        ;
+
+        $request = $this->createRequest(queryParams: ["include" => "children"]);
+
+        $service = new TestCrudService(TestEntity::class);
+        $entities = $service->index($request);
+
+        $this->assertCount(2, $entities);
+
+        // Verify relationships are loaded
+        $this->assertTrue(isset($entities[0]->children));
+        $this->assertCount(2, $entities[0]->children);
+        $this->assertSame(30, $entities[0]->children[0]->getId());
+        $this->assertSame("Child 1a", $entities[0]->children[0]->name);
+        $this->assertSame(31, $entities[0]->children[1]->getId());
+        $this->assertSame("Child 1b", $entities[0]->children[1]->name);
+
+        $this->assertTrue(isset($entities[1]->children));
+        $this->assertCount(1, $entities[1]->children);
+        $this->assertSame(32, $entities[1]->children[0]->getId());
+        $this->assertSame("Child 2a", $entities[1]->children[0]->name);
+    }
 }
