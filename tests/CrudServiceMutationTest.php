@@ -7,11 +7,6 @@ namespace JPI\CRUD\API\Tests;
 use JPI\CRUD\API\Entity\InvalidDataException;
 use JPI\CRUD\API\Tests\Fixtures\TestCrudService;
 use JPI\CRUD\API\Tests\Fixtures\TestEntity;
-use JPI\Database;
-use JPI\HTTP\Input;
-use JPI\HTTP\Request;
-use PHPUnit\Framework\MockObject\Stub;
-use PHPUnit\Framework\TestCase;
 
 /**
  * Test CrudService create and update operations
@@ -24,30 +19,7 @@ use PHPUnit\Framework\TestCase;
  * @covers \JPI\CRUD\API\CrudService::update
  * @covers \JPI\CRUD\API\CrudService::setValuesFromRequest
  */
-final class CrudServiceMutationTest extends TestCase {
-
-    private function createDatabase(): Database&Stub {
-        $database = $this->createStub(Database::class);
-        TestEntity::setDatabase($database);
-        return $database;
-    }
-
-    private function createRequest(array $body = [], array $routeParams = []): Request&Stub {
-        $request = $this->createStub(Request::class);
-
-        $request->method("getArrayFromBody")->willReturn(new Input($body));
-
-        $request->method("getAttribute")
-            ->willReturnCallback(function ($key) use ($routeParams) {
-                if ($key === "route_params") {
-                    return $routeParams;
-                }
-                return null;
-            })
-        ;
-
-        return $request;
-    }
+final class CrudServiceMutationTest extends AbstractCrudServiceTestCase {
 
     public function testCreateSuccess(): void {
         $database = $this->createDatabase();
@@ -67,7 +39,7 @@ final class CrudServiceMutationTest extends TestCase {
             ])
         ;
 
-        $request = $this->createRequest([
+        $request = $this->createRequest(body: [
             "name" => "Test Entity",
             "description" => "Test Description",
             "status" => "active",
@@ -83,7 +55,7 @@ final class CrudServiceMutationTest extends TestCase {
     }
 
     public function testCreateWithMissingRequiredFields(): void {
-        $request = $this->createRequest([
+        $request = $this->createRequest(body: [
             "description" => "Test Description",
         ]);
 
@@ -104,7 +76,7 @@ final class CrudServiceMutationTest extends TestCase {
     }
 
     public function testCreateWithEmptyRequiredFields(): void {
-        $request = $this->createRequest([
+        $request = $this->createRequest(body: [
             "name" => "",
             "description" => "Test Description",
             "created_at" => "",
@@ -127,7 +99,7 @@ final class CrudServiceMutationTest extends TestCase {
     }
 
     public function testCreateWithInvalidValues(): void {
-        $request = $this->createRequest([
+        $request = $this->createRequest(body: [
             "name" => "Test Entity",
             "age" => "not-a-number",
             "created_at" => "not-a-date",
@@ -173,11 +145,11 @@ final class CrudServiceMutationTest extends TestCase {
         $database->method("exec")->willReturn(1);
 
         $request = $this->createRequest(
-            [
+            body: [
                 "name" => "New Name",
                 "description" => "New Description",
             ],
-            ["id" => "2"]
+            attributes: ["route_params" => ["id" => 2]]
         );
 
         $service = new TestCrudService(TestEntity::class);
@@ -210,11 +182,11 @@ final class CrudServiceMutationTest extends TestCase {
         $database->method("exec")->willReturn(1);
 
         $request = $this->createRequest(
-            [
+            body: [
                 // name & created_at not provided but ok for update
                 "description" => "New Description",
             ],
-            ["id" => "3"]
+            attributes: ["route_params" => ["id" => 3]]
         );
 
         $service = new TestCrudService(TestEntity::class);
@@ -234,12 +206,12 @@ final class CrudServiceMutationTest extends TestCase {
         ;
 
         $request = $this->createRequest(
-            [
+            body: [
                 "name" => "",
                 "description" => "Test Description",
                 "created_at" => "",
             ],
-            ["id" => "4"]
+            attributes: ["route_params" => ["id" => 4]]
         );
 
         $service = new TestCrudService(TestEntity::class);
@@ -268,12 +240,12 @@ final class CrudServiceMutationTest extends TestCase {
         ;
 
         $request = $this->createRequest(
-            [
+            body: [
                 "name" => "Updated Name",
                 "age" => "not-a-number",
                 "created_at" => "not-a-date",
             ],
-            ["id" => "5"]
+            attributes: ["route_params" => ["id" => 5]]
         );
 
         $service = new TestCrudService(TestEntity::class);

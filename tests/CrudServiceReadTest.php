@@ -2,14 +2,11 @@
 
 declare(strict_types=1);
 
+namespace JPI\CRUD\API\Tests;
+
 use JPI\CRUD\API\Tests\Fixtures\TestCrudService;
 use JPI\CRUD\API\Tests\Fixtures\TestEntity;
 use JPI\CRUD\API\Tests\Fixtures\TestRelatedEntity;
-use JPI\Database;
-use JPI\HTTP\Request;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\MockObject\Stub;
-use PHPUnit\Framework\TestCase;
 
 /**
  * Test CrudService read operations with relationship includes.
@@ -19,39 +16,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @covers \JPI\CRUD\API\CrudService::read
  */
-final class CrudServiceReadTest extends TestCase {
-
-    private function createDatabase(string $entity = TestEntity::class): Database&MockObject {
-        $database = $this->createMock(Database::class);
-        $entity::setDatabase($database);
-        return $database;
-    }
-
-    private function createRequest(array $queryParams = [], array $attributes = []): Request&Stub {
-        $request = $this->createStub(Request::class);
-
-        $queryParams = new \JPI\HTTP\Input($queryParams);
-
-        $request->method("getQueryParam")
-            ->willReturnCallback(function (string $key) use ($queryParams) {
-                return $queryParams[$key] ?? null;
-            })
-        ;
-
-        $request->method("hasQueryParam")
-            ->willReturnCallback(function (string $key) use ($queryParams) {
-                return isset($queryParams[$key]);
-            })
-        ;
-
-        $request->method("getAttribute")
-            ->willReturnCallback(function (string $key) use ($attributes) {
-                return $attributes[$key] ?? null;
-            })
-        ;
-
-        return $request;
-    }
+final class CrudServiceReadTest extends AbstractCrudServiceTestCase {
 
     public function testIncludeBelongsToRelationship(): void {
         $this->createDatabase()->expects($this->once())
@@ -86,7 +51,7 @@ LIMIT 1;"),
             ])
         ;
 
-        $request = $this->createRequest(["include" => "related"], ["route_params" => ["id" => 7]]);
+        $request = $this->createRequest(queryParams: ["include" => "related"], attributes: ["route_params" => ["id" => 7]]);
 
         $service = new TestCrudService(TestEntity::class);
         $result = $service->read($request);
@@ -129,7 +94,7 @@ ORDER BY id ASC;"),
             ]])
         ;
 
-        $request = $this->createRequest(["include" => "child"], ["route_params" => ["id" => 8]]);
+        $request = $this->createRequest(queryParams: ["include" => "child"], attributes: ["route_params" => ["id" => 8]]);
 
         $service = new TestCrudService(TestEntity::class);
         $result = $service->read($request);
@@ -180,7 +145,7 @@ ORDER BY id ASC;"),
             ])
         ;
 
-        $request = $this->createRequest(["include" => "children"], ["route_params" => ["id" => 9]]);
+        $request = $this->createRequest(queryParams: ["include" => "children"], attributes: ["route_params" => ["id" => 9]]);
 
         $service = new TestCrudService(TestEntity::class);
         $result = $service->read($request);
@@ -220,7 +185,7 @@ LIMIT 1;"),
             ])
         ;
 
-        $request = $this->createRequest(["include" => "related,child,children"], ["route_params" => ["id" => 6]]);
+        $request = $this->createRequest(queryParams: ["include" => "related,child,children"], attributes: ["route_params" => ["id" => 6]]);
 
         $service = new TestCrudService(TestEntity::class);
         $result = $service->read($request);
