@@ -7,6 +7,7 @@ namespace JPI\CRUD\API\Tests;
 use JPI\CRUD\API\Tests\Fixtures\TestCrudService;
 use JPI\CRUD\API\Tests\Fixtures\TestEntity;
 use JPI\CRUD\API\Tests\Fixtures\TestRelatedEntity;
+use JPI\ORM\Entity\Collection;
 
 /**
  * Test CrudService read operations with relationship includes.
@@ -18,8 +19,9 @@ use JPI\CRUD\API\Tests\Fixtures\TestRelatedEntity;
  */
 final class CrudServiceReadTest extends AbstractCrudServiceTestCase {
 
-    public function testIncludeBelongsToRelationship(): void {
-        $this->createDatabase()->expects($this->once())
+    public function testIncludeBelongsTo(): void {
+        $this->createDatabase()
+            ->expects($this->once())
             ->method("selectFirst")
             ->with(
                 $this->equalTo("SELECT *
@@ -35,7 +37,8 @@ LIMIT 1;"),
             ])
         ;
 
-        $this->createDatabase(TestRelatedEntity::class)->expects($this->once())
+        $this->createDatabase(TestRelatedEntity::class)
+            ->expects($this->once())
             ->method("selectFirst")
             ->with(
                 $this->equalTo("SELECT *
@@ -51,18 +54,22 @@ LIMIT 1;"),
             ])
         ;
 
-        $request = $this->createRequest(queryParams: ["include" => "related"], attributes: ["route_params" => ["id" => 7]]);
+        $request = $this->createRequest(
+            queryParams: ["include" => "related"],
+            attributes: ["route_params" => ["id" => 7]]
+        );
 
         $service = new TestCrudService(TestEntity::class);
         $result = $service->read($request);
 
         $this->assertTrue(isset($result->related));
-        $this->assertInstanceOf(TestRelatedEntity::class, $result->related);
+        $this->assertSame(TestRelatedEntity::class, $result->related::class);
         $this->assertSame(70, $result->related->getId());
     }
 
-    public function testIncludeHasOneRelationship(): void {
-        $this->createDatabase()->expects($this->once())
+    public function testIncludeHasOne(): void {
+        $this->createDatabase()
+            ->expects($this->once())
             ->method("selectFirst")
             ->with(
                 $this->equalTo("SELECT *
@@ -77,7 +84,8 @@ LIMIT 1;"),
             ])
         ;
 
-        $this->createDatabase(TestRelatedEntity::class)->expects($this->once())
+        $this->createDatabase(TestRelatedEntity::class)
+            ->expects($this->once())
             ->method("selectAll")
             ->with(
                 $this->equalTo("SELECT *
@@ -94,18 +102,22 @@ ORDER BY id ASC;"),
             ]])
         ;
 
-        $request = $this->createRequest(queryParams: ["include" => "child"], attributes: ["route_params" => ["id" => 8]]);
+        $request = $this->createRequest(
+            queryParams: ["include" => "child"],
+            attributes: ["route_params" => ["id" => 8]]
+        );
 
         $service = new TestCrudService(TestEntity::class);
         $result = $service->read($request);
 
         $this->assertTrue(isset($result->child));
-        $this->assertInstanceOf(TestRelatedEntity::class, $result->child);
+        $this->assertSame(TestRelatedEntity::class, $result->child::class);
         $this->assertSame(80, $result->child->getId());
     }
 
-    public function testIncludeHasManyRelationship(): void {
-        $this->createDatabase()->expects($this->once())
+    public function testIncludeHasMany(): void {
+        $this->createDatabase()
+            ->expects($this->once())
             ->method("selectFirst")
             ->with(
                 $this->equalTo("SELECT *
@@ -120,7 +132,8 @@ LIMIT 1;"),
             ])
         ;
 
-        $this->createDatabase(TestRelatedEntity::class)->expects($this->once())
+        $this->createDatabase(TestRelatedEntity::class)
+            ->expects($this->once())
             ->method("selectAll")
             ->with(
                 $this->equalTo("SELECT *
@@ -145,56 +158,100 @@ ORDER BY id ASC;"),
             ])
         ;
 
-        $request = $this->createRequest(queryParams: ["include" => "children"], attributes: ["route_params" => ["id" => 9]]);
+        $request = $this->createRequest(
+            queryParams: ["include" => "children"],
+            attributes: ["route_params" => ["id" => 9]]
+        );
 
         $service = new TestCrudService(TestEntity::class);
         $result = $service->read($request);
 
         $this->assertTrue(isset($result->children));
+        $this->assertSame(Collection::class, $result->children::class);
+        $this->assertSame(2, count($result->children));
+        $this->assertSame(TestRelatedEntity::class, $result->children[0]::class);
     }
 
     public function testMultipleInclude(): void {
-        $this->createDatabase()->expects($this->once())
+        $this->createDatabase()
+            ->expects($this->once())
             ->method("selectFirst")
             ->with(
                 $this->equalTo("SELECT *
 FROM test_entities
 WHERE id = :id
 LIMIT 1;"),
-                $this->equalTo(["id" => 6])
+                $this->equalTo(["id" => 10])
             )
             ->willReturn([
-                "id" => 6,
+                "id" => 10,
                 "name" => "Test Entity",
-                "related_id" => 60,
+                "related_id" => 100,
             ])
         ;
 
-        $this->createDatabase(TestRelatedEntity::class)->expects($this->once())
+        $db = $this->createDatabase(TestRelatedEntity::class);
+
+        $db->expects($this->once())
             ->method("selectFirst")
             ->with(
                 $this->equalTo("SELECT *
 FROM related_test_entities
 WHERE id = :id
 LIMIT 1;"),
-                $this->equalTo(["id" => 60])
+                $this->equalTo(["id" => 100])
             )
             ->willReturn([
-                "id" => 60,
+                "id" => 100,
                 "name" => "Related Entity",
+                "parent_id" => 10,
             ])
         ;
 
-        $request = $this->createRequest(queryParams: ["include" => "related,child,children"], attributes: ["route_params" => ["id" => 6]]);
+        $db->expects($this->exactly(2))
+            ->method("selectAll")
+            ->with(
+                $this->equalTo("SELECT *
+FROM related_test_entities
+WHERE parent_id = :parent_id
+ORDER BY id ASC;"),
+                $this->equalTo(["parent_id" => 10])
+            )
+            ->willReturn([
+                [
+                    "id" => 100,
+                    "name" => "Child 1",
+                    "description" => "First child",
+                    "parent_id" => 10,
+                ],
+                [
+                    "id" => 101,
+                    "name" => "Child 2",
+                    "description" => "Second child",
+                    "parent_id" => 10,
+                ],
+            ])
+        ;
+
+        $request = $this->createRequest(
+            queryParams: ["include" => "related,child,children"],
+            attributes: ["route_params" => ["id" => 10]]
+        );
 
         $service = new TestCrudService(TestEntity::class);
         $result = $service->read($request);
 
-        $this->assertInstanceOf(TestEntity::class, $result);
-        $this->assertSame(6, $result->getId());
-
         $this->assertTrue(isset($result->related));
-        $this->assertInstanceOf(TestRelatedEntity::class, $result->related);
-        $this->assertSame(60, $result->related->getId());
+        $this->assertSame(TestRelatedEntity::class, $result->related::class);
+        $this->assertSame(100, $result->related->getId());
+
+        $this->assertTrue(isset($result->child));
+        $this->assertSame(TestRelatedEntity::class, $result->child::class);
+        $this->assertSame(100, $result->child->getId());
+
+        $this->assertTrue(isset($result->children));
+        $this->assertSame(Collection::class, $result->children::class);
+        $this->assertSame(2, count($result->children));
+        $this->assertSame(TestRelatedEntity::class, $result->children[0]::class);
     }
 }

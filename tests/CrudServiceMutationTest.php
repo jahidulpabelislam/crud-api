@@ -50,7 +50,7 @@ final class CrudServiceMutationTest extends AbstractCrudServiceTestCase {
         $service = new TestCrudService(TestEntity::class);
         $entity = $service->create($request);
 
-        $this->assertInstanceOf(TestEntity::class, $entity);
+        $this->assertSame(TestEntity::class, $entity::class);
         $this->assertSame("Test Entity", $entity->name);
     }
 
@@ -155,7 +155,7 @@ final class CrudServiceMutationTest extends AbstractCrudServiceTestCase {
         $service = new TestCrudService(TestEntity::class);
         $entity = $service->update($request);
 
-        $this->assertInstanceOf(TestEntity::class, $entity);
+        $this->assertSame(TestEntity::class, $entity::class);
         $this->assertSame("New Name", $entity->name);
     }
 
@@ -192,7 +192,7 @@ final class CrudServiceMutationTest extends AbstractCrudServiceTestCase {
         $service = new TestCrudService(TestEntity::class);
         $entity = $service->update($request);
 
-        $this->assertInstanceOf(TestEntity::class, $entity);
+        $this->assertSame(TestEntity::class, $entity::class);
         $this->assertSame("New Description", $entity->description);
     }
 
