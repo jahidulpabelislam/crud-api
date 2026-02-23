@@ -15,6 +15,8 @@ class TestRelatedEntity extends AbstractEntity {
     protected static string $displayName = "Related Test Entity";
     protected static string $table = "related_test_entities";
 
+    protected static array $registry = [];
+
     private static ?\JPI\Database $database = null;
 
     public static function getPluralDisplayName(): string {
@@ -43,5 +45,21 @@ class TestRelatedEntity extends AbstractEntity {
             throw new \RuntimeException("Database not configured for tests");
         }
         return self::$database;
+    }
+
+    /**
+     * Try ignore registry.
+     */
+    public static function getById(int $id): ?static {
+        static::$registry = [];
+        return parent::getById($id);
+    }
+
+    /**
+     * Try ignore registry.
+     */
+    public static function loadFromDatabaseRow(array $row): static {
+        static::$registry = [];
+        return parent::loadFromDatabaseRow($row);
     }
 }

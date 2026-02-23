@@ -332,7 +332,6 @@ final class ResponderTest extends TestCase {
     public function testEntityWithBelongsTo(): void {
         $entity = $this->createEntity(2, "Main Entity");
         $entity->related = $this->createEntity(20, "Related Entity Name", TestRelatedEntity::class);
-        $entity->related->parent = null;
 
         $response = $this->controller->getEntityResponse($this->request, $entity, 2);
         $body = json_decode($response->getBody(), true);
