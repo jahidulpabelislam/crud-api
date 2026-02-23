@@ -26,6 +26,8 @@ class TestEntity extends AbstractEntity implements SearchableInterface, Filterab
     protected static array $filterableColumns = ["status", "category"];
     protected static array $sortableColumns = ["id", "name", "created_at", "status"];
 
+    protected static array $registry = [];
+
     private static ?\JPI\Database $database = null;
 
     public static function getPluralDisplayName(): string {
@@ -81,13 +83,16 @@ class TestEntity extends AbstractEntity implements SearchableInterface, Filterab
     /**
      * Try ignore registry.
      */
+    public static function getById(int $id): ?static {
+        static::$registry = [];
+        return parent::getById($id);
+    }
+
+    /**
+     * Try ignore registry.
+     */
     public static function loadFromDatabaseRow(array $row): static {
-        $freshEntity = static::factory($row);
-        $entity = parent::loadFromDatabaseRow($row);
-
-        $entity->data = $freshEntity->data;
-        $entity->setValues($row, true);
-
-        return $entity;
+        static::$registry = [];
+        return parent::loadFromDatabaseRow($row);
     }
 }
