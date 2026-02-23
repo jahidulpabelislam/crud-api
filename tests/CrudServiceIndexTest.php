@@ -254,9 +254,9 @@ LIMIT 10;"),
     }
 
     /**
-     * Test index response format when including a belongs_to relationship.
+     * Test response format when including a belongs_to relationship.
      */
-    public function testIndexWithBelongsTo(): void {
+    public function testWithBelongsTo(): void {
         $this->createDatabase()
             ->expects($this->once())
             ->method("selectAll")
@@ -317,9 +317,9 @@ FROM test_entities"),
     }
 
     /**
-     * Test index response format when including a has_one relationship.
+     * Test response format when including a has_one relationship.
      */
-    public function testIndexWithHasOne(): void {
+    public function testWithHasOne(): void {
         $this->createDatabase()
             ->expects($this->once())
             ->method("selectAll")
@@ -378,9 +378,9 @@ FROM test_entities"),
     }
 
     /**
-     * Test index response format when including a has_many relationship.
+     * Test response format when including a has_many relationship.
      */
-    public function testIndexWithHasMany(): void {
+    public function testWithHasMany(): void {
         $database = $this->createDatabase();
 
         $database->expects($this->once())
