@@ -37,8 +37,6 @@ LIMIT 3;"),
             ->willReturn([])
         ;
 
-        $database->method("selectFirst")->willReturn(["count" => 20]);
-
         $request = $this->createRequest(queryParams: [
             "limit" => 3,
         ]);
@@ -62,7 +60,10 @@ LIMIT 10 OFFSET 20;"),
             ->willReturn([])
         ;
 
-        $database->method("selectFirst")->willReturn(["count" => 20]);
+        $database->expects($this->once())
+            ->method("selectFirst")
+            ->willReturn(["count" => 20])
+        ;
 
         $request = $this->createRequest(queryParams: [
             "page" => 3,
@@ -73,7 +74,8 @@ LIMIT 10 OFFSET 20;"),
     }
 
     public function testFiltering(): void {
-        $this->createDatabase()->expects($this->once())
+        $this->createDatabase()
+            ->expects($this->once())
             ->method("selectAll")
             ->with(
                 $this->equalTo("SELECT *
@@ -102,7 +104,8 @@ LIMIT 10;"),
     }
 
     public function testSearching(): void {
-        $this->createDatabase()->expects($this->once())
+        $this->createDatabase()
+            ->expects($this->once())
             ->method("selectAll")
             ->with(
                 $this->equalTo("SELECT *
@@ -127,7 +130,8 @@ LIMIT 10;"),
     }
 
     public function testSorting(): void {
-        $this->createDatabase()->expects($this->once())
+        $this->createDatabase()
+            ->expects($this->once())
             ->method("selectAll")
             ->with(
                 $this->equalTo("SELECT *
@@ -148,7 +152,8 @@ LIMIT 10;"),
     }
 
     public function testFiltersWithSearch(): void {
-        $this->createDatabase()->expects($this->once())
+        $this->createDatabase()
+            ->expects($this->once())
             ->method("selectAll")
             ->with(
                 $this->equalTo("SELECT *
@@ -197,7 +202,10 @@ LIMIT 10 OFFSET 10;"),
             ->willReturn([])
         ;
 
-        $database->method("selectFirst")->willReturn(["count" => 20]);
+        $database->expects($this->once())
+            ->method("selectFirst")
+            ->willReturn(["count" => 20])
+        ;
 
         $request = $this->createRequest(queryParams: [
             "filters" => [
@@ -247,15 +255,10 @@ LIMIT 10;"),
             ->willReturn([])
         ;
 
-        $database->method("selectFirst")->willReturn(["count" => 20]);
-
         $service = new TestCrudService(TestEntity::class);
         $service->index($this->createRequest(queryParams: $queryParams));
     }
 
-    /**
-     * Test response format when including a belongs_to relationship.
-     */
     public function testWithBelongsTo(): void {
         $this->createDatabase()
             ->expects($this->once())
@@ -290,6 +293,7 @@ FROM test_entities"),
         ;
 
         $this->createDatabase(TestRelatedEntity::class)
+            ->expects($this->once())
             ->method("selectAll")
             ->willReturn(
                 [
@@ -316,9 +320,6 @@ FROM test_entities"),
         $this->assertSame("Related 2", $entities[1]->related->name);
     }
 
-    /**
-     * Test response format when including a has_one relationship.
-     */
     public function testWithHasOne(): void {
         $this->createDatabase()
             ->expects($this->once())
@@ -351,6 +352,7 @@ FROM test_entities"),
         ;
 
         $this->createDatabase(TestRelatedEntity::class)
+            ->expects($this->once())
             ->method("selectAll")
             ->willReturn(
                 [
@@ -377,9 +379,6 @@ FROM test_entities"),
         $this->assertSame("Child 2", $entities[1]->child->name);
     }
 
-    /**
-     * Test response format when including a has_many relationship.
-     */
     public function testWithHasMany(): void {
         $database = $this->createDatabase();
 
@@ -412,9 +411,8 @@ FROM test_entities"),
             ])
         ;
 
-        $database->method("selectFirst")->willReturn(["count" => 2]);
-
         $this->createDatabase(TestRelatedEntity::class)
+            ->expects($this->once())
             ->method("selectAll")
             ->willReturn(
                 [

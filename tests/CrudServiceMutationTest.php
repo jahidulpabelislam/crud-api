@@ -7,7 +7,6 @@ namespace JPI\CRUD\API\Tests;
 use JPI\CRUD\API\Entity\InvalidDataException;
 use JPI\CRUD\API\Tests\Fixtures\TestCrudService;
 use JPI\CRUD\API\Tests\Fixtures\TestEntity;
-use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 
 /**
  * Test CrudService create and update operations
@@ -22,16 +21,22 @@ use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
  */
 final class CrudServiceMutationTest extends AbstractCrudServiceTestCase {
 
-    #[AllowMockObjectsWithoutExpectations]
     public function testCreateSuccess(): void {
         $database = $this->createDatabase();
 
         // Mock insert operation
-        $database->method("exec")->willReturn(1);
-        $database->method("getLastInsertedId")->willReturn(1);
+        $database->expects($this->once())
+            ->method("exec")
+            ->willReturn(1)
+        ;
+        $database->expects($this->once())
+            ->method("getLastInsertedId")
+            ->willReturn(1)
+        ;
 
         // Mock reload operation
-        $database->method("selectFirst")
+        $database->expects($this->once())
+            ->method("selectFirst")
             ->willReturn([
                 "id" => 1,
                 "name" => "Test Entity",
@@ -66,7 +71,8 @@ final class CrudServiceMutationTest extends AbstractCrudServiceTestCase {
         try {
             $service->create($request);
             $this->fail("Expected InvalidDataException to be thrown");
-        } catch (InvalidDataException $e) {
+        }
+        catch (InvalidDataException $e) {
             $this->assertSame(
                 [
                     "name" => "`name` is required.",
@@ -89,7 +95,8 @@ final class CrudServiceMutationTest extends AbstractCrudServiceTestCase {
         try {
             $service->create($request);
             $this->fail("Expected InvalidDataException to be thrown");
-        } catch (InvalidDataException $e) {
+        }
+        catch (InvalidDataException $e) {
             $this->assertSame(
                 [
                     "name" => "`name` cannot be empty.",
@@ -112,7 +119,8 @@ final class CrudServiceMutationTest extends AbstractCrudServiceTestCase {
         try {
             $service->create($request);
             $this->fail("Expected InvalidDataException was not thrown");
-        } catch (InvalidDataException $e) {
+        }
+        catch (InvalidDataException $e) {
             $this->assertSame(
                 [
                     "age" => "`age` must be an integer or null.",
@@ -124,12 +132,13 @@ final class CrudServiceMutationTest extends AbstractCrudServiceTestCase {
         }
     }
 
-    #[AllowMockObjectsWithoutExpectations]
     public function testUpdateSuccess(): void {
         $database = $this->createDatabase();
 
         // Mock getById to return existing entity
-        $database->method("selectFirst")
+        $database
+            ->expects($this->exactly(2))
+            ->method("selectFirst")
             ->willReturnOnConsecutiveCalls(
                 [
                     "id" => 2,
@@ -145,7 +154,10 @@ final class CrudServiceMutationTest extends AbstractCrudServiceTestCase {
         ;
 
         // Mock update operation
-        $database->method("exec")->willReturn(1);
+        $database->expects($this->once())
+            ->method("exec")
+            ->willReturn(1)
+        ;
 
         $request = $this->createRequest(
             body: [
@@ -162,12 +174,12 @@ final class CrudServiceMutationTest extends AbstractCrudServiceTestCase {
         $this->assertSame("New Name", $entity->name);
     }
 
-    #[AllowMockObjectsWithoutExpectations]
     public function testUpdateWithMissingRequiredFields(): void {
         $database = $this->createDatabase();
 
         // Mock getById to return existing entity with name already set
-        $database->method("selectFirst")
+        $database->expects($this->exactly(2))
+            ->method("selectFirst")
             ->willReturnOnConsecutiveCalls(
                 [
                     "id" => 3,
@@ -183,7 +195,10 @@ final class CrudServiceMutationTest extends AbstractCrudServiceTestCase {
         ;
 
         // Mock update operation
-        $database->method("exec")->willReturn(1);
+        $database->expects($this->once())
+            ->method("exec")
+            ->willReturn(1)
+        ;
 
         $request = $this->createRequest(
             body: [
@@ -200,10 +215,11 @@ final class CrudServiceMutationTest extends AbstractCrudServiceTestCase {
         $this->assertSame("New Description", $entity->description);
     }
 
-    #[AllowMockObjectsWithoutExpectations]
     public function testUpdateWithEmptyRequiredFields(): void {
         // Mock getById to return existing entity
-        $this->createDatabase()->method("selectFirst")
+        $this->createDatabase()
+            ->expects($this->once())
+            ->method("selectFirst")
             ->willReturn([
                 "id" => 4,
                 "name" => "Existing Name",
@@ -224,7 +240,8 @@ final class CrudServiceMutationTest extends AbstractCrudServiceTestCase {
         try {
             $service->update($request);
             $this->fail("Expected InvalidDataException to be thrown");
-        } catch (InvalidDataException $e) {
+        }
+        catch (InvalidDataException $e) {
             $this->assertSame(
                 [
                     "name" => "`name` cannot be empty.",
@@ -235,10 +252,11 @@ final class CrudServiceMutationTest extends AbstractCrudServiceTestCase {
         }
     }
 
-    #[AllowMockObjectsWithoutExpectations]
     public function testUpdateWithInvalidValues(): void {
         // Mock getById to return existing entity
-        $this->createDatabase()->method("selectFirst")
+        $this->createDatabase()
+            ->expects($this->once())
+            ->method("selectFirst")
             ->willReturn([
                 "id" => 5,
                 "name" => "Existing Name",
@@ -259,7 +277,8 @@ final class CrudServiceMutationTest extends AbstractCrudServiceTestCase {
         try {
             $service->update($request);
             $this->fail("Expected InvalidDataException to be thrown");
-        } catch (InvalidDataException $e) {
+        }
+        catch (InvalidDataException $e) {
             $this->assertSame(
                 [
                     "age" => "`age` must be an integer or null.",
