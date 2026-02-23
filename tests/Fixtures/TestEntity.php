@@ -77,4 +77,17 @@ class TestEntity extends AbstractEntity implements SearchableInterface, Filterab
         }
         return self::$database;
     }
+
+    /**
+     * Try ignore registry.
+     */
+    public static function loadFromDatabaseRow(array $row): static {
+        $freshEntity = static::factory($row);
+        $entity = parent::loadFromDatabaseRow($row);
+
+        $entity->data = $freshEntity->data;
+        $entity->setValues($row, true);
+
+        return $entity;
+    }
 }

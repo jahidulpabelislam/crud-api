@@ -6,6 +6,7 @@ namespace JPI\CRUD\API\Tests;
 
 use JPI\CRUD\API\Tests\Fixtures\TestCrudService;
 use JPI\CRUD\API\Tests\Fixtures\TestEntity;
+use JPI\CRUD\API\Tests\Fixtures\TestRelatedEntity;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
@@ -256,9 +257,8 @@ LIMIT 10;"),
      * Test index response format when including a belongs_to relationship.
      */
     public function testIndexWithBelongsTo(): void {
-        $database = $this->createDatabase();
-
-        $database->expects($this->once())
+        $this->createDatabase()
+            ->expects($this->once())
             ->method("selectAll")
             ->with(
                 $this->stringContains("SELECT *
@@ -289,11 +289,13 @@ FROM test_entities"),
             ])
         ;
 
-        $database->method("selectFirst")
-            ->willReturnOnConsecutiveCalls(
-                ["count" => 2],
-                ["id" => 10, "name" => "Related 1", "description" => null],
-                ["id" => 11, "name" => "Related 2", "description" => null]
+        $this->createDatabase(TestRelatedEntity::class)
+            ->method("selectAll")
+            ->willReturn(
+                [
+                    ["id" => 10, "name" => "Related 1", "description" => null],
+                    ["id" => 11, "name" => "Related 2", "description" => null],
+                ]
             )
         ;
 
@@ -318,9 +320,8 @@ FROM test_entities"),
      * Test index response format when including a has_one relationship.
      */
     public function testIndexWithHasOne(): void {
-        $database = $this->createDatabase();
-
-        $database->expects($this->once())
+        $this->createDatabase()
+            ->expects($this->once())
             ->method("selectAll")
             ->with(
                 $this->stringContains("SELECT *
@@ -349,11 +350,13 @@ FROM test_entities"),
             ])
         ;
 
-        $database->method("selectFirst")
-            ->willReturnOnConsecutiveCalls(
-                ["count" => 2],
-                ["id" => 20, "name" => "Child 1", "description" => null, "parent_id" => 1],
-                ["id" => 21, "name" => "Child 2", "description" => null, "parent_id" => 2]
+        $this->createDatabase(TestRelatedEntity::class)
+            ->method("selectAll")
+            ->willReturn(
+                [
+                    ["id" => 20, "name" => "Child 1", "description" => null, "parent_id" => 1],
+                    ["id" => 21, "name" => "Child 2", "description" => null, "parent_id" => 2],
+                ]
             )
         ;
 
@@ -411,19 +414,14 @@ FROM test_entities"),
 
         $database->method("selectFirst")->willReturn(["count" => 2]);
 
-        $database->method("selectAll")
-            ->willReturnOnConsecutiveCalls(
-                // Main query already handled by expects above
-                null,
-                // Children for entity 1
+        $this->createDatabase(TestRelatedEntity::class)
+            ->method("selectAll")
+            ->willReturn(
                 [
                     ["id" => 30, "name" => "Child 1a", "description" => null, "parent_id" => 1],
                     ["id" => 31, "name" => "Child 1b", "description" => null, "parent_id" => 1],
-                ],
-                // Children for entity 2
-                [
                     ["id" => 32, "name" => "Child 2a", "description" => null, "parent_id" => 2],
-                ]
+                ],
             )
         ;
 
