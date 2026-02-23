@@ -60,11 +60,11 @@ LIMIT 1;"),
         );
 
         $service = new TestCrudService(TestEntity::class);
-        $result = $service->read($request);
+        $entity = $service->read($request);
 
-        $this->assertTrue(isset($result->related));
-        $this->assertSame(TestRelatedEntity::class, $result->related::class);
-        $this->assertSame(70, $result->related->getId());
+        $this->assertTrue(isset($entity->related));
+        $this->assertSame(TestRelatedEntity::class, $entity->related::class);
+        $this->assertSame(70, $entity->related->getId());
     }
 
     public function testIncludeHasOne(): void {
@@ -108,11 +108,11 @@ ORDER BY id ASC;"),
         );
 
         $service = new TestCrudService(TestEntity::class);
-        $result = $service->read($request);
+        $entity = $service->read($request);
 
-        $this->assertTrue(isset($result->child));
-        $this->assertSame(TestRelatedEntity::class, $result->child::class);
-        $this->assertSame(80, $result->child->getId());
+        $this->assertTrue(isset($entity->child));
+        $this->assertSame(TestRelatedEntity::class, $entity->child::class);
+        $this->assertSame(80, $entity->child->getId());
     }
 
     public function testIncludeHasMany(): void {
@@ -164,12 +164,12 @@ ORDER BY id ASC;"),
         );
 
         $service = new TestCrudService(TestEntity::class);
-        $result = $service->read($request);
+        $entity = $service->read($request);
 
-        $this->assertTrue(isset($result->children));
-        $this->assertSame(Collection::class, $result->children::class);
-        $this->assertSame(2, count($result->children));
-        $this->assertSame(TestRelatedEntity::class, $result->children[0]::class);
+        $this->assertTrue(isset($entity->children));
+        $this->assertSame(Collection::class, $entity->children::class);
+        $this->assertSame(2, count($entity->children));
+        $this->assertSame(TestRelatedEntity::class, $entity->children[0]::class);
     }
 
     public function testMultipleInclude(): void {
@@ -239,19 +239,19 @@ ORDER BY id ASC;"),
         );
 
         $service = new TestCrudService(TestEntity::class);
-        $result = $service->read($request);
+        $entity = $service->read($request);
 
-        $this->assertTrue(isset($result->related));
-        $this->assertSame(TestRelatedEntity::class, $result->related::class);
-        $this->assertSame(100, $result->related->getId());
+        $this->assertTrue(isset($entity->related));
+        $this->assertSame(TestRelatedEntity::class, $entity->related::class);
+        $this->assertSame(100, $entity->related->getId());
 
-        $this->assertTrue(isset($result->child));
-        $this->assertSame(TestRelatedEntity::class, $result->child::class);
-        $this->assertSame(101, $result->child->getId());
+        $this->assertTrue(isset($entity->child));
+        $this->assertSame(TestRelatedEntity::class, $entity->child::class);
+        $this->assertSame(101, $entity->child->getId());
 
-        $this->assertTrue(isset($result->children));
-        $this->assertSame(Collection::class, $result->children::class);
-        $this->assertSame(2, count($result->children));
-        $this->assertSame(TestRelatedEntity::class, $result->children[0]::class);
+        $this->assertTrue(isset($entity->children));
+        $this->assertSame(Collection::class, $entity->children::class);
+        $this->assertSame(2, count($entity->children));
+        $this->assertSame(TestRelatedEntity::class, $entity->children[0]::class);
     }
 }
