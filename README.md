@@ -16,6 +16,7 @@ A lightweight PHP framework for building RESTful CRUD APIs with built-in support
 - **Search & Filtering**: Flexible search and filter functionality for listing endpoints
 - **Sorting**: Sort results by multiple columns in ascending or descending order
 - **Field Selection**: Choose which fields to return in API responses to reduce payload size
+- **Relationship Inclusion**: Eager load related entities to avoid N+1 query problems
 - **Authentication**: Built-in authentication checks for protected endpoints
 - **JSON Responses**: Standardised JSON response format with HATEOAS links
 - **Validation**: Comprehensive data validation with detailed error messages
@@ -274,6 +275,40 @@ GET /projects/?fields=name,created_at
     "data": {
         "id": 1,
         "name": "Example Project",
+        "created_at": "2024-01-15 10:30:00 UTC"
+    },
+    "_links": {
+        "self": "https://api.example.com/projects/1/"
+    }
+}
+```
+
+### Including Relationships
+
+You can include related entities in API responses using the `include` query parameter. This uses eager loading to avoid N+1 query problems and efficiently load all relationships in a single or minimal number of queries.
+
+Use comma-separated relationship names that match the property names defined in your entity's data mapping:
+
+```
+GET /projects/1/?include=author,category
+GET /projects/?include=author,comments
+```
+
+**Example:** If your `Project` entity has an `author` relationship (defined as a `belongs_to` in the ORM), you can include it:
+
+```json
+{
+    "data": {
+        "id": 1,
+        "name": "Example Project",
+        "description": "A sample project",
+        "author": {
+            "id": 5,
+            "name": "John Doe",
+            "_links": {
+                "self": "https://api.example.com/users/5/"
+            }
+        },
         "created_at": "2024-01-15 10:30:00 UTC"
     },
     "_links": {

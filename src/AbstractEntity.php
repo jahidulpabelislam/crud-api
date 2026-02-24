@@ -62,12 +62,16 @@ abstract class AbstractEntity extends BaseEntity {
         ];
 
         $mapping = static::getDataMapping();
+        $relationTypes = static::getRelationTypes();
 
         $fields = $request->getAttribute("fields");
         $fields = $fields ? array_intersect(array_keys($mapping), $fields) : null;
 
         foreach ($this->data as $key => $value) {
-            if (!array_key_exists("value", $value) || ($fields && !in_array($key, $fields))) {
+            if (
+                !array_key_exists("value", $value)
+                || ($fields && !in_array($key, $fields) && !in_array($mapping[$key]["type"], $relationTypes))
+            ) {
                 continue;
             }
 
@@ -78,7 +82,9 @@ abstract class AbstractEntity extends BaseEntity {
                     continue;
                 }
 
-                $value = $value->getAPIResponse($request, $this);
+                $entity = $value;
+                $value = $entity->getAPIResponse($request, $this);
+                $value["_links"] = $entity->getAPILinks($request);
             }
             else if ($value instanceof EntityCollection) {
                 if ($parentEntity && $mapping[$key]["entity"] === $parentEntity::class) {

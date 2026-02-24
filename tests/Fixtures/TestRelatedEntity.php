@@ -1,0 +1,34 @@
+<?php
+
+declare(strict_types=1);
+
+namespace JPI\CRUD\API\Tests\Fixtures;
+
+/**
+ * A related test entity for testing relationship functionality.
+ * This can represent related entities like authors, categories, etc.
+ */
+class TestRelatedEntity extends AbstractEntity {
+
+    protected static string $displayName = "Related Test Entity";
+    protected static string $table = "related_test_entities";
+
+    protected static ?\JPI\Database $database = null;
+
+    public static function getPluralDisplayName(): string {
+        return "Related Test Entities";
+    }
+
+    protected static array $dataMapping = [
+        "name" => [
+            "type" => "string",
+        ],
+        "description" => [
+            "type" => "string",
+        ],
+        "parent" => [
+            "type" => "belongs_to",
+            "entity" => TestEntity::class,
+        ],
+    ];
+}

@@ -37,15 +37,36 @@ class CrudService {
         return new $this->entityClass();
     }
 
+    /**
+     * Parse and return relationships to eager load from the request's include parameter.
+     *
+     * @return string[]
+     */
+    private function getRelationsFromRequest(Request $request): array {
+        $include = $request->getQueryParam("include");
+        if (!is_string($include) || empty($include)) {
+            return [];
+        }
+
+        return array_filter(array_map("trim", explode(",", $include)));
+    }
+
     public function getEntityFromRequest(Request $request): ?AbstractEntity {
         $id = $request->getAttribute("route_params")["id"];
         if (!is_numeric($id)) {
             return null;
         }
 
-        return $this->getEntityInstance()
-            ->getById((int)$request->getAttribute("route_params")["id"])
-        ;
+        $relations = $this->getRelationsFromRequest($request);
+        if (!empty($relations)) {
+            // Use query builder with eager loading when relationships are requested
+            return $this->getEntityInstance()::newQuery()
+                ->where("id", "=", (int)$id)
+                ->with(...$relations)
+                ->select();
+        }
+
+        return $this->getEntityInstance()->getById((int)$id);
     }
 
     /**
@@ -80,6 +101,11 @@ class CrudService {
                 $sort = array_filter(array_map("trim", explode(",", $sort)));
                 $entity::addSortToQuery($query, $sort);
             }
+        }
+
+        $relations = $this->getRelationsFromRequest($request);
+        if (!empty($relations)) {
+            $query->with(...$relations);
         }
 
         if ($this->perPage === null) {
