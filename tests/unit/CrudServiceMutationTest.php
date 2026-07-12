@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace JPI\CRUD\API\Tests;
+namespace JPI\CRUD\API\Tests\Unit;
 
 use JPI\CRUD\API\Entity\InvalidDataException;
 use JPI\CRUD\API\Tests\Fixtures\TestCrudService;

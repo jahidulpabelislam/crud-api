@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace JPI\CRUD\API\Tests;
+namespace JPI\CRUD\API\Tests\Unit;
 
 use JPI\CRUD\API\Tests\Fixtures\TestController;
 use JPI\HTTP\Input;
