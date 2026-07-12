@@ -33,7 +33,8 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "JPI\\CRUD\\API\\Tests\\": "tests/"
+            "JPI\\CRUD\\API\\Tests\\Fixtures\\": "tests/fixtures",
+            "JPI\\CRUD\\API\\Tests\\Unit\\": "tests/unit"
         }
     },
     "scripts": {
