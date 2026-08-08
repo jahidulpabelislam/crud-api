@@ -29,10 +29,10 @@ class Router extends BaseRouter {
     public function addCRUDRoutes(string $basePath, string $controller, ?string $name = null): void {
         $basePath = trim($basePath, "/");
 
-        $this->addRoute("/$basePath/", "GET", "$controller::index");
-        $this->addRoute("/$basePath/", "POST", "$controller::create");
-        $this->addRoute("/$basePath/{id}/", "GET", "$controller::read", $name);
-        $this->addRoute("/$basePath/{id}/", "PUT", "$controller::update");
-        $this->addRoute("/$basePath/{id}/", "DELETE", "$controller::delete");
+        $this->addRoute("/$basePath/", "GET", [new AuthenticationDecoratedController($controller, "index"), "passthrough"]);
+        $this->addRoute("/$basePath/", "POST", [new AuthenticationDecoratedController($controller, "create"), "passthrough"]);
+        $this->addRoute("/$basePath/{id}/", "GET", [new AuthenticationDecoratedController($controller, "read"), "passthrough"], $name);
+        $this->addRoute("/$basePath/{id}/", "PUT", [new AuthenticationDecoratedController($controller, "update"), "passthrough"]);
+        $this->addRoute("/$basePath/{id}/", "DELETE", [new AuthenticationDecoratedController($controller, "delete"), "passthrough"]);
     }
 }

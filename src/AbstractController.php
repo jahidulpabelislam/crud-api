@@ -48,12 +48,6 @@ abstract class AbstractController {
         return new $this->entityClass();
     }
 
-    public function getNotAuthorisedResponse(): Response {
-        return Response::json(401, [
-            "message" => "You need to be logged in!",
-        ]);
-    }
-
     public function getInvalidInputResponse(array $errors): Response {
         return Response::json(400, [
             "message" => "The necessary data was not provided and/or invalid.",
@@ -83,13 +77,6 @@ abstract class AbstractController {
     public function index(): Response {
         $request = $this->getRequest();
 
-        if (
-            !in_array("index", $this->getPublicActions())
-            && !$request->getAttribute("is_authenticated")
-        ) {
-            return $this->getNotAuthorisedResponse();
-        }
-
         $this->parseFieldsAttribute();
 
         $entities = $this->getEntityInstance()::getCrudService()->index($request);
@@ -104,13 +91,6 @@ abstract class AbstractController {
     public function create(): Response {
         $request = $this->getRequest();
 
-        if (
-            !in_array("create", $this->getPublicActions())
-            && !$request->getAttribute("is_authenticated")
-        ) {
-            return $this->getNotAuthorisedResponse();
-        }
-
         try {
             $entity = $this->getEntityInstance()::getCrudService()->create($request);
         }
@@ -124,13 +104,6 @@ abstract class AbstractController {
     public function read(int|string|null $id): Response {
         $request = $this->getRequest();
 
-        if (
-            !in_array("read", $this->getPublicActions())
-            && !$request->getAttribute("is_authenticated")
-        ) {
-            return $this->getNotAuthorisedResponse();
-        }
-
         $this->parseFieldsAttribute();
 
         $entity = $this->getEntityInstance()::getCrudService()->read($request);
@@ -139,13 +112,6 @@ abstract class AbstractController {
 
     public function update(int|string|null $id): Response {
         $request = $this->getRequest();
-
-        if (
-            !in_array("update", $this->getPublicActions())
-            && !$request->getAttribute("is_authenticated")
-        ) {
-            return $this->getNotAuthorisedResponse();
-        }
 
         try {
             $entity = $this->getEntityInstance()::getCrudService()->update($request);
@@ -159,14 +125,6 @@ abstract class AbstractController {
 
     public function delete(int|string|null $id): Response {
         $request = $this->getRequest();
-
-        if (
-            !in_array("delete", $this->getPublicActions())
-            && !$request->getAttribute("is_authenticated")
-        ) {
-            return $this->getNotAuthorisedResponse();
-        }
-
         $entity = $this->getEntityInstance()::getCrudService()->delete($request);
         return $this->getEntityDeleteResponse($request, $entity, $id);
     }
